@@ -1,8 +1,8 @@
-# AM web server
+# Web application server
 
 ## Description
 
-This is a sever side of AM client-server application.
+This is a sever side of web client-server application.
 To run client side, you need to run one of client projects:
 
 - am_web_client_js

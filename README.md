@@ -5,8 +5,9 @@
 This is a sever side of web client-server application.
 To run client side, you need to run one of client projects:
 
-- am_web_client_js
-- am_web_client_react
+- [web_app_client_pure_js](https://github.com/Pioryd/web_app_client_pure_js)
+- [web_app_client_pure_react](https://github.com/Pioryd/web_app_client_pure_react)
+- [web_app_client_react_gl](https://github.com/Pioryd/web_app_client_react_gl)
 
 ## How to run
 

@@ -1,14 +1,12 @@
 {
-  "name": "am_forms_web_gui",
+  "name": "am_web_server_node",
   "version": "0.0.1",
-  "description": "Artificial mind forms web gui",
-  "main": "am.js",
+  "description": "AM web server node",
   "engines": {
     "node": ">=6"
   },
   "author": "Piotr Rydwański",
   "dependencies": {
-    "mineflayer": "^2.9.5",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
@@ -21,11 +19,11 @@
   },
   "directories": {
     "lib": "lib",
-    "web": "web",
-    "module": "module"
+    "module": "modules"
   },
   "scripts": {
-    "test": "mocha lib/**/*.js"
+    "test": "mocha lib/**/*.js",
+    "start": "node main.js"
   },
   "repository": {
     "type": "git",

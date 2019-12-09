@@ -1,8 +1,8 @@
 [
   {
     "name": "Bot",
-    "x": 256,
-    "y": 234,
+    "x": 373,
+    "y": 260,
     "radius": 30,
     "description": "This is bot",
     "type": "actor",
@@ -16,15 +16,6 @@
     "description": "very long description\ncraftsman profession",
     "type": "mechanical",
     "color": "#03fc1333"
-  },
-  {
-    "name": "dance",
-    "x": 203,
-    "y": 204,
-    "radius": 30,
-    "description": "very long description\ndance",
-    "type": "dynamic",
-    "color": "#ffab0333"
   },
   {
     "name": "eat apple",

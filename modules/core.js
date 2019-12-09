@@ -1,4 +1,4 @@
-const lib_web_server = require("../web/server.js");
+const lib_web_server = require("../lib/server.js");
 const lib_util = require("../lib/util.js");
 
 /**
@@ -44,10 +44,6 @@ class UI_Server {
           `Error: Unable to add form: "${packet.form.name}". ` +
           `Do not contains correct values.`;
 
-        // Add opacity to colors
-        packet.form.background_color =
-          packet.form.background_color.substring(0, 7) + "33";
-
         packet.form.x = parseInt(packet.form.x);
         packet.form.y = parseInt(packet.form.y);
         packet.form.radius = parseInt(packet.form.radius);
@@ -62,9 +58,7 @@ class UI_Server {
           packet.form.name !== "" &&
           packet.form.x !== "" &&
           packet.form.y !== "" &&
-          packet.form.radius !== "" &&
-          packet.form.background_color !== "" &&
-          packet.form.background_color.includes("#")
+          packet.form.radius !== ""
         ) {
           data.log = `Added new form: "${packet.form.name}".`;
           this.world.forms[packet.form.name] = packet.form;

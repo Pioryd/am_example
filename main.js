@@ -1,4 +1,4 @@
-const lib_module = require("./module/module.js");
+const lib_module = require("./modules/core.js");
 const lib_util = require("./lib/util.js");
 
 const Application = require("./lib/application.js").Application;

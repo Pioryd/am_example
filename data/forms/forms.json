@@ -1,8 +1,8 @@
 [
   {
     "name": "Bot",
-    "x": 373,
-    "y": 260,
+    "x": 235,
+    "y": 215,
     "radius": 30,
     "description": "This is bot",
     "type": "actor",

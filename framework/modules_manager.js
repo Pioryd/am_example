@@ -1,12 +1,18 @@
 const fw_util = require("./util.js");
 
 class ModulesManager {
-  constructor({ event_emiter, modules_directory, events_list }) {
+  constructor({
+    event_emiter,
+    modules_directory,
+    events_list,
+    disabled_modules
+  }) {
     this.event_emiter = event_emiter;
     this.events_list = events_list;
     this.modules_directory = modules_directory;
     this.modules_list = {};
     this.event_module_bounds = {};
+    this.disabled_modules = disabled_modules;
   }
 
   add_event(event_name, module_name) {
@@ -52,6 +58,8 @@ class ModulesManager {
     let modules_names = fw_util.get_directories(this.modules_directory);
 
     for (const module_name of modules_names) {
+      if (this.disabled_modules.includes(module_name)) continue;
+
       const path = `${this.modules_directory}/${module_name}`;
 
       if (fw_util.is_path_exist(path)) {

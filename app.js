@@ -21,7 +21,8 @@ class App extends EventEmitter {
     this.modules_manager = new fw_modules_manager.ModulesManager({
       event_emiter: this,
       modules_directory: Directories.modules_dir,
-      events_list: Events_list
+      events_list: Events_list,
+      disabled_modules: this.config.disabled_modules
     });
   }
 

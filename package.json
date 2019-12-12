@@ -23,7 +23,7 @@
   },
   "scripts": {
     "test": "mocha lib/**/*.js",
-    "start": "node main.js"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",

@@ -7,7 +7,7 @@ class Forms {
 
   on_prepare(web_server) {
     this.manager.load_forms();
-    web_server.add_parse_dict(this.manager.create_parse_dict_());
+    web_server.add_parse_dict(this.manager.create_parse_dict());
   }
 
   on_tick() {

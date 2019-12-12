@@ -1,5 +1,5 @@
 const fw_util = require("../../framework/util.js");
-const { ParsePacket } = "./parse_packet.js";
+const { ParsePacket } = require("./parse_packet");
 const data_directory = "./data/forms/forms.json";
 
 class Manager {
@@ -42,66 +42,11 @@ class Manager {
     }
   }
 
-  create_parse_dict_() {
+  create_parse_dict() {
     return {
       radar: packet => {
-        let data = null;
-        // if (packet.command in ParsePacket)
-        //   return ParsePacket[packet.command](packet, this);
-
-        switch (packet.command) {
-          case "update":
-            data = {};
-            data.command = "update";
-            data.points = [];
-            data.map_size = this.map_size;
-
-            for (const [key, value] of Object.entries(this.forms))
-              data.points.push(JSON.parse(JSON.stringify(value, null, 2)));
-
-            return data;
-          case "edit_form":
-            data = {};
-            data.command = "edit_form";
-            data.log =
-              `Error: Unable to add form: "${packet.form.name}". ` +
-              `Do not contains correct values.`;
-
-            packet.form.x = parseInt(packet.form.x);
-            packet.form.y = parseInt(packet.form.y);
-            packet.form.radius = parseInt(packet.form.radius);
-
-            if (packet.form.name in this.forms) {
-              this.forms[packet.form.name] = packet.form;
-              data.log = `Updated form: "${packet.form.name}".`;
-              return data;
-            }
-
-            if (
-              packet.form.name !== "" &&
-              packet.form.x !== "" &&
-              packet.form.y !== "" &&
-              packet.form.radius !== ""
-            ) {
-              data.log = `Added new form: "${packet.form.name}".`;
-              this.forms[packet.form.name] = packet.form;
-            }
-
-            return data;
-          case "remove_form":
-            data = {};
-            data.command = "remove_form";
-            data.log =
-              `Error: Unable to remove form: "${packet.form.name}". ` +
-              `Form NOT found.`;
-            if (packet.form.name in this.forms) {
-              delete this.forms[packet.form.name];
-
-              data.log = `Removed form: "${packet.form.name}".`;
-            }
-
-            return data;
-        }
+        if (packet.command in ParsePacket)
+          return ParsePacket[packet.command](packet, this);
       }
     };
   }

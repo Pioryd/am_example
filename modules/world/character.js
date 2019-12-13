@@ -5,12 +5,16 @@ class Character {
     this.id = id;
     this.name = "";
     this.position = { land_id: 0, object_id: 0, x: 0 };
+
     this.current_state = {};
     this.current_action = {};
     this.current_activity = {};
+
     this.states_list = ["happy", "sad", "bored"];
     this.actions_list = ["walking", "thinking", "searching"];
     this.activities_list = ["working", "cleaning", "shopping"];
+
+    this.friends_list = ["Bot_1", "Bot_2", "Bot_3"];
 
     this.update_statistics();
     setInterval(() => {

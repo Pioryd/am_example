@@ -8,15 +8,20 @@ class ParsePacket {
   }
 
   static change_position(packet, manager) {
-    for (const land of manager.lands_list)
-      if (packet.position > land.size) return;
-    if (packet.position <= 0) return;
-
-    manager.character.position.x = packet.position;
+    for (const [name, character] of Object.entries(manager.characters_map))
+      if (packet.character_id === character.id)
+        for (const land of manager.lands_list)
+          if (packet.position <= land.size && packet.position > 0)
+            manager.characters_map[character.id].position.x = packet.position;
   }
 
   static change_land(packet, manager) {
-    manager.change_character_land(packet.character_id, packet.land_id);
+    for (const [name, character] of Object.entries(manager.characters_map))
+      if (packet.character_id === character.id)
+        for (const land of manager.lands_list)
+          if (packet.land_id === land.id)
+            manager.characters_map[character.id].position.land_id =
+              packet.land_id;
   }
 }
 

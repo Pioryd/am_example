@@ -41,6 +41,15 @@ class ParsePacket {
             packet.friend_name
           );
   }
+
+  static chat_message(packet, manager) {
+    let data = {};
+    data.command = "chat_message";
+    data.message = "message received: " + packet.message;
+    data.from_character_id = packet.from_character_id;
+    data.to_character_id = packet.to_character_id;
+    return data;
+  }
 }
 
 module.exports = { ParsePacket };

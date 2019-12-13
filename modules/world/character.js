@@ -31,7 +31,9 @@ class Character {
 
   update_position() {
     // not player
-    if (this.id != 0) this.position = Util.get_random_int(1, 20);
+    if (this.id != 0)
+      if (Util.get_random_int(1, 10) > 5)
+        this.position = Util.get_random_int(1, 20);
   }
 }
 

@@ -17,8 +17,10 @@ class Land {
 
 function generate_random_land(count) {
   const lands = [];
+  // Create lands
   for (let i = 0; i < count; i++) {
     const land = new Land(i + 1);
+    // Insert environment object - house
     if (Util.get_random_int(0, 1) === 1) {
       const object_name = "house";
       land.objects_list.push(
@@ -29,7 +31,8 @@ function generate_random_land(count) {
         )
       );
     }
-    for (let k = 0; k < 3; k++)
+    // Insert environment object - tree
+    for (let k = 0; k < 3; k++) {
       if (Util.get_random_int(0, 1) === 1) {
         const object_name = "tree";
         land.objects_list.push(
@@ -40,6 +43,7 @@ function generate_random_land(count) {
           )
         );
       }
+    }
     lands.push(land);
   }
   return lands;

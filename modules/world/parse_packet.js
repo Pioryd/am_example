@@ -2,7 +2,8 @@ class ParsePacket {
   static update(packet, manager) {
     let data = {};
     data.command = "update";
-    data.character = manager.character;
+    data.characters_map = manager.characters_map;
+    data.lands_list = manager.lands_list;
     return data;
   }
 
@@ -15,12 +16,7 @@ class ParsePacket {
   }
 
   static change_land(packet, manager) {
-    for (const land of manager.lands_list) {
-      if (packet.id === land.id) {
-        manager.character.position.land_id = packet.id;
-        break;
-      }
-    }
+    manager.change_character_land(packet.character_id, packet.land_id);
   }
 }
 

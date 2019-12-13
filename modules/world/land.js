@@ -1,10 +1,48 @@
+const { Util } = require("../../framework/util.js");
+const { EnvironmentObject } = require("./environment_object");
+
+const EnvironmentObjectList = {
+  house: { id: 1, size: 3 },
+  tree: { id: 2, size: 3 }
+};
+
 class Land {
   constructor(id) {
     this.id = id;
     this.size = 20;
-    this.objects_list = {};
-    this.characters_list = [];
+    this.objects_list = [];
+    this.characters_map = [];
   }
 }
 
-module.exports = { Land };
+function generate_random_land(count) {
+  const lands = [];
+  for (let i = 0; i < count; i++) {
+    const land = new Land(i + 1);
+    if (Util.get_random_int(0, 1) === 1) {
+      const object_name = "house";
+      land.objects_list.push(
+        new EnvironmentObject(
+          EnvironmentObjectList[object_name].id,
+          object_name,
+          EnvironmentObjectList[object_name].size
+        )
+      );
+    }
+    for (let k = 0; k < 3; k++)
+      if (Util.get_random_int(0, 1) === 1) {
+        const object_name = "tree";
+        land.objects_list.push(
+          new EnvironmentObject(
+            EnvironmentObjectList[object_name].id,
+            object_name,
+            EnvironmentObjectList[object_name].size
+          )
+        );
+      }
+    lands.push(land);
+  }
+  return lands;
+}
+
+module.exports = { Land, generate_random_land };

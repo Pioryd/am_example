@@ -11,13 +11,13 @@ class ParsePacket {
       if (packet.position > land.size) return;
     if (packet.position <= 0) return;
 
-    manager.character.position = packet.position;
+    manager.character.position.x = packet.position;
   }
 
   static change_land(packet, manager) {
     for (const land of manager.lands_list) {
       if (packet.id === land.id) {
-        manager.character.land_id = packet.id;
+        manager.character.position.land_id = packet.id;
         break;
       }
     }

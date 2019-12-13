@@ -8,7 +8,7 @@ class ParsePacket {
   }
 
   static change_position(packet, manager) {
-    for (const [name, character] of Object.entries(manager.characters_map))
+    for (const [id, character] of Object.entries(manager.characters_map))
       if (packet.character_id === character.id)
         for (const land of manager.lands_list)
           if (packet.position <= land.size && packet.position > 0)
@@ -16,12 +16,30 @@ class ParsePacket {
   }
 
   static change_land(packet, manager) {
-    for (const [name, character] of Object.entries(manager.characters_map))
+    for (const [id, character] of Object.entries(manager.characters_map))
       if (packet.character_id === character.id)
         for (const land of manager.lands_list)
           if (packet.land_id === land.id)
-            manager.characters_map[character.id].position.land_id =
+            manager.characters_map[packet.character_id].position.land_id =
               packet.land_id;
+  }
+
+  static add_friend(packet, manager) {
+    let found = false;
+    for (const [id, character] of Object.entries(manager.characters_map))
+      if (packet.character_id === character.id) found = true;
+    if (!found) return;
+
+    for (const [id, character] of Object.entries(manager.characters_map))
+      if (packet.friend_name === character.name)
+        if (
+          !manager.characters_map[packet.character_id].friends_list.includes(
+            packet.friend_name
+          )
+        )
+          manager.characters_map[packet.character_id].friends_list.push(
+            packet.friend_name
+          );
   }
 }
 

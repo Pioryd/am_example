@@ -1,4 +1,4 @@
-const fw_util = require("./util.js");
+const { Util } = require("./util.js");
 
 class ModulesManager {
   constructor({
@@ -55,14 +55,14 @@ class ModulesManager {
   }
 
   load_modules() {
-    let modules_names = fw_util.get_directories(this.modules_directory);
+    let modules_names = Util.get_directories(this.modules_directory);
 
     for (const module_name of modules_names) {
       if (this.disabled_modules.includes(module_name)) continue;
 
       const path = `${this.modules_directory}/${module_name}`;
 
-      if (fw_util.is_path_exist(path)) {
+      if (Util.is_path_exist(path)) {
         let fw_module = require("../" + path);
         let fw_module_class_name = Object.entries(fw_module)
           .values()

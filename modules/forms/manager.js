@@ -1,4 +1,4 @@
-const fw_util = require("../../framework/util.js");
+const { Util } = require("../../framework/util.js");
 const { ParsePacket } = require("./parse_packet");
 const data_directory = "./data/forms/forms.json";
 
@@ -9,7 +9,7 @@ class Manager {
   }
 
   load_forms() {
-    const forms_json = fw_util.read_from_json(data_directory);
+    const forms_json = Util.read_from_json(data_directory);
     for (let i = 0; i < forms_json.length; i++)
       this.forms[forms_json[i].name] = forms_json[i];
   }
@@ -22,7 +22,7 @@ class Manager {
       if (form.type === "static") form.color = "#ff030333";
     }
 
-    fw_util.write_to_json(data_directory, Object.values(this.forms));
+    Util.write_to_json(data_directory, Object.values(this.forms));
   }
 
   move_forms() {

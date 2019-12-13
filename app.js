@@ -1,4 +1,4 @@
-const fw_util = require("./framework/util.js");
+const { Util } = require("./framework/util.js");
 const fw_server = require("./framework/server.js");
 const fw_modules_manager = require("./framework/modules_manager.js");
 const { setup_exit_handlers } = require("./framework/application.js");
@@ -16,7 +16,7 @@ const Events_list = [
 class App extends EventEmitter {
   constructor() {
     super();
-    this.config = fw_util.read_from_json(Directories.config_file);
+    this.config = Util.read_from_json(Directories.config_file);
     this.web_server = new fw_server.Server(this.config.port);
     this.modules_manager = new fw_modules_manager.ModulesManager({
       event_emiter: this,

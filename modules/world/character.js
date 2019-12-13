@@ -14,11 +14,12 @@ class Character {
     this.actions_list = ["walking", "thinking", "searching"];
     this.activities_list = ["working", "cleaning", "shopping"];
 
-    this.friends_list = ["Bot_1", "Bot_2", "Bot_3"];
+    this.friends_list = [];
 
     this.update_statistics();
     setInterval(() => {
       this.update_statistics();
+      this.update_position();
     }, 100);
   }
 
@@ -26,6 +27,11 @@ class Character {
     this.current_state = this.states_list[Util.get_random_int(0, 2)];
     this.current_action = this.actions_list[Util.get_random_int(0, 2)];
     this.current_activity = this.activities_list[Util.get_random_int(0, 2)];
+  }
+
+  update_position() {
+    // not player
+    if (this.id != 0) this.position = Util.get_random_int(1, 20);
   }
 }
 

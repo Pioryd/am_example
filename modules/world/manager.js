@@ -16,13 +16,14 @@ class Manager {
     this.insert_bots();
   }
 
-  create_parse_dict() {
-    return {
-      world: packet => {
-        if (packet.command in ParsePacket)
-          return ParsePacket[packet.command](packet, this);
-      }
-    };
+  create_parse_packet_dict() {
+    let parse_packet_dict = {};
+    for (const [packet_id] of Object.entries(ParsePacket)) {
+      parse_packet_dict[packet_id] = (socket_id, data) => {
+        return ParsePacket[packet_id](socket_id, data, this);
+      };
+    }
+    return parse_packet_dict;
   }
 
   insert_bots() {

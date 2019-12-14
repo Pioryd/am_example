@@ -17,7 +17,7 @@ class App extends EventEmitter {
   constructor() {
     super();
     this.config = Util.read_from_json(Directories.config_file);
-    this.web_server = new fw_server.Server(this.config.port);
+    this.web_server = new fw_server.Server({ port: this.config.port });
     this.modules_manager = new fw_modules_manager.ModulesManager({
       event_emiter: this,
       modules_directory: Directories.modules_dir,

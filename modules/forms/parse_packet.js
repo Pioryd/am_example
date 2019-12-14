@@ -1,5 +1,5 @@
-class ParsePacket {
-  static update(packet, manager) {
+const ParsePacket = {
+  update: (packet, manager) => {
     let data = {};
     data.command = "update";
     data.points = [];
@@ -9,9 +9,8 @@ class ParsePacket {
       data.points.push(JSON.parse(JSON.stringify(value, null, 2)));
 
     return data;
-  }
-
-  static edit_form(packet, manager) {
+  },
+  edit_form: (packet, manager) => {
     let data = {};
     data.command = "edit_form";
     data.log =
@@ -39,9 +38,8 @@ class ParsePacket {
     }
 
     return data;
-  }
-
-  static edit_form(packet, manager) {
+  },
+  edit_form: (packet, manager) => {
     let data = {};
     data.command = "remove_form";
     data.log =
@@ -55,6 +53,6 @@ class ParsePacket {
 
     return data;
   }
-}
+};
 
 module.exports = { ParsePacket };

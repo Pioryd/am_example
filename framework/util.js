@@ -17,6 +17,15 @@ class Util {
     });
   }
 
+  static get_time_hms() {
+    return new Date().toLocaleTimeString("en-US", {
+      hour12: false,
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric"
+    });
+  }
+
   static is_path_exist(path) {
     return fw_fs.existsSync(path);
   }

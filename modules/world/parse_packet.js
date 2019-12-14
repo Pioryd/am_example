@@ -1,55 +1,71 @@
-class ParsePacket {
-  static update(packet, manager) {
-    let data = {};
-    data.command = "update";
-    data.characters_map = manager.characters_map;
-    data.lands_list = manager.lands_list;
-    return data;
-  }
+const ParsePacket = {
+  accept_connection: (socket_id, data, manager) => {
+    return {
+      id: "login",
+      data: {}
+    };
+  },
 
-  static change_position(packet, manager) {
+  disconnect_connection: (socket_id, data, manager) => {
+    console.log("From parse_packet-on_disconnect: hello");
+  },
+  login: (socket_id, data, manager) => {},
+
+  update: (socket_id, data, manager) => {
+    return {
+      id: "update",
+      data: {
+        characters_map: manager.characters_map,
+        lands_list: manager.lands_list
+      }
+    };
+  },
+  change_position: (socket_id, data, manager) => {
     for (const [id, character] of Object.entries(manager.characters_map))
-      if (packet.character_id === character.id)
+      if ((data, character_id === character.id))
         for (const land of manager.lands_list)
-          if (packet.position <= land.size && packet.position > 0)
-            manager.characters_map[character.id].position.x = packet.position;
-  }
-
-  static change_land(packet, manager) {
+          if ((data, position <= land.size && data, position > 0))
+            (manager.characters_map[character.id].position.x = data), position;
+  },
+  change_land: (socket_id, data, manager) => {
     for (const [id, character] of Object.entries(manager.characters_map))
-      if (packet.character_id === character.id)
+      if ((data, character_id === character.id))
         for (const land of manager.lands_list)
-          if (packet.land_id === land.id)
-            manager.characters_map[packet.character_id].position.land_id =
-              packet.land_id;
-  }
-
-  static add_friend(packet, manager) {
+          if ((data, land_id === land.id))
+            (manager.characters_map[
+              (data, character_id)
+            ].position.land_id = data),
+              land_id;
+  },
+  add_friend: (socket_id, data, manager) => {
     let found = false;
     for (const [id, character] of Object.entries(manager.characters_map))
-      if (packet.character_id === character.id) found = true;
+      if ((data, character_id === character.id)) found = true;
     if (!found) return;
 
     for (const [id, character] of Object.entries(manager.characters_map))
-      if (packet.friend_name === character.name)
+      if ((data, friend_name === character.name))
         if (
-          !manager.characters_map[packet.character_id].friends_list.includes(
-            packet.friend_name
+          !manager.characters_map[(data, character_id)].friends_list.includes(
+            data,
+            friend_name
           )
         )
-          manager.characters_map[packet.character_id].friends_list.push(
-            packet.friend_name
+          manager.characters_map[(data, character_id)].friends_list.push(
+            data,
+            friend_name
           );
+  },
+  chat_message: (socket_id, data, manager) => {
+    return {
+      id: "chat_message",
+      data: {
+        message: "message received: " + data.message,
+        from_character_id: data.from_character_id,
+        to_character_id: data.to_character_id
+      }
+    };
   }
-
-  static chat_message(packet, manager) {
-    let data = {};
-    data.command = "chat_message";
-    data.message = "message received: " + packet.message;
-    data.from_character_id = packet.from_character_id;
-    data.to_character_id = packet.to_character_id;
-    return data;
-  }
-}
+};
 
 module.exports = { ParsePacket };

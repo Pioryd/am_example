@@ -1,17 +1,31 @@
 const ParsePacket = {
-  accept_connection: (socket_id, data, manager) => {
+  accept_connection: (connection, data, manager) => {
+    // -1 Admin ID
+    if (
+      data.character_id !== -1 &&
+      !(data.character_id in manager.characters_map)
+    )
+      return;
+
+    // manager.set_character_connected -> change rom auto(bot) to semi/manuala
+    connection.user_data.character_id = data.character_id;
+    const character_name =
+      data.character_id === -1
+        ? "Admin"
+        : manager.characters_map[data.character_id].name;
     return {
       id: "login",
-      data: {}
+      data: { character_name: character_name }
     };
   },
 
-  disconnect_connection: (socket_id, data, manager) => {
+  disconnect_connection: (connection, data, manager) => {
     console.log("From parse_packet-on_disconnect: hello");
   },
-  login: (socket_id, data, manager) => {},
 
-  update: (socket_id, data, manager) => {
+  login: (connection, data, manager) => {},
+
+  update: (connection, data, manager) => {
     return {
       id: "update",
       data: {
@@ -20,14 +34,14 @@ const ParsePacket = {
       }
     };
   },
-  change_position: (socket_id, data, manager) => {
+  change_position: (connection, data, manager) => {
     for (const [id, character] of Object.entries(manager.characters_map))
       if ((data, character_id === character.id))
         for (const land of manager.lands_list)
           if ((data, position <= land.size && data, position > 0))
             (manager.characters_map[character.id].position.x = data), position;
   },
-  change_land: (socket_id, data, manager) => {
+  change_land: (connection, data, manager) => {
     for (const [id, character] of Object.entries(manager.characters_map))
       if ((data, character_id === character.id))
         for (const land of manager.lands_list)
@@ -37,7 +51,7 @@ const ParsePacket = {
             ].position.land_id = data),
               land_id;
   },
-  add_friend: (socket_id, data, manager) => {
+  add_friend: (connection, data, manager) => {
     let found = false;
     for (const [id, character] of Object.entries(manager.characters_map))
       if ((data, character_id === character.id)) found = true;
@@ -56,7 +70,7 @@ const ParsePacket = {
             friend_name
           );
   },
-  chat_message: (socket_id, data, manager) => {
+  chat_message: (connection, data, manager) => {
     return {
       id: "chat_message",
       data: {

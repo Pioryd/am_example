@@ -16,6 +16,10 @@ class Manager {
     this.insert_bots();
   }
 
+  get_character_by_id(id) {
+    return id in this.characters_map;
+  }
+
   create_parse_packet_dict() {
     let parse_packet_dict = {};
     for (const [packet_id] of Object.entries(ParsePacket)) {

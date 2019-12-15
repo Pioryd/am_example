@@ -5,13 +5,14 @@ class Connection {
     this.last_packet_time = new Date();
     this.socket = socket;
     this.accepted = false;
+    this.user_data = {};
   }
 }
 /**
  * @description Handling sockets and connections.
  */
 class Server {
-  constructor({ port = 0, check_interval = 1000, timeout = 30 * 1000 }) {
+  constructor({ port = 0, check_interval = 1000, timeout = 3 * 1000 }) {
     this.port = port;
     this.check_interval = check_interval;
     this.timeout = timeout;
@@ -26,8 +27,9 @@ class Server {
   }
 
   check_connections() {
-    for (const [socket_id] of Object.entries(this.connections_map)) {
-      const connection = this.connections_map[socket_id];
+    for (const [socket_id, connection] of Object.entries(
+      this.connections_map
+    )) {
       const is_timeout =
         new Date() - connection.last_packet_time > this.timeout;
 
@@ -66,19 +68,20 @@ class Server {
 
       for (const [packet_id] of Object.entries(this.parse_packet_dict)) {
         socket.on(packet_id, data => {
-          this.connections_map[socket.id].last_packet_time = new Date();
-
           try {
+            const connection = this.connections_map[socket.id];
+            connection.last_packet_time = new Date();
+
             // Accept connection by server core, if not accepted yet.
-            if (!this.connections_map[socket.id].accepted) {
+            if (!connection.accepted) {
               const send_packet = this.parse_packet(
                 "accept_connection",
-                socket.id,
+                connection,
                 data
               );
 
               if (send_packet !== undefined) {
-                this.connections_map[socket.id].accepted = true;
+                connection.accepted = true;
                 socket.emit(send_packet.id, send_packet.data);
               } else {
                 this.close_connection(

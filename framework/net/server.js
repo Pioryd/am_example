@@ -6,9 +6,8 @@ const { Connection } = require("./connection");
  * @description Handling sockets and connections.
  */
 class Server {
-  constructor({ port = 0, check_interval = 1000, timeout = 3 * 1000 }) {
+  constructor({ port = 0, send_delay = 0, timeout = 3 * 1000 }) {
     this.port = port;
-    this.check_interval = check_interval;
     this.timeout = timeout;
 
     this.parse_packet_dict = {};
@@ -24,11 +23,13 @@ class Server {
     for (const [socket_id, connection] of Object.entries(
       this.connections_map
     )) {
-      const is_timeout =
-        new Date() - connection.last_packet_time > this.timeout;
+      let date = new Date();
 
-      if (is_timeout) this._close_connection(socket_id, "Timeout");
-      else if (!connection.socket.connected)
+      const is_timeout = date - connection.last_packet_time > this.timeout;
+
+      if (is_timeout) {
+        this._close_connection(socket_id, "Timeout");
+      } else if (!connection.socket.connected)
         this._close_connection(socket_id, "Connection lost");
     }
   }
@@ -127,7 +128,15 @@ class Server {
 
   _send(socket, packet_id, data) {
     try {
-      if (socket.connected) socket.emit(packet_id, data);
+      if (!socket.connected) return;
+
+      if (this.send_delay > 0) {
+        setTimeout(() => {
+          socket.emit(packet_id, data);
+        }, this.send_delay);
+      } else {
+        socket.emit(packet_id, data);
+      }
     } catch (error) {
       console.log("Exception: " + error);
     }

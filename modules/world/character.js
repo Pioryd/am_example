@@ -6,16 +6,27 @@ class Character {
     this.name = "";
     this.position = { land_id: 0, object_id: 0, x: 0 };
 
+    // Send from AM to server as id/string
+    // On AM side is all logic
     this.current_state = {};
+    // Send from server to AM as id/string
+    // On server side is all logic
     this.current_action = {};
+    // Send from AM to server as id/string
+    // On AM side is all logic
     this.current_activity = {};
 
+    // Move to AM
     this.states_list = ["happy", "sad", "bored"];
+    // Stay here
     this.actions_list = ["walking", "thinking", "searching"];
+    // Move to AM
     this.activities_list = ["working", "cleaning", "shopping"];
 
+    // Move to AM
     this.friends_list = [];
 
+    // Move to AM
     this.update_statistics();
     setInterval(() => {
       this.update_statistics();
@@ -29,6 +40,7 @@ class Character {
     this.current_activity = this.activities_list[Util.get_random_int(0, 2)];
   }
 
+  // Move to Manager
   update_position() {
     // not player
     if (this.id != 0)

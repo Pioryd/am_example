@@ -7,13 +7,12 @@ class Manager {
     this.lands_list = generate_random_land(5);
     this.characters_map = {};
 
-    // Create player
-    let id = 0;
-    let player = new Character(id);
-    player.name = "player";
-    this.characters_map[id] = player;
-
-    this.insert_bots();
+    // insert ams
+    for (let i = 0; i <= 5; i++) {
+      const bot = new Character(i);
+      bot.name = `AM_${i}`;
+      this.characters_map[i] = bot;
+    }
   }
 
   get_character_by_id(id) {
@@ -28,14 +27,6 @@ class Manager {
       };
     }
     return parse_packet_dict;
-  }
-
-  insert_bots() {
-    for (let i = 1; i <= 3; i++) {
-      const bot = new Character(i);
-      bot.name = `bot_${i}`;
-      this.characters_map[i] = bot;
-    }
   }
 }
 

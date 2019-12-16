@@ -19,7 +19,7 @@ function generate_random_land(count) {
   const lands = [];
   // Create lands
   for (let i = 0; i < count; i++) {
-    const land = new Land(i + 1);
+    const land = new Land(i);
     // Insert environment object - house
     if (Util.get_random_int(0, 1) === 1) {
       const object_name = "house";

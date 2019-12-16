@@ -27,11 +27,11 @@ class Character {
     this.friends_list = [];
 
     // Move to AM
-    this.update_statistics();
-    setInterval(() => {
-      this.update_statistics();
-      this.update_position();
-    }, 100);
+    // this.update_statistics();
+    // setInterval(() => {
+    //   this.update_statistics();
+    //   this.update_position();
+    // }, 100);
   }
 
   update_statistics() {

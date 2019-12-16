@@ -14,20 +14,18 @@ const ParsePacket = {
         ? "Admin"
         : manager.characters_map[data.character_id].name;
     return {
-      id: "login",
+      packet_id: "login",
       data: { character_name: character_name }
     };
   },
 
-  disconnect_connection: (connection, data, manager) => {
-    console.log("From parse_packet-on_disconnect: hello");
-  },
+  disconnect_connection: (connection, data, manager) => {},
 
   login: (connection, data, manager) => {},
 
   update: (connection, data, manager) => {
     return {
-      id: "update",
+      packet_id: "update",
       data: {
         characters_map: manager.characters_map,
         lands_list: manager.lands_list
@@ -72,7 +70,7 @@ const ParsePacket = {
   },
   chat_message: (connection, data, manager) => {
     return {
-      id: "chat_message",
+      packet_id: "chat_message",
       data: {
         message: "message received: " + data.message,
         from_character_id: data.from_character_id,

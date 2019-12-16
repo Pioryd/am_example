@@ -1,5 +1,5 @@
 const { Util } = require("./framework/util.js");
-const fw_server = require("./framework/server.js");
+const fw_server = require("./framework/net/server.js");
 const fw_modules_manager = require("./framework/modules_manager.js");
 const { setup_exit_handlers } = require("./framework/application.js");
 const EventEmitter = require("events");
@@ -27,7 +27,9 @@ class App extends EventEmitter {
   }
 
   main_loop(_this) {
+    _this.web_server.poll();
     _this.emit("on_tick");
+
     setTimeout(() => {
       _this.main_loop(_this);
     }, 10);

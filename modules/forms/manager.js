@@ -1,4 +1,4 @@
-const { Util } = require("../../framework/util.js");
+const { Util } = require("am_framework");
 const { ParsePacket } = require("./parse_packet");
 const data_directory = "./data/forms/forms.json";
 

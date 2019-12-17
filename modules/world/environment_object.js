@@ -1,4 +1,4 @@
-const { Util } = require("../../framework/util.js");
+const { Util } = require("am_framework");
 
 class EnvironmentObject {
   constructor(id, name, size) {

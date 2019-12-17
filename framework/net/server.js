@@ -1,5 +1,6 @@
 const io = require("socket.io");
-const { Util } = require("../util");
+const io_client = require("socket.io-client");
+const { Util } = require("am_framework");
 const { Connection } = require("./connection");
 
 /**
@@ -10,6 +11,7 @@ class Server {
     this.port = port;
     this.timeout = timeout;
 
+    this.client = new io_client();
     this.parse_packet_dict = {};
     this.socket = {};
     this.connections_map = {};

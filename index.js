@@ -1,6 +1,7 @@
 const {
   Util,
   Server,
+  Config,
   ModulesManager,
   setup_exit_handlers
 } = require("am_framework");
@@ -8,8 +9,8 @@ const EventEmitter = require("events");
 const path = require("path");
 
 const Directories = {
-  modules_directory: "modules",
-  config_file: "config.json"
+  modules_directory: path.join(__dirname, "modules"),
+  config_file_full_name: path.join(__dirname, "config.json")
 };
 const Events_list = [
   "on_init",
@@ -22,13 +23,23 @@ const Events_list = [
 class App extends EventEmitter {
   constructor() {
     super();
-    this.config = Util.read_from_json(Directories.config_file);
-    this.web_server = new Server({ port: this.config.port });
+    this.config = new Config({
+      file_full_name: Directories.config_file_full_name,
+      on_update: () => {
+        console.log("config updated");
+      }
+    });
+    this.config.load();
+    this.on("on_exit", () => {
+      this.config.terminate();
+    });
+
+    this.web_server = new Server({ port: this.config.data.port });
     this.modules_manager = new ModulesManager({
       event_emiter: this,
-      modules_directory: path.join(__dirname, Directories.modules_directory),
+      modules_directory: Directories.modules_directory,
       events_list: Events_list,
-      disabled_modules: this.config.disabled_modules
+      disabled_modules: this.config.data.disabled_modules
     });
   }
 

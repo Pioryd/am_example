@@ -1,18 +1,28 @@
 const ParsePacket = {
   accept_connection: (connection, data, manager) => {
-    // -1 Admin ID
-    if (
-      data.character_id !== -1 &&
-      !(data.character_id in manager.characters_map)
-    )
+    const error = manager.authenticate(
+      connection.socket.id,
+      data.login,
+      data.password
+    );
+    if (error != null) {
+      console.log("Unable to authenticate. Error: " + error);
       return;
+    }
 
-    // manager.set_character_connected -> change rom auto(bot) to semi/manuala
-    connection.user_data.character_id = data.character_id;
-    const character_name =
-      data.character_id === -1
-        ? "Admin"
-        : manager.characters_map[data.character_id].name;
+    const character_id = manager.get_character_id_by_name(data.login);
+    if (character_id == null) return;
+
+    connection.user_data.login = data.login;
+    connection.user_data.password = data.password;
+    connection.user_data.character_id = character_id;
+    connection.on_close = connection => {
+      manager.log_off_character(connection.id);
+    };
+
+    const character_name = manager.get_character_name_by_id(character_id);
+    if (character_name == null) return;
+
     return {
       packet_id: "login",
       data: { character_name: character_name }
@@ -24,46 +34,45 @@ const ParsePacket = {
   login: (connection, data, manager) => {},
 
   update: (connection, data, manager) => {
+    const character_data = manager.get_character_data_by_id(
+      connection.user_data.character_id
+    );
+
     return {
       packet_id: "update",
-      data: {
-        characters_map: manager.characters_map,
-        lands_list: manager.lands_list
-      }
+      data: { ...character_data }
     };
   },
   change_position: (connection, data, manager) => {
     for (const [id, character] of Object.entries(manager.characters_map))
-      if ((data, character_id === character.id))
+      if (character_id === character.id)
         for (const land of manager.lands_list)
-          if ((data, position <= land.size && data, position > 0))
+          if (position <= land.size && position > 0)
             (manager.characters_map[character.id].position.x = data), position;
   },
   change_land: (connection, data, manager) => {
     for (const [id, character] of Object.entries(manager.characters_map))
-      if ((data, character_id === character.id))
+      if (character_id === character.id)
         for (const land of manager.lands_list)
-          if ((data, land_id === land.id))
-            (manager.characters_map[
-              (data, character_id)
-            ].position.land_id = data),
+          if (land_id === land.id)
+            (manager.characters_map[character_id].position.land_id = data),
               land_id;
   },
   add_friend: (connection, data, manager) => {
     let found = false;
     for (const [id, character] of Object.entries(manager.characters_map))
-      if ((data, character_id === character.id)) found = true;
+      if (character_id === character.id) found = true;
     if (!found) return;
 
     for (const [id, character] of Object.entries(manager.characters_map))
-      if ((data, friend_name === character.name))
+      if (friend_name === character.name)
         if (
-          !manager.characters_map[(data, character_id)].friends_list.includes(
+          !manager.characters_map[character_id].friends_list.includes(
             data,
             friend_name
           )
         )
-          manager.characters_map[(data, character_id)].friends_list.push(
+          manager.characters_map[character_id].friends_list.push(
             data,
             friend_name
           );

@@ -11,13 +11,13 @@ class Character {
 
     // Send from AM to server as id/string
     // On AM side is all logic
-    this.state = {};
+    this.state = "";
     // Send from server to AM as id/string
     // On server side is all logic
-    this.action = {};
+    this.action = "";
     // Send from AM to server as id/string
     // On AM side is all logic
-    this.activity = {};
+    this.activity = "";
 
     // // Move to AM
     // this.states_list = ["happy", "sad", "bored"];

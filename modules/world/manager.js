@@ -4,9 +4,10 @@ const { Character } = require("./character");
 
 const AdminAccount = { id: -1, login: "admin", password: "123" };
 class Manager {
-  constructor() {
+  constructor({ application }) {
     this.lands_list = generate_random_land(5);
     this.characters_map = {};
+    this.server = application.web_server;
 
     // insert ams
     for (let i = 0; i <= 5; i++) {

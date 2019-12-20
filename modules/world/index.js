@@ -1,8 +1,8 @@
 const { Manager } = require("./manager.js");
 
 class World {
-  constructor() {
-    this.manager = new Manager();
+  constructor({ application }) {
+    this.manager = new Manager({ application: application });
   }
 
   on_prepare(web_server) {

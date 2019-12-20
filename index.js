@@ -1,5 +1,4 @@
 const {
-  Util,
   Server,
   Config,
   ModulesManager,
@@ -36,6 +35,7 @@ class App extends EventEmitter {
 
     this.web_server = new Server({ port: this.config.data.port });
     this.modules_manager = new ModulesManager({
+      application: this,
       event_emiter: this,
       modules_directory: Directories.modules_directory,
       events_list: Events_list,

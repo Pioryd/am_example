@@ -184,7 +184,12 @@ function data_character_add_friend(connection, received_data, manager) {
 
   const friend_name = received_data.name;
 
-  if (friend_name == null) {
+  if (
+    friend_name == null ||
+    !manager.is_character_exist(friend_name)
+    // ||
+    // friend_name == character.name
+  ) {
     handle_error(connection, received_data);
     return;
   }
@@ -289,36 +294,21 @@ function action_message(connection, received_data, manager) {
     return;
   }
 
-  const from = {
-    connection: connection,
-    character: manager.get_character_name_by_id(from.character_id)
-  };
-  const to = {
-    character: manager.get_character_id_by_name(received_data.character_name)
-  };
-  const message = received_data.message;
-  const date = new Date();
+  const from_character = manager.get_character_by_id(character_id);
+  const to_character = manager.get_character_by_id(received_data.name);
+  const text = received_data.text;
 
-  if (message == null || from.character == null || to.character == null) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  to.connection = manager.server.get_connection_by_id(to.character.socket_id);
-
-  if (to.connection == null) {
+  if (text == null || from_character == null || to_character == null) {
     handle_error(connection, received_data);
     return;
   }
 
   const send_data = {
-    date: date,
-    from_user: from.character.name,
-    to_user: to.character.name,
-    message: message
+    name: from_character.name,
+    text: text
   };
 
-  manager.server.send(dest_connection.socket.id, "action_message", send_data);
+  manager.server.send(to_character.socket_id, "action_message", send_data);
 }
 
 module.exports = {

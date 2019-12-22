@@ -13,8 +13,12 @@ class Manager {
     for (let i = 0; i <= 5; i++) {
       const bot = new Character(i);
       bot.name = `AM_${i}`;
-      this.characters_map[i] = bot;
+      this.characters_map[bot.name] = bot;
     }
+  }
+
+  is_character_exist(name) {
+    return name in this.characters_map && this.characters_map[name] != null;
   }
 
   authenticate(socket_id, login, password) {
@@ -44,6 +48,10 @@ class Manager {
       }
     }
     return "Wrong authentication data";
+  }
+
+  get_character_by_id(id) {
+    if (id in this.characters_map) return this.characters_map[id];
   }
 
   get_character_id_by_name(name) {

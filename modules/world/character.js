@@ -5,7 +5,7 @@ class Character {
     this.id = id;
     this.name = "";
     this.password = "123";
-    this.socket_id = undefined;
+    this.connection_id = undefined;
 
     this.position = { land_id: 0, object_id: 0, x: 0 };
 

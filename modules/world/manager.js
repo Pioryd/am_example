@@ -21,8 +21,8 @@ class Manager {
     return name in this.characters_map && this.characters_map[name] != null;
   }
 
-  authenticate(socket_id, login, password) {
-    if (socket_id == null || login == null || password == null) return;
+  authenticate(connection_id, login, password) {
+    if (connection_id == null || login == null || password == null) return;
 
     // Admin
     // Many accounts(sockets) can be logged as admin,
@@ -40,10 +40,10 @@ class Manager {
         character.name.toLowerCase() === login.toLowerCase() &&
         character.password.toLowerCase() === password.toLowerCase()
       ) {
-        if (character.socket_id != null)
-          return "Another socket is logged in: " + character.socket_id;
+        if (character.connection_id != null)
+          return "Another socket is logged in: " + character.connection_id;
 
-        character.socket_id = socket_id;
+        character.connection_id = connection_id;
         return;
       }
     }
@@ -94,7 +94,7 @@ class Manager {
     if (id == null) return;
 
     if (id in this.characters_map)
-      return (this.characters_map[id].socket_id = undefined);
+      return (this.characters_map[id].connection_id = undefined);
   }
 
   create_parse_packet_dict() {

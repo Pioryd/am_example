@@ -1,10 +1,10 @@
 const SendPacket = {
-  event_world_earthquake: (socket_id, packet_id, manager) => {
-    manager.server.send(socket_id, packet_id, data);
+  event_world_earthquake: (connection_id, packet_id, manager) => {
+    manager.server.send(connection_id, packet_id, data);
   },
 
-  action_message: (socket_id, manager, packet_id, data) => {
-    manager.server.send(socket_id, packet_id, data);
+  action_message: (connection_id, manager, packet_id, data) => {
+    manager.server.send(connection_id, packet_id, data);
   }
 };
 

@@ -302,7 +302,7 @@ function action_message(connection, received_data, manager) {
     name: from_character.name,
     text: text
   };
-  manager.server.send(to_character.socket_id, "action_message", send_data);
+  manager.server.send(to_character.connection_id, "action_message", send_data);
 }
 
 module.exports = {

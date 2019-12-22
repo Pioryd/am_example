@@ -184,12 +184,7 @@ function data_character_add_friend(connection, received_data, manager) {
 
   const friend_name = received_data.name;
 
-  if (
-    friend_name == null ||
-    !manager.is_character_exist(friend_name)
-    // ||
-    // friend_name == character.name
-  ) {
+  if (friend_name == null || !manager.is_character_exist(friend_name)) {
     handle_error(connection, received_data);
     return;
   }
@@ -307,7 +302,6 @@ function action_message(connection, received_data, manager) {
     name: from_character.name,
     text: text
   };
-
   manager.server.send(to_character.socket_id, "action_message", send_data);
 }
 

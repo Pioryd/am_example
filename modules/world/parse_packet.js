@@ -68,12 +68,12 @@ function data_full(connection, received_data, manager) {
 
   if (is_admin(character_id)) {
     send_data = {
-      lands_list: manager.lands_list,
+      lands_map: manager.lands_map,
       characters_map: manager.characters_map
     };
   } else {
     const character = manager.characters_map[character_id];
-    const land = manager.lands_list[character.position.land_id];
+    const land = manager.lands_map[character.position.land_id];
     send_data = {
       character: character,
       land: land
@@ -117,7 +117,7 @@ function data_world(connection, received_data, manager) {
     return;
   }
 
-  const land = manager.lands_list[character.position.land_id];
+  const land = manager.lands_map[character.position.land_id];
 
   send_data = {
     land: land
@@ -154,7 +154,7 @@ function data_character_change_land(connection, received_data, manager) {
     return;
   }
 
-  if (!(received_data.land_id in manager.lands_list)) {
+  if (!(received_data.land_id in manager.lands_map)) {
     handle_error(connection, received_data);
     return;
   }

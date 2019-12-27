@@ -7,11 +7,16 @@ class World {
 
   on_prepare(web_server) {
     web_server.add_parse_packet_dict(this.manager.create_parse_packet_dict());
+    this.manager.load_data_from_database();
   }
 
-  on_tick() {}
+  on_tick() {
+    this.manager.poll();
+  }
 
-  on_exit() {}
+  on_exit() {
+    this.manager.database.close();
+  }
 }
 
 module.exports = { World };

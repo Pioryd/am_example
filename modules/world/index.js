@@ -7,7 +7,7 @@ class World {
 
   on_prepare(web_server) {
     web_server.add_parse_packet_dict(this.manager.create_parse_packet_dict());
-    this.manager.load_data_from_database();
+    this.manager.database_load_data();
   }
 
   on_tick() {

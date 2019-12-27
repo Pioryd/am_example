@@ -12,7 +12,7 @@ class Manager {
   constructor({ application }) {
     this.database = new Database({
       url: "mongodb://127.0.0.1:27017",
-      name: "t"
+      name: "am_world"
     });
     this.lands_map = {};
     this.characters_map = {};
@@ -21,6 +21,26 @@ class Manager {
     this.settings = { generated: false };
 
     this.stopwatches = { database_save: new Stopwatch(10 * 1000) };
+  }
+
+  poll() {
+    if (!this.ready) return;
+
+    if (this.stopwatches.database_save.is_elapsed()) {
+      log.info(`[${Util.get_time_hms()}] Auto save to database`);
+      this.database_save_data();
+      this.stopwatches.database_save.reset();
+    }
+  }
+
+  create_parse_packet_dict() {
+    let parse_packet_dict = {};
+    for (const [packet_id] of Object.entries(ParsePacket)) {
+      parse_packet_dict[packet_id] = (connection, data) => {
+        return ParsePacket[packet_id](connection, data, this);
+      };
+    }
+    return parse_packet_dict;
   }
 
   generate_world() {
@@ -45,13 +65,13 @@ class Manager {
     this.settings.generated = true;
   }
 
-  setup_database_models() {
+  database_setup_models() {
     SettingsModel.setup(this.database.connection);
     CharacterModel.setup(this.database.connection);
     LandModel.setup(this.database.connection);
   }
 
-  save_data_to_database(step = "connect", error, results) {
+  database_save_data(step = "connect", error, results) {
     log.info("Save data to database, step:", step);
 
     if (error != null) log.error(error);
@@ -59,23 +79,23 @@ class Manager {
     switch (step) {
       case "connect":
         this.database.connect(collections => {
-          this.setup_database_models();
-          this.save_data_to_database("connected");
+          this.database_setup_models();
+          this.database_save_data("connected");
         });
         break;
       case "connected":
         SettingsModel.save(this.settings, (...args) => {
-          this.save_data_to_database(...args);
+          this.database_save_data(...args);
         });
         break;
       case "settings.save":
         CharacterModel.save(Object.values(this.characters_map), (...args) => {
-          this.save_data_to_database(...args);
+          this.database_save_data(...args);
         });
         break;
       case "character.save":
         LandModel.save(Object.values(this.lands_map), (...args) => {
-          this.save_data_to_database(...args);
+          this.database_save_data(...args);
         });
         break;
       case "land.save":
@@ -83,7 +103,7 @@ class Manager {
     }
   }
 
-  load_data_from_database(step = "connect", error, results) {
+  database_load_data(step = "connect", error, results) {
     const set_settings = results_list => {
       if (results_list.length <= 0) return;
       this.settings = results_list[0]._doc;
@@ -112,7 +132,7 @@ class Manager {
     };
 
     const check_collections = collections => {
-      this.setup_database_models();
+      this.database_setup_models();
 
       const collections_names = ["settings", "character", "land"];
 
@@ -133,13 +153,13 @@ class Manager {
 
           this.generate_world();
 
-          this.load_data_from_database("check_loaded_data");
+          this.database_load_data("check_loaded_data");
 
           return;
         }
       }
 
-      this.load_data_from_database("connected");
+      this.database_load_data("connected");
     };
 
     const check_loaded_data = () => {
@@ -157,7 +177,7 @@ class Manager {
 
     if (!Array.isArray(results)) results = results == null ? [] : [results];
 
-    if (error != null) log.info("load_data_from_database error:", error);
+    if (error != null) log.info("database_load_data error:", error);
 
     switch (step) {
       case "connect":
@@ -167,24 +187,24 @@ class Manager {
         break;
       case "connected":
         SettingsModel.load((...args) => {
-          this.load_data_from_database(...args);
+          this.database_load_data(...args);
         });
         break;
       case "settings.load":
         set_settings(results);
         CharacterModel.load_all((...args) => {
-          this.load_data_from_database(...args);
+          this.database_load_data(...args);
         });
         break;
       case "character.load_all":
         set_characters(results);
         LandModel.load_all((...args) => {
-          this.load_data_from_database(...args);
+          this.database_load_data(...args);
         });
         break;
       case "land.load_all":
         set_lands(results);
-        this.load_data_from_database("check_loaded_data");
+        this.database_load_data("check_loaded_data");
         break;
       case "check_loaded_data":
         check_loaded_data(); // must be as last function
@@ -194,11 +214,105 @@ class Manager {
     }
   }
 
-  is_character_exist(name) {
+  character_is_exist(name) {
     return name in this.characters_map && this.characters_map[name] != null;
   }
 
-  authenticate(connection_id, login, password) {
+  _character_get_by_id(id) {
+    if (id in this.characters_map) return this.characters_map[id];
+  }
+
+  character_get_id_by_name(name) {
+    if (name == null) return;
+
+    // Admin
+    if (AdminAccount.login.toLowerCase() === name.toLowerCase())
+      return AdminAccount.id;
+
+    // Characters
+    for (const [id, character] of Object.entries(this.characters_map))
+      if (character.name.toLowerCase() === name.toLowerCase()) return id;
+  }
+
+  character_get_name_by_id(id) {
+    if (id == null) return;
+
+    // Admin
+    if (AdminAccount.id == id) return AdminAccount.login;
+
+    // Characters
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    return character.name;
+  }
+
+  character_get_connection_id(id) {
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    return character.connection_id;
+  }
+
+  character_change_position(id, position_x) {
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    character.position.x = position_x;
+  }
+
+  character_change_land(id, land_id) {
+    if (!(land_id in this.lands_map)) return;
+
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    character.position.land_id = land_id;
+  }
+
+  character_add_friend(id, friend_name) {
+    if (!this.character_is_exist(friend_name)) return;
+
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    if (character.friends_list.includes(friend_name)) return;
+    character.friends_list.push(friend_name);
+  }
+
+  character_remove_friend(id, friend_name) {
+    if (!this.character_is_exist(friend_name)) return;
+
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    if (!character.friends_list.includes(friend_name)) return;
+    character.friends_list.splice(
+      character.friends_list.indexOf(friend_name),
+      1
+    );
+  }
+
+  character_change_state(id, state) {
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    character.state = state;
+  }
+
+  character_change_action(id, action) {
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    character.action = action;
+  }
+
+  character_change_activity(id, activity) {
+    const character = this._character_get_by_id(id);
+    if (character == null) return;
+    character.activity = activity;
+  }
+
+  character_log_off(id) {
+    if (id == null) return;
+
+    if (id in this.characters_map)
+      return (this.characters_map[id].connection_id = undefined);
+  }
+
+  character_authenticate(connection_id, login, password) {
     if (connection_id == null || login == null || password == null) return;
 
     // Admin
@@ -225,73 +339,6 @@ class Manager {
       }
     }
     return "Wrong authentication data";
-  }
-
-  get_character_by_id(id) {
-    if (id in this.characters_map) return this.characters_map[id];
-  }
-
-  get_character_id_by_name(name) {
-    if (name == null) return;
-
-    // Admin
-    if (AdminAccount.login.toLowerCase() === name.toLowerCase())
-      return AdminAccount.id;
-
-    // Characters
-    for (const [id, character] of Object.entries(this.characters_map))
-      if (character.name.toLowerCase() === name.toLowerCase()) return id;
-  }
-
-  get_character_name_by_id(id) {
-    if (id == null) return;
-
-    // Admin
-    if (AdminAccount.id == id) return AdminAccount.login;
-
-    // Characters
-    if (id in this.characters_map) return this.characters_map[id].name;
-  }
-
-  get_character_data_by_id(id) {
-    if (id == null) return;
-
-    // Admin
-    if (AdminAccount.id == id)
-      return {
-        lands_map: this.lands_map,
-        characters_map: this.characters_map
-      };
-
-    // Characters
-    if (id in this.characters_map) return this.characters_map[id];
-  }
-
-  log_off_character(id) {
-    if (id == null) return;
-
-    if (id in this.characters_map)
-      return (this.characters_map[id].connection_id = undefined);
-  }
-
-  create_parse_packet_dict() {
-    let parse_packet_dict = {};
-    for (const [packet_id] of Object.entries(ParsePacket)) {
-      parse_packet_dict[packet_id] = (connection, data) => {
-        return ParsePacket[packet_id](connection, data, this);
-      };
-    }
-    return parse_packet_dict;
-  }
-
-  poll() {
-    if (!this.ready) return;
-
-    if (this.stopwatches.database_save.is_elapsed()) {
-      log.info(`[${Util.get_time_hms()}] Auto save to database`);
-      this.save_data_to_database();
-      this.stopwatches.database_save.reset();
-    }
   }
 }
 

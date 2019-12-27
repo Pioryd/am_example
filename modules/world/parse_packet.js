@@ -1,3 +1,8 @@
+/*
+NOTE!
+Classes instances like: [Character], [Land], etc use only as read only. 
+To change any data of them use [manager] methods.
+*/
 function is_admin(id) {
   return id < 0;
 }
@@ -23,7 +28,7 @@ function handle_error(connection, received_data, message) {
 // Parse functions
 
 function accept_connection(connection, received_data, manager) {
-  const error = manager.authenticate(
+  const error = manager.character_authenticate(
     connection.socket.id,
     received_data.login,
     received_data.password
@@ -32,12 +37,12 @@ function accept_connection(connection, received_data, manager) {
     handle_error(
       connection,
       received_data,
-      "Unable to authenticate. Error: " + error
+      "Unable to character_authenticate. Error: " + error
     );
     return;
   }
 
-  const character_id = manager.get_character_id_by_name(received_data.login);
+  const character_id = manager.character_get_id_by_name(received_data.login);
   if (character_id == null) {
     handle_error(connection, received_data);
     return;
@@ -47,10 +52,10 @@ function accept_connection(connection, received_data, manager) {
   connection.user_data.password = received_data.password;
   connection.user_data.character_id = character_id;
   connection.on_close = connection => {
-    manager.log_off_character(character_id);
+    manager.character_log_off(character_id);
   };
 
-  const character_name = manager.get_character_name_by_id(character_id);
+  const character_name = manager.character_get_name_by_id(character_id);
   if (character_name == null) {
     handle_error(connection, received_data);
     return;
@@ -84,6 +89,7 @@ function data_full(connection, received_data, manager) {
     data: send_data
   };
 }
+
 function data_character(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -103,6 +109,7 @@ function data_character(connection, received_data, manager) {
     data: send_data
   };
 }
+
 function data_world(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -128,6 +135,7 @@ function data_world(connection, received_data, manager) {
     data: send_data
   };
 }
+
 function data_character_change_position(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -136,16 +144,11 @@ function data_character_change_position(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.characters_map[character_id];
-  if (character == null) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  character.position.x = received_data.position_x;
+  manager.character_change_position(character_id, received_data.position_x);
 
   return data_character(connection, received_data, manager);
 }
+
 function data_character_change_land(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -154,21 +157,11 @@ function data_character_change_land(connection, received_data, manager) {
     return;
   }
 
-  if (!(received_data.land_id in manager.lands_map)) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  const character = manager.characters_map[character_id];
-  if (character == null) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  character.position.land_id = received_data.land_id;
+  manager.character_change_land(character_id, received_data.land_id);
 
   return data_character(connection, received_data, manager);
 }
+
 function data_character_add_friend(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -176,24 +169,12 @@ function data_character_add_friend(connection, received_data, manager) {
     handle_error(connection, received_data);
     return;
   }
-  const character = manager.characters_map[character_id];
-  if (character == null) {
-    handle_error(connection, received_data);
-    return;
-  }
 
-  const friend_name = received_data.name;
-
-  if (friend_name == null || !manager.is_character_exist(friend_name)) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  if (character.friends_list.includes(friend_name)) return;
-  character.friends_list.push(friend_name);
+  manager.character_add_friend(character_id, received_data.name);
 
   return data_character(connection, received_data, manager);
 }
+
 function data_character_remove_friend(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -202,24 +183,11 @@ function data_character_remove_friend(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.characters_map[character_id];
-  if (character == null) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  const friend_name = received_data.name;
-
-  if (friend_name == null) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  if (!character.friends_list.includes(friend_name)) return;
-  character.friends_list.splice(character.friends_list.indexOf(friend_name), 1);
+  manager.character_remove_friend(character_id, received_data.name);
 
   return data_character(connection, received_data, manager);
 }
+
 function data_character_change_state(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -228,18 +196,11 @@ function data_character_change_state(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.characters_map[character_id];
-  if (character == null) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  const state_name = received_data.name;
-
-  character.state = state_name;
+  manager.character_change_state(character_id, received_data.name);
 
   return data_character(connection, received_data, manager);
 }
+
 function data_character_change_action(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -248,18 +209,11 @@ function data_character_change_action(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.characters_map[character_id];
-  if (character == null) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  const action_name = received_data.name;
-
-  character.action = action_name;
+  manager.character_change_action(character_id, received_data.name);
 
   return data_character(connection, received_data, manager);
 }
+
 function data_character_change_activity(connection, received_data, manager) {
   const character_id = connection.user_data.character_id;
 
@@ -268,15 +222,7 @@ function data_character_change_activity(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.characters_map[character_id];
-  if (character == null) {
-    handle_error(connection, received_data);
-    return;
-  }
-
-  const activity_name = received_data.name;
-
-  character.activity = activity_name;
+  manager.character_change_activity(character_id, received_data.name);
 
   return data_character(connection, received_data, manager);
 }
@@ -289,20 +235,27 @@ function action_message(connection, received_data, manager) {
     return;
   }
 
-  const from_character = manager.get_character_by_id(character_id);
-  const to_character = manager.get_character_by_id(received_data.name);
+  const from_character_name = manager.character_get_name_by_id(character_id);
+  const to_character_connection_id = manager.character_get_connection_id(
+    manager.character_get_id_by_name(received_data.name)
+  );
+
   const text = received_data.text;
 
-  if (text == null || from_character == null || to_character == null) {
+  if (
+    text == null ||
+    from_character_name == null ||
+    to_character_connection_id == null
+  ) {
     handle_error(connection, received_data);
     return;
   }
 
   const send_data = {
-    name: from_character.name,
+    name: from_character_name,
     text: text
   };
-  manager.server.send(to_character.connection_id, "action_message", send_data);
+  manager.server.send(to_character_connection_id, "action_message", send_data);
 }
 
 module.exports = {

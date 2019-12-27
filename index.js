@@ -25,7 +25,7 @@ class App extends EventEmitter {
     this.config = new Config({
       file_full_name: Directories.config_file_full_name,
       on_update: () => {
-        console.log("config updated");
+        log.info("config updated");
       }
     });
     this.config.load();

@@ -1,6 +1,7 @@
 const { ParsePacket } = require("./parse_packet");
 const { Land, generate_random_land } = require("./land");
 const { Character } = require("./character");
+const { EnvironmentObject } = require("./environment_object");
 const { Database, Util, Stopwatch } = require("am_framework");
 const CharacterModel = require("../../models/character");
 const LandModel = require("../../models/land");
@@ -61,6 +62,31 @@ class Manager {
       character.position.land_id = id;
       this.characters_map[character.name] = character;
     }
+
+    // // Insert environment object - house
+    // if (Util.get_random_int(0, 1) === 1) {
+    //   const object_name = "house";
+    //   land.objects_list.push(
+    //     new EnvironmentObject(
+    //       EnvironmentObjectList[object_name].id,
+    //       object_name,
+    //       EnvironmentObjectList[object_name].size
+    //     )
+    //   );
+    // }
+    // // Insert environment object - tree
+    // for (let k = 0; k < 3; k++) {
+    //   if (Util.get_random_int(0, 1) === 1) {
+    //     const object_name = "tree";
+    //     land.objects_list.push(
+    //       new EnvironmentObject(
+    //         EnvironmentObjectList[object_name].id,
+    //         object_name,
+    //         EnvironmentObjectList[object_name].size
+    //       )
+    //     );
+    //   }
+    // }
 
     this.settings.generated = true;
   }
@@ -263,7 +289,14 @@ class Manager {
 
     const character = this._character_get_by_id(id);
     if (character == null) return;
+
+    const current_land = this.lands_map[character.position.land_id];
+    delete current_land.characters_map[character.name];
+
     character.position.land_id = land_id;
+
+    const new_land = this.lands_map[land_id];
+    new_land.characters_map[character.name] = character;
   }
 
   character_add_friend(id, friend_name) {

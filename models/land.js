@@ -11,13 +11,20 @@ class LandModel {
   setup(connection) {
     this.connection = connection;
 
-    this.schema = new Schema({
-      id: { type: Number, required: true, unique: true, index: true },
-      size: { type: Number, required: true },
-      name: { type: String },
-      objects_list: { type: [String] },
-      characters_list: { type: [String] }
-    });
+    this.schema = new Schema(
+      {
+        id: { type: Number, required: true, unique: true, index: true },
+        size: { type: Number, required: true },
+        name: { type: String },
+        map: [
+          {
+            objects_list: { type: [String] },
+            characters_list: { type: [String] }
+          }
+        ]
+      },
+      { _id: false, id: false }
+    );
     this.model = this.connection.model("Land", this.schema, "land");
   }
 
@@ -26,9 +33,10 @@ class LandModel {
       classes_instances = [classes_instances];
 
     for (const class_instance of classes_instances) {
+      const data = class_instance._data;
       this.model.updateOne(
-        { id: class_instance.id },
-        class_instance,
+        { id: data.id },
+        data,
         { upsert: true },
         (error, raw) => {
           if (error) {

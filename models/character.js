@@ -14,11 +14,6 @@ class CharacterModel {
     this.schema = new Schema({
       name: { type: String, required: true, unique: true, index: true },
       password: { type: String },
-      position: {
-        land_id: { type: Number, required: true },
-        object_id: { type: Number, required: true },
-        x: { type: Number, required: true }
-      },
       state: { type: String },
       action: { type: String },
       activity: { type: String },
@@ -32,9 +27,10 @@ class CharacterModel {
       classes_instances = [classes_instances];
 
     for (const class_instance of classes_instances) {
+      const data = class_instance._data;
       this.model.updateOne(
-        { name: class_instance.name },
-        { ...class_instance },
+        { name: data.name },
+        { ...data },
         { upsert: true },
         (error, raw) => {
           if (error) {

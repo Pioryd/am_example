@@ -1,33 +1,74 @@
 const { Util } = require("am_framework");
 
+/*
+Data format:
+  name: string
+  password: string
+  state: string
+  action: string
+  activity: string
+  friends_list: array<string>
+  }>
+*/
 class Character {
-  constructor(name) {
-    this.name = name;
-    this.password = "";
-    this.connection_id = undefined;
+  constructor(data) {
+    this._data = data;
 
-    this.position = { land_id: 0, object_id: 0, x: 0 };
-
-    this.state = "";
-    this.action = "";
-    this.activity = "";
-
-    // Move to AM
-    this.friends_list = [];
+    this._connection_id = undefined;
   }
 
-  update_statistics() {
-    this.current_state = this.states_list[Util.get_random_int(0, 2)];
-    this.current_action = this.actions_list[Util.get_random_int(0, 2)];
-    this.current_activity = this.activities_list[Util.get_random_int(0, 2)];
+  get_name() {
+    return this._data.name;
   }
 
-  // Move to Manager
-  update_position() {
-    // not player
-    if (this.id != 0)
-      if (Util.get_random_int(1, 10) > 5)
-        this.position = Util.get_random_int(1, 20);
+  get_password() {
+    return this._data.password;
+  }
+
+  get_state() {
+    return this._data.state;
+  }
+
+  change_state(state) {
+    this._data.state = state;
+  }
+
+  get_action() {
+    return this._data.action;
+  }
+
+  change_action(action) {
+    this._data.action = action;
+  }
+
+  get_activity() {
+    return this._data.activity;
+  }
+
+  change_activity(activity) {
+    this._data.activity = activity;
+  }
+
+  get_friends_list() {
+    return [...this._data.get_friends_list];
+  }
+
+  add_friend(name) {
+    if (this._data.friends_list.includes(name)) return;
+    this._data.friends_list.push(name);
+  }
+
+  remove_friend(name) {
+    if (!this._data.friends_list.includes(name)) return;
+    this._data.friends_list.splice(this._data.friends_list.indexOf(name), 1);
+  }
+
+  get_connection_id() {
+    return this._connection_id;
+  }
+
+  set_connection_id(connection_id) {
+    this._connection_id = connection_id;
   }
 }
 

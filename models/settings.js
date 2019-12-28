@@ -12,7 +12,9 @@ class SettingsModel {
 
     this.schema = new Schema(
       {
-        generated: { type: Boolean, default: false }
+        generated: { type: Boolean, default: false, require: true },
+        admin_login: { type: String, default: "admin", require: true },
+        admin_password: { type: String, default: "123", require: true }
       },
       {
         capped: { size: 1024, max: 1 }

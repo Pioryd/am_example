@@ -73,15 +73,15 @@ function data_full(connection, received_data, manager) {
 
   if (is_admin(character_id)) {
     send_data = {
-      lands_map: manager.lands_map,
-      characters_map: manager.characters_map
+      lands_map: manager._lands_map,
+      characters_map: manager._characters_map
     };
   } else {
-    const character = manager.characters_map[character_id];
-    const land = manager.lands_map[character.position.land_id];
+    const character = manager.character_get_by_id(character_id);
+    const land = manager.character_get_land(character_id);
     send_data = {
-      character: character,
-      land: land
+      character: character._data,
+      land: land._data
     };
   }
   return {
@@ -98,10 +98,10 @@ function data_character(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.characters_map[character_id];
+  const character = manager.character_get_by_id(character_id);
 
   send_data = {
-    character: character
+    character: character._data
   };
 
   return {
@@ -118,20 +118,20 @@ function data_world(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.characters_map[character_id];
+  const character = manager.character_get_by_id(character_id);
   if (character == null) {
     handle_error(connection, received_data);
     return;
   }
 
-  const land = manager.lands_map[character.position.land_id];
+  const land = manager.character_get_land(character_id);
 
   send_data = {
-    land: land
+    land: land._data
   };
 
   return {
-    packet_id: "data_character",
+    packet_id: "data_world",
     data: send_data
   };
 }
@@ -170,7 +170,7 @@ function data_character_add_friend(connection, received_data, manager) {
     return;
   }
 
-  manager.character_add_friend(character_id, received_data.name);
+  manager.character_add_friend_if_exist(character_id, received_data.name);
 
   return data_character(connection, received_data, manager);
 }
@@ -183,7 +183,8 @@ function data_character_remove_friend(connection, received_data, manager) {
     return;
   }
 
-  manager.character_remove_friend(character_id, received_data.name);
+  const character = manager.character_get_by_id(character_id);
+  character.remove_friend(received_data.name);
 
   return data_character(connection, received_data, manager);
 }
@@ -196,7 +197,8 @@ function data_character_change_state(connection, received_data, manager) {
     return;
   }
 
-  manager.character_change_state(character_id, received_data.name);
+  const character = manager.character_get_by_id(character_id);
+  character.change_state(received_data.name);
 
   return data_character(connection, received_data, manager);
 }
@@ -209,7 +211,8 @@ function data_character_change_action(connection, received_data, manager) {
     return;
   }
 
-  manager.character_change_action(character_id, received_data.name);
+  const character = manager.character_get_by_id(character_id);
+  character.change_action(received_data.name);
 
   return data_character(connection, received_data, manager);
 }
@@ -222,7 +225,8 @@ function data_character_change_activity(connection, received_data, manager) {
     return;
   }
 
-  manager.character_change_activity(character_id, received_data.name);
+  const character = manager.character_get_by_id(character_id);
+  character.change_activity(received_data.name);
 
   return data_character(connection, received_data, manager);
 }

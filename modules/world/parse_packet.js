@@ -143,7 +143,7 @@ function data_character_change_position(connection, received_data, manager) {
 
   manager.character_change_position(character_name, received_data.position_x);
 
-  return data_character(connection, received_data, manager);
+  return data_world(connection, received_data, manager);
 }
 
 function data_character_change_land(connection, received_data, manager) {
@@ -156,7 +156,7 @@ function data_character_change_land(connection, received_data, manager) {
 
   manager.character_change_land(character_name, received_data.land_id);
 
-  return data_character(connection, received_data, manager);
+  return data_world(connection, received_data, manager);
 }
 
 function data_character_add_friend(connection, received_data, manager) {

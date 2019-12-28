@@ -290,7 +290,7 @@ class Manager {
     }
 
     const new_land = this._lands_map[land_id];
-    new_land.insert_character(character.get_name());
+    new_land.insert_character(character_name);
   }
 
   character_add_friend_if_exist(character_name, friend_name) {

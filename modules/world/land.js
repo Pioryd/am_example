@@ -61,6 +61,7 @@ class Land {
 
   change_character_position(name, new_position) {
     const current_position = this.get_character_position(name);
+
     if (current_position == null || new_position > this._data.map.length)
       return;
 
@@ -70,7 +71,7 @@ class Land {
       1
     );
 
-    const new_point = this._data.map[current_position];
+    const new_point = this._data.map[new_position];
     new_point.characters_list.push(name);
   }
 

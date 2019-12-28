@@ -8,7 +8,6 @@ const LandModel = require("../../models/land");
 const SettingsModel = require("../../models/settings");
 const log = require("simple-node-logger").createSimpleLogger();
 
-const Admin_Account_ID = -1;
 class Manager {
   constructor({ application }) {
     this.database = new Database({
@@ -260,36 +259,12 @@ class Manager {
     return name in this._characters_map && this._characters_map[name] != null;
   }
 
-  character_get_by_id(id) {
-    if (id in this._characters_map) return this._characters_map[id];
+  character_get(name) {
+    if (name in this._characters_map) return this._characters_map[name];
   }
 
-  character_get_id_by_name(name) {
-    if (name == null) return;
-
-    // Admin
-    if (this.settings.admin_login.toLowerCase() === name.toLowerCase())
-      return Admin_Account_ID;
-
-    // Characters
-    for (const [id, character] of Object.entries(this._characters_map))
-      if (character.get_name().toLowerCase() === name.toLowerCase()) return id;
-  }
-
-  character_get_name_by_id(id) {
-    if (id == null) return;
-
-    // Admin
-    if (Admin_Account_ID == id) return this.settings.admin_login;
-
-    // Characters
-    const character = this.character_get_by_id(id);
-    if (character == null) return;
-    return character.get_name();
-  }
-
-  character_get_connection_id(id) {
-    const character = this.character_get_by_id(id);
+  character_get_connection_id(character_name) {
+    const character = this.character_get(character_name);
     if (character == null) return;
     return character.get_connection_id();
   }
@@ -299,23 +274,17 @@ class Manager {
       if (land.get_character_position(character_name) != null) return land;
   }
 
-  character_change_position(id, position) {
-    const character = this.character_get_by_id(id);
-    if (character == null) return;
-
+  character_change_position(character_name, position) {
     for (const land of Object.values(this._lands_map))
-      land.change_character_position(character.get_name(), position);
+      land.change_character_position(character_name, position);
   }
 
-  character_change_land(id, land_id) {
+  character_change_land(character_name, land_id) {
     if (!(land_id in this._lands_map)) return;
 
-    const character = this.character_get_by_id(id);
-    if (character == null) return;
-
     for (const land of Object.values(this._lands_map)) {
-      if (land.get_character_position(character.get_name()) != null) {
-        land.remove_character(character.get_name());
+      if (land.get_character_position(character_name) != null) {
+        land.remove_character(character_name);
         break;
       }
     }
@@ -325,8 +294,8 @@ class Manager {
   }
 
   character_add_friend_if_exist(character_name, friend_name) {
-    const character = this.character_get_by_id(character_name);
-    const friend = this.character_get_by_id(friend_name);
+    const character = this.character_get(character_name);
+    const friend = this.character_get(friend_name);
 
     if (character == null || friend == null) return;
 
@@ -353,7 +322,7 @@ class Manager {
 
     // Characters
     // Only one account per character
-    for (const [id, character] of Object.entries(this._characters_map)) {
+    for (const character of Object.values(this._characters_map)) {
       console.log(character.get_name().toLowerCase(), login.toLowerCase());
       console.log(
         character.get_password().toLowerCase(),

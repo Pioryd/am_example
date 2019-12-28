@@ -4,7 +4,7 @@ class Land {
     this.name = name;
     this.size = 20;
     this.objects_list = [];
-    this.characters_map = [];
+    this.characters_list = [];
   }
 }
 

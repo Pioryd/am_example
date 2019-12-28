@@ -16,7 +16,7 @@ class LandModel {
       size: { type: Number, required: true },
       name: { type: String },
       objects_list: { type: [String] },
-      characters_map: { type: [String] }
+      characters_list: { type: [String] }
     });
     this.model = this.connection.model("Land", this.schema, "land");
   }

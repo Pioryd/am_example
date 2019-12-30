@@ -16,7 +16,8 @@ const Events_list = [
   "on_terminate",
   "on_prepare",
   "on_tick",
-  "on_exit"
+  "on_exit",
+  "on_close"
 ];
 
 class App extends EventEmitter {
@@ -41,6 +42,24 @@ class App extends EventEmitter {
       events_list: Events_list,
       disabled_modules: this.config.data.disabled_modules
     });
+
+    process.stdin.resume();
+    process.stdin.setEncoding("utf8");
+
+    process.stdin.on("data", text => {
+      console.log(text);
+      if (text.trim() === "close") {
+        console.log("command close");
+        this.emit("on_close");
+      }
+    });
+
+    // prompt.start();
+    // prompt.get(["close"], (err, result) => {
+    //   console.log(err, result);
+    //   if (err) console.log(error);
+    //   if (result === "close") this.emit("on_close");
+    // });
   }
 
   main_loop(_this) {

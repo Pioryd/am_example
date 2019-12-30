@@ -29,20 +29,31 @@ class SettingsModel {
       class_instance,
       { upsert: true },
       (error, raw) => {
-        callback(this.model.collection.name + ".save", error, raw);
+        callback({
+          step: this.model.collection.name + ".save",
+          error: error,
+          results: raw
+        });
       }
     );
   }
 
   remove(callback) {
     this.model.delete(null, error => {
-      callback(this.model.collection.name + ".remove", error);
+      callback({
+        step: this.model.collection.name + ".remove",
+        error: error
+      });
     });
   }
 
   load(callback) {
     this.model.find(null, (error, result) => {
-      callback(this.model.collection.name + ".load", error, result);
+      callback({
+        step: this.model.collection.name + ".load",
+        error: error,
+        results: result
+      });
     });
   }
 }

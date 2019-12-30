@@ -1,7 +1,7 @@
 const Schema = require("mongoose").Schema;
 const log = require("simple-node-logger").createSimpleLogger();
 
-class LandModel {
+class EnvironmentObjectModel {
   constructor() {
     this.connection = {};
     this.schema = {};
@@ -13,15 +13,14 @@ class LandModel {
 
     this.schema = new Schema({
       id: { type: String, required: true, unique: true, index: true },
-      name: { type: String, required: true },
-      map: [
-        {
-          objects_list: { type: [String] },
-          characters_list: { type: [String] }
-        }
-      ]
+      type: { type: String, required: true },
+      name: { type: String, required: true }
     });
-    this.model = this.connection.model("Land", this.schema, "land");
+    this.model = this.connection.model(
+      "EnvironmentObject",
+      this.schema,
+      "environment_object"
+    );
   }
 
   save(classes_instances, callback, index = 0) {
@@ -80,4 +79,4 @@ class LandModel {
   }
 }
 
-module.exports = new LandModel();
+module.exports = new EnvironmentObjectModel();

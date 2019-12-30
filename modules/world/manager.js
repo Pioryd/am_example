@@ -6,7 +6,9 @@ const { Database, Util, Stopwatch } = require("am_framework");
 const CharacterModel = require("../../models/character");
 const LandModel = require("../../models/land");
 const SettingsModel = require("../../models/settings");
+const EnvironmentObjectModel = require("../../models/environment_object");
 const log = require("simple-node-logger").createSimpleLogger();
+const ObjectID = require("bson-objectid");
 
 class Manager {
   constructor({ application }) {
@@ -16,19 +18,31 @@ class Manager {
     });
     this._lands_map = {};
     this._characters_map = {};
+    this._environment_objects_map = {};
     this.server = application.web_server;
+    this.event_emiter = application;
     this.ready = false;
     this.settings = { generated: false, admin_login: "", admin_password: "" };
 
-    this.stopwatches_map = { database_save: new Stopwatch(10 * 1000) };
+    this.stopwatches_map = { database_save: new Stopwatch(5 * 1000) };
+
+    this.event_emiter.on(
+      "character_leave_object",
+      this.on_character_leave_object
+    );
+    this.event_emiter.on(
+      "character_enter_object",
+      this.on_character_enter_object
+    );
   }
 
   poll() {
     if (!this.ready) return;
 
     if (this.stopwatches_map.database_save.is_elapsed()) {
-      log.info(`[${Util.get_time_hms()}] Auto save to database`);
-      this.database_save_data();
+      // change to backup_db
+      // log.info("Auto save to database");
+      // this.database_save_data();
       this.stopwatches_map.database_save.reset();
     }
   }
@@ -59,46 +73,62 @@ class Manager {
       this._characters_map[character._data.name] = character;
 
       // Create land
-      const land = new Land({ id: id, name: "land_" + id, map: [] });
-      const size = Util.get_random_int(10, 20);
-      for (let i = 0; i < size; i++)
+      const land = new Land(
+        {
+          id: ObjectID().toHexString(),
+          name: "land_" + id,
+          map: []
+        },
+        this.event_emiter
+      );
+      const land_size = Util.get_random_int(10, 20);
+      for (let i = 0; i < land_size; i++)
         land._data.map.push({ characters_list: [], objects_list: [] });
       this._lands_map[id] = land;
 
       // Place character at land
-      land._data.map[Util.get_random_int(0, size - 1)].characters_list.push(
+      const character_position = Util.get_random_int(0, land_size - 1);
+      land._data.map[character_position].characters_list.push(
         character._data.name
       );
 
-      // const EnvironmentObjectList = {
-      //   house: { id: 1, size: 3 },
-      //   tree: { id: 2, size: 3 }
-      // };
+      // Place portal at land
+      const environment_object = new EnvironmentObject({
+        id: ObjectID().toHexString(),
+        type: "portal",
+        name: "portal_" + id
+      });
+      this._environment_objects_map[
+        environment_object.get_id()
+      ] = environment_object;
 
-      // // Insert environment object - house
-      // if (Util.get_random_int(0, 1) === 1) {
-      //   const object_name = "house";
-      //   land.objects_list.push(
-      //     new EnvironmentObject(
-      //       EnvironmentObjectList[object_name].id,
-      //       object_name,
-      //       EnvironmentObjectList[object_name].size
-      //     )
-      //   );
-      // }
-      // // Insert environment object - tree
-      // for (let k = 0; k < 3; k++) {
-      //   if (Util.get_random_int(0, 1) === 1) {
-      //     const object_name = "tree";
-      //     land.objects_list.push(
-      //       new EnvironmentObject(
-      //         EnvironmentObjectList[object_name].id,
-      //         object_name,
-      //         EnvironmentObjectList[object_name].size
-      //       )
-      //     );
-      //   }
-      // }
+      const portal_position = Util.get_random_int(0, land_size - 1);
+      if (portal_position === character_position)
+        if (portal_position - 1 < 0) portal_position++;
+      land._data.map[portal_position].objects_list.push(
+        environment_object.get_id()
+      );
+
+      // Place some trees
+      let number_of_trees = Util.get_random_int(1, 4);
+
+      for (let i = 0; i < number_of_trees; i++) {
+        const environment_object = new EnvironmentObject({
+          id: ObjectID().toHexString(),
+          type: "tree",
+          name: "tree"
+        });
+        this._environment_objects_map[
+          environment_object.get_id()
+        ] = environment_object;
+
+        const tree_position = Util.get_random_int(0, land_size - 1);
+        if (tree_position === character_position)
+          if (tree_position - 1 < 0) tree_position++;
+        land._data.map[tree_position].objects_list.push(
+          environment_object.get_id()
+        );
+      }
     }
 
     this.settings.generated = true;
@@ -110,9 +140,19 @@ class Manager {
     SettingsModel.setup(this.database.connection);
     CharacterModel.setup(this.database.connection);
     LandModel.setup(this.database.connection);
+    EnvironmentObjectModel.setup(this.database.connection);
   }
 
-  database_save_data(step = "connect", error, results) {
+  /* 
+    Save data is NOT safe, because data can be changed while function 
+    is working.  
+  */
+  database_save_data({
+    step = "connect",
+    error = null,
+    results = [],
+    on_success = null
+  }) {
     log.info("Save data to database, step:", step);
 
     if (error != null) log.error(error);
@@ -121,30 +161,51 @@ class Manager {
       case "connect":
         this.database.connect(collections => {
           this.database_setup_models();
-          this.database_save_data("connected");
+          this.database_save_data({
+            step: "connected",
+            on_success: on_success
+          });
         });
         break;
       case "connected":
         SettingsModel.save(this.settings, (...args) => {
-          this.database_save_data(...args);
+          this.database_save_data(
+            Object.assign(...args, { on_success: on_success })
+          );
         });
         break;
       case "settings.save":
         CharacterModel.save(Object.values(this._characters_map), (...args) => {
-          this.database_save_data(...args);
+          console.log();
+          this.database_save_data(
+            Object.assign(...args, { on_success: on_success })
+          );
         });
         break;
       case "character.save":
         LandModel.save(Object.values(this._lands_map), (...args) => {
-          this.database_save_data(...args);
+          this.database_save_data(
+            Object.assign(...args, { on_success: on_success })
+          );
         });
         break;
       case "land.save":
+        EnvironmentObjectModel.save(
+          Object.values(this._environment_objects_map),
+          (...args) => {
+            this.database_save_data(
+              Object.assign(...args, { on_success: on_success })
+            );
+          }
+        );
+        break;
+      case "environment_object.save":
+        on_success();
         break;
     }
   }
 
-  database_load_data(step = "connect", error, results) {
+  database_load_data({ step = "connect", error = null, results = [] }) {
     const set_settings = results_list => {
       if (results_list.length <= 0) return;
       this.settings = results_list[0]._doc;
@@ -164,7 +225,7 @@ class Manager {
 
     const set_lands = results_list => {
       for (const result of results_list) {
-        const land = new Land({ ...result._doc });
+        const land = new Land({ ...result._doc }, this.event_emiter);
         delete land._id;
         delete land.__v;
 
@@ -172,10 +233,27 @@ class Manager {
       }
     };
 
+    const set_environment_objects = results_list => {
+      for (const result of results_list) {
+        const environment_object = new EnvironmentObject({ ...result._doc });
+        delete environment_object._id;
+        delete environment_object.__v;
+
+        this._environment_objects_map[
+          environment_object.get_id()
+        ] = environment_object;
+      }
+    };
+
     const check_collections = collections => {
       this.database_setup_models();
 
-      const collections_names = ["settings", "character", "land"];
+      const collections_names = [
+        "settings",
+        "character",
+        "land",
+        "environment_object"
+      ];
 
       for (const collection_name of collections_names) {
         let found = false;
@@ -194,13 +272,13 @@ class Manager {
 
           this.generate_world();
 
-          this.database_load_data("check_loaded_data");
+          this.database_load_data({ step: "check_loaded_data" });
 
           return;
         }
       }
 
-      this.database_load_data("connected");
+      this.database_load_data({ step: "connected" });
     };
 
     const check_loaded_data = () => {
@@ -245,7 +323,13 @@ class Manager {
         break;
       case "land.load_all":
         set_lands(results);
-        this.database_load_data("check_loaded_data");
+        EnvironmentObjectModel.load_all((...args) => {
+          this.database_load_data(...args);
+        });
+        break;
+      case "environment_object.load_all":
+        set_environment_objects(results);
+        this.database_load_data({ step: "check_loaded_data" });
         break;
       case "check_loaded_data":
         check_loaded_data(); // must be as last function
@@ -323,11 +407,6 @@ class Manager {
     // Characters
     // Only one account per character
     for (const character of Object.values(this._characters_map)) {
-      console.log(character.get_name().toLowerCase(), login.toLowerCase());
-      console.log(
-        character.get_password().toLowerCase(),
-        password.toLowerCase()
-      );
       if (
         character.get_name().toLowerCase() === login.toLowerCase() &&
         character.get_password().toLowerCase() === password.toLowerCase()
@@ -343,6 +422,10 @@ class Manager {
     }
     return "Wrong authentication data";
   }
+
+  on_character_enter_object(name, objects_list) {}
+
+  on_character_leave_object(name, objects_list) {}
 }
 
 module.exports = { Manager };

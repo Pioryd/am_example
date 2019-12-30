@@ -1,10 +1,14 @@
-const { Util } = require("am_framework");
-
 class EnvironmentObject {
-  constructor(id, name, size) {
-    this.id = id;
-    this.name = name;
-    this.size = size;
+  constructor(data) {
+    this._data = data;
+  }
+
+  get_id() {
+    return this._data.id;
+  }
+
+  get_name() {
+    return this._data.name;
   }
 }
 

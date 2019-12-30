@@ -1,7 +1,7 @@
 /*
 NOTE!
 Classes instances like: [Character], [Land], etc use only as read only. 
-To change any data of them use [manager] methods.
+To change any data of them use [managers] methods.
 */
 function is_admin(name) {
   return name === "admin";
@@ -27,11 +27,11 @@ function handle_error(connection, received_data, message) {
 
 // Parse functions
 
-function accept_connection(connection, received_data, manager) {
+function accept_connection(connection, received_data, managers) {
   const login = received_data.login;
   const password = received_data.password;
 
-  const error = manager.character_authenticate(
+  const error = managers.characters.log_in_character(
     connection.socket.id,
     login,
     password
@@ -46,7 +46,7 @@ function accept_connection(connection, received_data, manager) {
     return;
   }
 
-  if (manager.character_is_exist(login) == null) {
+  if (managers.characters.is_character_exist(login) == null) {
     handle_error(connection, received_data);
     return;
   }
@@ -54,7 +54,7 @@ function accept_connection(connection, received_data, manager) {
   connection.user_data.character_name = login;
   connection.user_data.password = password;
   connection.on_close = connection => {
-    manager.character_log_off(login);
+    managers.characters.log_off_character(login);
   };
 
   return {
@@ -66,18 +66,18 @@ function accept_connection(connection, received_data, manager) {
   };
 }
 
-function data_full(connection, received_data, manager) {
+function data_full(connection, received_data, managers) {
   let send_data = {};
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
     send_data = {
-      lands_map: manager._lands_map,
-      characters_map: manager._characters_map
+      lands_map: managers.world.get_lands(),
+      characters_map: managers.get_characters()
     };
   } else {
-    const character = manager.character_get(character_name);
-    const land = manager.character_get_land(character_name);
+    const character = managers.characters.get_character(character_name);
+    const land = managers.characters.get_character_land(character_name);
     send_data = {
       character: character._data,
       land: land._data
@@ -89,7 +89,7 @@ function data_full(connection, received_data, manager) {
   };
 }
 
-function data_character(connection, received_data, manager) {
+function data_character(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -97,7 +97,7 @@ function data_character(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.character_get(character_name);
+  const character = managers.characters.get_character(character_name);
 
   send_data = {
     character: character._data
@@ -109,7 +109,7 @@ function data_character(connection, received_data, manager) {
   };
 }
 
-function data_world(connection, received_data, manager) {
+function data_world(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -117,7 +117,7 @@ function data_world(connection, received_data, manager) {
     return;
   }
 
-  const land = manager.character_get_land(character_name);
+  const land = managers.characters.get_character_land(character_name);
   if (land == null) {
     handle_error(connection, received_data);
     return;
@@ -133,7 +133,7 @@ function data_world(connection, received_data, manager) {
   };
 }
 
-function data_character_change_position(connection, received_data, manager) {
+function data_character_change_position(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -141,12 +141,15 @@ function data_character_change_position(connection, received_data, manager) {
     return;
   }
 
-  manager.character_change_position(character_name, received_data.position_x);
+  managers.characters.change_character_position(
+    character_name,
+    received_data.position_x
+  );
 
-  return data_world(connection, received_data, manager);
+  return data_world(connection, received_data, managers);
 }
 
-function data_character_change_land(connection, received_data, manager) {
+function data_character_change_land(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -154,12 +157,15 @@ function data_character_change_land(connection, received_data, manager) {
     return;
   }
 
-  manager.character_change_land(character_name, received_data.land_id);
+  managers.characters.change_character_land(
+    character_name,
+    received_data.land_id
+  );
 
-  return data_world(connection, received_data, manager);
+  return data_world(connection, received_data, managers);
 }
 
-function data_character_add_friend(connection, received_data, manager) {
+function data_character_add_friend(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -167,12 +173,15 @@ function data_character_add_friend(connection, received_data, manager) {
     return;
   }
 
-  manager.character_add_friend_if_exist(character_name, received_data.name);
+  managers.characters.add_character_friend_if_exist(
+    character_name,
+    received_data.name
+  );
 
-  return data_character(connection, received_data, manager);
+  return data_character(connection, received_data, managers);
 }
 
-function data_character_remove_friend(connection, received_data, manager) {
+function data_character_remove_friend(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -180,13 +189,13 @@ function data_character_remove_friend(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.character_get(character_name);
+  const character = managers.characters.get_character(character_name);
   character.remove_friend(received_data.name);
 
-  return data_character(connection, received_data, manager);
+  return data_character(connection, received_data, managers);
 }
 
-function data_character_change_state(connection, received_data, manager) {
+function data_character_change_state(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -194,13 +203,13 @@ function data_character_change_state(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.character_get(character_name);
+  const character = managers.characters.get_character(character_name);
   character.change_state(received_data.name);
 
-  return data_character(connection, received_data, manager);
+  return data_character(connection, received_data, managers);
 }
 
-function data_character_change_action(connection, received_data, manager) {
+function data_character_change_action(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -208,13 +217,13 @@ function data_character_change_action(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.character_get(character_name);
+  const character = managers.characters.get_character(character_name);
   character.change_action(received_data.name);
 
-  return data_character(connection, received_data, manager);
+  return data_character(connection, received_data, managers);
 }
 
-function data_character_change_activity(connection, received_data, manager) {
+function data_character_change_activity(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -222,13 +231,13 @@ function data_character_change_activity(connection, received_data, manager) {
     return;
   }
 
-  const character = manager.character_get(character_name);
+  const character = managers.characters.get_character(character_name);
   character.change_activity(received_data.name);
 
-  return data_character(connection, received_data, manager);
+  return data_character(connection, received_data, managers);
 }
 
-function action_message(connection, received_data, manager) {
+function action_message(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
   if (is_admin(character_name)) {
@@ -237,7 +246,7 @@ function action_message(connection, received_data, manager) {
   }
 
   const from_character_name = character_name;
-  const to_character_connection_id = manager.character_get_connection_id(
+  const to_character_connection_id = managers.characters.get_character_connection_id(
     received_data.name
   );
 
@@ -256,7 +265,7 @@ function action_message(connection, received_data, manager) {
     name: from_character_name,
     text: text
   };
-  manager.server.send(to_character_connection_id, "action_message", send_data);
+  managers.server.send(to_character_connection_id, "action_message", send_data);
 }
 
 module.exports = {

@@ -24,36 +24,56 @@ class SettingsModel {
   }
 
   save(class_instance, callback) {
+    if (class_instance == null) {
+      callback({
+        step: this.model.collection.name + ".save",
+        error: "class_instance is null"
+      });
+      return;
+    }
+
     this.model.updateOne(
       null,
       class_instance,
       { upsert: true },
       (error, raw) => {
-        callback({
-          step: this.model.collection.name + ".save",
-          error: error,
-          results: raw
-        });
+        try {
+          callback({
+            step: this.model.collection.name + ".save",
+            error: error,
+            results: raw
+          });
+        } catch (e) {
+          log.error(e);
+        }
       }
     );
   }
 
   remove(callback) {
     this.model.delete(null, error => {
-      callback({
-        step: this.model.collection.name + ".remove",
-        error: error
-      });
+      try {
+        callback({
+          step: this.model.collection.name + ".remove",
+          error: error
+        });
+      } catch (e) {
+        log.error(e);
+      }
     });
   }
 
   load(callback) {
     this.model.find(null, (error, result) => {
-      callback({
-        step: this.model.collection.name + ".load",
-        error: error,
-        results: result
-      });
+      try {
+        callback({
+          step: this.model.collection.name + ".load",
+          error: error,
+          results: result
+        });
+      } catch (e) {
+        log.error(e);
+      }
     });
   }
 }

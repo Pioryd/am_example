@@ -32,21 +32,35 @@ class LandModel {
       const class_instance = classes_instances[index];
       index++;
 
+      if (class_instance == null) {
+        callback({
+          step: this.model.collection.name + ".save",
+          error: "class_instance is null"
+        });
+        return;
+      }
+
       const data = class_instance._data;
       this.model.updateOne(
         { id: data.id },
         { ...data },
         { upsert: true },
         (error, raw) => {
-          if (error) {
-            log.info("Error:", error);
-            log.info("Raw:", raw);
+          try {
+            if (error) {
+              callback({
+                step: this.model.collection.name + ".save",
+                error: error,
+                results: raw
+              });
+            } else {
+              this.save(classes_instances, callback, index);
+            }
+          } catch (e) {
+            log.error(e);
           }
-
-          this.save(classes_instances, callback, index);
         }
       );
-
       return;
     }
 
@@ -55,27 +69,42 @@ class LandModel {
 
   remove(id, callback) {
     this.model.deleteOne({ id: id }, error => {
-      callback({ step: this.model.collection.name + ".remove", error: error });
+      try {
+        callback({
+          step: this.model.collection.name + ".remove",
+          error: error
+        });
+      } catch (e) {
+        log.error(e);
+      }
     });
   }
 
   load(id, callback) {
     this.model.findOne({ id: id }, (error, result) => {
-      callback({
-        step: this.model.collection.name + ".load",
-        error: error,
-        results: result
-      });
+      try {
+        callback({
+          step: this.model.collection.name + ".load",
+          error: error,
+          results: result
+        });
+      } catch (e) {
+        log.error(e);
+      }
     });
   }
 
   load_all(callback) {
     this.model.find(null, (error, result) => {
-      callback({
-        step: this.model.collection.name + ".load_all",
-        error: error,
-        results: result
-      });
+      try {
+        callback({
+          step: this.model.collection.name + ".load_all",
+          error: error,
+          results: result
+        });
+      } catch (e) {
+        log.error(e);
+      }
     });
   }
 }

@@ -16,9 +16,11 @@ Responsible for:
 class DatabaseManager {
   constructor(module_world) {
     this.module_world = module_world;
+    this.config = this.module_world.application.config.data;
+
     this.database = new Database({
-      url: "mongodb://127.0.0.1:27017",
-      name: "am_world",
+      url: this.config.module_world.database.url,
+      name: this.config.module_world.database.name,
       setup_models: this.setup_models
     });
     this.ready = false;

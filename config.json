@@ -1,7 +1,14 @@
 {
-  "port": 3000,
+  "module_world": {
+    "database": {
+      "url": "mongodb://127.0.0.1:27017",
+      "name": "am_world"
+    },
+    "server": {
+      "port": 3000
+    }
+  },
+  "close_app_delay": 5000,
   "forms_location": "data/forms.json",
-  "disabled_modules": [
-    "forms"
-  ]
+  "disabled_modules": []
 }

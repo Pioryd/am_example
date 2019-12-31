@@ -1,7 +1,7 @@
 class Land {
-  constructor(data, event_manager) {
+  constructor(data, event_emitter) {
     this._data = data;
-    this.event_manager = event_manager;
+    this.event_emitter = event_emitter;
   }
 
   get_id() {
@@ -65,7 +65,7 @@ class Land {
     );
 
     if (current_point.objects_list.length > 0) {
-      this.event_manager.emit("character_leave_object", name, {
+      this.event_emitter.emit("character_leave_object", name, {
         ...current_point.objects_list
       });
     }
@@ -74,7 +74,7 @@ class Land {
     new_point.characters_list.push(name);
 
     if (new_point.objects_list.length > 0) {
-      this.event_manager.emit("character_enter_object", name, {
+      this.event_emitter.emit("character_enter_object", name, {
         ...new_point.objects_list
       });
     }
@@ -86,7 +86,7 @@ class Land {
     point.characters_list.push(name);
 
     if (point.objects_list.length > 0) {
-      this.event_manager.emit("character_enter_object", name, {
+      this.event_emitter.emit("character_enter_object", name, {
         ...point.objects_list
       });
     }
@@ -99,7 +99,7 @@ class Land {
         point.characters_list.splice(point.characters_list.indexOf(name), 1);
 
         if (point.objects_list.length > 0) {
-          this.event_manager.emit("character_leave_object", name, {
+          this.event_emitter.emit("character_leave_object", name, {
             ...point.objects_list
           });
         }

@@ -5,10 +5,15 @@ const Server = require("./manager/server");
 
 const log = require("simple-node-logger").createSimpleLogger();
 
-class ModuleWorld {
+/* 
+  ModuleWorld === EventEmiter
+  But:
+    - managers should use it as ModuleWorld
+    - data objects should use it as EventEmiter
+*/
+class ModuleWorld extends EventEmitter {
   constructor({ application }) {
     this.application = application;
-    this.event_emitter = application;
     this.data = {
       lands_map: {},
       characters_map: {},

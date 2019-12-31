@@ -12,11 +12,11 @@ class World {
   constructor(module_world) {
     this.module_world = module_world;
 
-    this.module_world.event_emitter.on(
+    this.module_world.on(
       "character_leave_object",
       this.on_character_leave_object
     );
-    this.module_world.event_emitter.on(
+    this.module_world.on(
       "character_enter_object",
       this.on_character_enter_object
     );
@@ -68,7 +68,7 @@ class World {
           name: "land_" + id,
           map: []
         },
-        this.event_emiter
+        this.module_world
       );
       const land_size = Util.get_random_int(10, 20);
       for (let i = 0; i < land_size; i++)

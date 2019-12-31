@@ -189,10 +189,7 @@ class DatabaseManager {
 
     const set_lands = results_list => {
       for (const result of results_list) {
-        const land = new Land(
-          { ...result._doc },
-          this.module_world.event_emiter
-        );
+        const land = new Land({ ...result._doc }, this.module_world);
         delete land._id;
         delete land.__v;
 

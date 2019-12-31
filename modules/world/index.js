@@ -1,14 +1,13 @@
 const CharactersManager = require("./manager/characters");
 const DatabaseManager = require("./manager/database");
 const EventsManager = require("./manager/world");
-const ServerManager = require("./manager/server");
+const Server = require("./manager/server");
 
 const log = require("simple-node-logger").createSimpleLogger();
 
 class ModuleWorld {
   constructor({ application }) {
     this.application = application;
-    this.web_server = null;
     this.event_emitter = application;
     this.data = {
       lands_map: {},
@@ -20,7 +19,7 @@ class ModuleWorld {
       characters: new CharactersManager(this),
       database: new DatabaseManager(this),
       world: new EventsManager(this),
-      server: new ServerManager(this)
+      server: new Server(this)
     };
 
     this.ready = false;
@@ -28,22 +27,15 @@ class ModuleWorld {
 
   // Async
   on_prepare(web_server) {
-    this.web_server = web_server;
-    this.web_server.add_parse_packet_dict(
-      this.managers.server.create_parse_packet_dict()
-    );
-    this.managers.database.load_data({
-      step: "connect",
-      on_success: () => {
-        if (this.data.settings.generated === false)
-          this.managers.world.generate_world();
-        this.ready = true;
-        log.info("Server is running...");
-      },
-      on_error: () => {
-        on_close();
-      }
-    });
+    try {
+      // The order is important for logic
+      this.managers.database.initialize();
+      this.managers.server.initialize();
+      this.managers.characters.initialize();
+      this.managers.world.initialize();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   // Async
@@ -51,39 +43,49 @@ class ModuleWorld {
     if (!this.ready) return;
 
     try {
-      this.managers.characters.poll();
+      // The order is important for logic
       this.managers.database.poll();
-      this.managers.world.poll();
       this.managers.server.poll();
-    } catch (error) {
-      log.error(error);
+      this.managers.characters.poll();
+      this.managers.world.poll();
+    } catch (e) {
+      console.error(e);
     }
   }
 
   // Async
-  on_exit() {
-    this.managers.database.close();
+  on_force_close() {
+    try {
+      console.error(
+        "Closing forced, unexpected behavior.\n" +
+          "Check data before run [World] module again."
+      );
+      this.application.removeAllListeners();
+
+      // The order is important for logic
+      this.managers.server.terminate();
+      this.managers.world.terminate();
+      this.managers.characters.terminate();
+      this.managers.database.terminate();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   // Async
   on_close() {
-    if (this.web_server != null) this.web_server.stop();
-    this.application.removeAllListeners();
+    try {
+      log.info("Close [World] module...");
+      this.application.removeAllListeners();
 
-    // safe save data to database after close all previous listeners
-    console.log("Saving data to database before exit application");
-    this.managers.database.save_data({
-      on_success: () => {
-        setTimeout(() => {
-          process.exit(0);
-        }, 1000);
-      },
-      on_error: () => {
-        setTimeout(() => {
-          process.exit(0);
-        }, 1000);
-      }
-    });
+      // The order is important for logic
+      this.managers.server.terminate();
+      this.managers.world.terminate();
+      this.managers.characters.terminate();
+      this.managers.database.terminate();
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 

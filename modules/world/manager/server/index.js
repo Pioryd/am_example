@@ -1,11 +1,38 @@
 const { ParsePacket } = require("./parse_packet");
-
-class Server {
+const { Server } = require("am_framework");
+/*
+  Responsible for:
+    - parse/send packets
+*/
+class ServerManager {
   constructor(module_world) {
     this.module_world = module_world;
+    this.config = this.module_world.application.config.data;
+
+    this.web_server = new Server({
+      port: this.config.module_world.server.port
+    });
   }
 
-  poll() {}
+  initialize() {
+    if (this.web_server == null) {
+      log.info("Unable to set wer_server");
+      return;
+    }
+
+    this.web_server.add_parse_packet_dict(this.create_parse_packet_dict());
+  }
+
+  terminate() {
+    if (this.web_server != null) {
+      this.web_server.stop();
+      this.web_server = null;
+    }
+  }
+
+  poll() {
+    this.web_server.poll();
+  }
 
   send(connection_id, packet_id, data) {
     this.module_world.web_server.send(connection_id, packet_id, data);
@@ -26,4 +53,4 @@ class Server {
   }
 }
 
-module.exports = Server;
+module.exports = ServerManager;

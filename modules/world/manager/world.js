@@ -22,6 +22,10 @@ class World {
     );
   }
 
+  initialize() {}
+
+  terminate() {}
+
   poll() {}
 
   get_lands() {

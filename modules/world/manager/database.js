@@ -27,6 +27,36 @@ class DatabaseManager {
     this.stopwatches_map = { database_save: new Stopwatch(5 * 1000) };
   }
 
+  initialize() {
+    this.load_data({
+      step: "connect",
+      on_success: () => {
+        if (this.module_world.data.settings.generated === false)
+          this.module_world.managers.world.generate_world();
+        this.ready = true;
+        log.info("Server is running...");
+      },
+      on_error: () => {
+        on_close();
+      }
+    });
+  }
+
+  terminate() {
+    this.save_data({
+      on_success: () => {
+        setTimeout(() => {
+          this.managers.database.close();
+        }, 1000);
+      },
+      on_error: () => {
+        setTimeout(() => {
+          this.managers.database.close();
+        }, 1000);
+      }
+    });
+  }
+
   poll() {
     if (!this.ready) return;
 

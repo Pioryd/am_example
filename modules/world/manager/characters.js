@@ -3,6 +3,10 @@ class Characters {
     this.module_world = module_world;
   }
 
+  initialize() {}
+
+  terminate() {}
+
   poll() {}
 
   is_character_exist(name) {

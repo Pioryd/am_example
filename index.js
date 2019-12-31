@@ -6,6 +6,7 @@ const {
 } = require("am_framework");
 const EventEmitter = require("events");
 const path = require("path");
+const log = require("simple-node-logger").createSimpleLogger();
 
 const Directories = {
   modules_directory: path.join(__dirname, "modules"),
@@ -46,20 +47,26 @@ class App extends EventEmitter {
     process.stdin.resume();
     process.stdin.setEncoding("utf8");
 
-    process.stdin.on("data", text => {
-      console.log(text);
-      if (text.trim() === "close") {
-        console.log("command close");
-        this.emit("on_close");
+    process.stdin.on("data", data => {
+      const commands_map = {
+        close: () => {
+          this.emit("on_close");
+        }
+      };
+      try {
+        const command = data.trim();
+
+        if (!(command in commands_map)) {
+          log.info(`Unknown command: ${command}`);
+          return;
+        }
+
+        log.info(`Process command: ${command}`);
+        commands_map[command]();
+      } catch (e) {
+        log.info(e);
       }
     });
-
-    // prompt.start();
-    // prompt.get(["close"], (err, result) => {
-    //   console.log(err, result);
-    //   if (err) console.log(error);
-    //   if (result === "close") this.emit("on_close");
-    // });
   }
 
   main_loop(_this) {

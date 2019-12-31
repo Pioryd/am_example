@@ -74,10 +74,14 @@ class ModuleWorld {
     console.log("Saving data to database before exit application");
     this.managers.database.save_data({
       on_success: () => {
-        process.exit(0);
+        setTimeout(() => {
+          process.exit(0);
+        }, 1000);
       },
       on_error: () => {
-        process.exit(0);
+        setTimeout(() => {
+          process.exit(0);
+        }, 1000);
       }
     });
   }

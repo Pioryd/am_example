@@ -44,7 +44,7 @@ class SettingsModel {
             results: raw
           });
         } catch (e) {
-          log.error(e);
+          console.error(e);
         }
       }
     );
@@ -58,7 +58,7 @@ class SettingsModel {
           error: error
         });
       } catch (e) {
-        log.error(e);
+        console.error(e);
       }
     });
   }
@@ -72,7 +72,7 @@ class SettingsModel {
           results: result
         });
       } catch (e) {
-        log.error(e);
+        console.error(e);
       }
     });
   }

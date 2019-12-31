@@ -60,7 +60,7 @@ class DatabaseManager {
     log.info("Save data to database, step:", step);
 
     if (error != null) {
-      log.error(error);
+      console.error(error);
       on_error();
       return;
     }

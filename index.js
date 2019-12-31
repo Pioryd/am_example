@@ -50,7 +50,7 @@ class App extends EventEmitter {
     process.stdin.on("data", data => {
       const commands_map = {
         close: () => {
-          this.emit("on_close");
+          this.close();
         }
       };
       try {
@@ -64,7 +64,6 @@ class App extends EventEmitter {
         log.info(`Process command: ${command}`);
         commands_map[command]();
       } catch (e) {
-        log.info(e);
       }
     });
   }

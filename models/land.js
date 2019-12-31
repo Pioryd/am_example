@@ -57,7 +57,7 @@ class LandModel {
               this.save(classes_instances, callback, index);
             }
           } catch (e) {
-            log.error(e);
+            console.error(e);
           }
         }
       );
@@ -75,7 +75,7 @@ class LandModel {
           error: error
         });
       } catch (e) {
-        log.error(e);
+        console.error(e);
       }
     });
   }
@@ -89,7 +89,7 @@ class LandModel {
           results: result
         });
       } catch (e) {
-        log.error(e);
+        console.error(e);
       }
     });
   }
@@ -103,7 +103,7 @@ class LandModel {
           results: result
         });
       } catch (e) {
-        log.error(e);
+        console.error(e);
       }
     });
   }

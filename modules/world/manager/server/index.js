@@ -16,7 +16,7 @@ class ServerManager {
 
   initialize() {
     if (this.web_server == null) {
-      log.info("Unable to set wer_server");
+      log.info("Unable to set web_server");
       return;
     }
 

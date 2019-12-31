@@ -9,7 +9,8 @@ const Directories = {
 };
 
 /*
-  All modules events must be listed here
+  All application events must be listed in {Events_list}. They are used by 
+  {App.modules_manager} to automatically connect them to modules. 
 */
 const Events_list = [
   "on_init",
@@ -30,9 +31,6 @@ class App extends EventEmitter {
       }
     });
     this.config.load();
-    this.on("on_close", () => {
-      this.config.terminate();
-    });
 
     this.modules_manager = new ModulesManager({
       application: this,
@@ -41,19 +39,18 @@ class App extends EventEmitter {
       events_list: Events_list,
       disabled_modules: this.config.data.disabled_modules
     });
-
-    this.init_commands();
   }
 
-  init_commands() {
+  _init_commands() {
+    const commands_map = {
+      close: () => {
+        this.close();
+      }
+    };
+
     process.stdin.resume();
     process.stdin.setEncoding("utf8");
     process.stdin.on("data", data => {
-      const commands_map = {
-        close: () => {
-          this.close();
-        }
-      };
       try {
         const command = data.trim();
 
@@ -70,7 +67,7 @@ class App extends EventEmitter {
     });
   }
 
-  main_loop(_this) {
+  _main_loop(_this) {
     try {
       _this.emit("on_tick");
     } catch (e) {
@@ -78,11 +75,13 @@ class App extends EventEmitter {
     }
 
     setTimeout(() => {
-      _this.main_loop(_this);
+      _this._main_loop(_this);
     }, 10);
   }
 
+  // Should be called only once
   run() {
+    this._init_commands();
     this.modules_manager.load_modules();
 
     setup_exit_handlers(
@@ -96,11 +95,14 @@ class App extends EventEmitter {
 
     this.emit("on_prepare");
 
-    this.main_loop(this);
+    this._main_loop(this);
   }
 
+  // Should be called only once
   close() {
     log.info(`Closing in ${this.config.data.close_app_delay / 1000} seconds`);
+
+    this.config.terminate();
 
     this.emit("on_close");
 

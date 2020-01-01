@@ -1,8 +1,5 @@
-const CharactersManager = require("./manager/characters");
-const DatabaseManager = require("./manager/database");
-const EventsManager = require("./manager/world");
-const Server = require("./manager/server");
-
+const Manager = require("./managers");
+const EventEmitter = require("events");
 const log = require("simple-node-logger").createSimpleLogger();
 
 /* 
@@ -13,6 +10,7 @@ const log = require("simple-node-logger").createSimpleLogger();
 */
 class ModuleWorld extends EventEmitter {
   constructor({ application }) {
+    super();
     this.application = application;
     this.data = {
       lands_map: {},
@@ -21,10 +19,10 @@ class ModuleWorld extends EventEmitter {
       settings: { generated: false, admin_login: "", admin_password: "" }
     };
     this.managers = {
-      characters: new CharactersManager(this),
-      database: new DatabaseManager(this),
-      world: new EventsManager(this),
-      server: new Server(this)
+      characters: new Manager.Characters(this),
+      database: new Manager.Database(this),
+      main_world: new Manager.MainWorld(this),
+      server: new Manager.Server(this)
     };
 
     this.ready = false;
@@ -37,7 +35,7 @@ class ModuleWorld extends EventEmitter {
       this.managers.database.initialize();
       this.managers.server.initialize();
       this.managers.characters.initialize();
-      this.managers.world.initialize();
+      this.managers.main_world.initialize();
     } catch (e) {
       console.error(e);
     }
@@ -52,7 +50,7 @@ class ModuleWorld extends EventEmitter {
       this.managers.database.poll();
       this.managers.server.poll();
       this.managers.characters.poll();
-      this.managers.world.poll();
+      this.managers.main_world.poll();
     } catch (e) {
       console.error(e);
     }
@@ -69,7 +67,7 @@ class ModuleWorld extends EventEmitter {
 
       // The order is important for logic
       this.managers.server.terminate();
-      this.managers.world.terminate();
+      this.managers.main_world.terminate();
       this.managers.characters.terminate();
       this.managers.database.terminate();
     } catch (e) {
@@ -85,7 +83,7 @@ class ModuleWorld extends EventEmitter {
 
       // The order is important for logic
       this.managers.server.terminate();
-      this.managers.world.terminate();
+      this.managers.main_world.terminate();
       this.managers.characters.terminate();
       this.managers.database.terminate();
     } catch (e) {

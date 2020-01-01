@@ -64,46 +64,21 @@ class Land {
       1
     );
 
-    if (current_point.objects_list.length > 0) {
-      this.event_emitter.emit("character_leave_object", name, {
-        ...current_point.objects_list
-      });
-    }
-
     const new_point = this._data.map[new_position];
     new_point.characters_list.push(name);
-
-    if (new_point.objects_list.length > 0) {
-      this.event_emitter.emit("character_enter_object", name, {
-        ...new_point.objects_list
-      });
-    }
   }
 
   insert_character(name, position = 0) {
     position = position < this._data.map.length ? position : 0;
     const point = this._data.map[position];
     point.characters_list.push(name);
-
-    if (point.objects_list.length > 0) {
-      this.event_emitter.emit("character_enter_object", name, {
-        ...point.objects_list
-      });
-    }
   }
 
   remove_character(name) {
     for (let i = 0; i < this._data.map; i++) {
       const point = this._data.map[i];
-      if (point.characters_list.includes(name)) {
+      if (point.characters_list.includes(name))
         point.characters_list.splice(point.characters_list.indexOf(name), 1);
-
-        if (point.objects_list.length > 0) {
-          this.event_emitter.emit("character_leave_object", name, {
-            ...point.objects_list
-          });
-        }
-      }
     }
   }
 }

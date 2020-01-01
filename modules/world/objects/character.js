@@ -1,5 +1,3 @@
-const { Util } = require("am_framework");
-
 /*
 Data format:
   name: string

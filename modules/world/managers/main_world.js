@@ -1,6 +1,4 @@
-const { Land } = require("../land");
-const { Character } = require("../character");
-const { EnvironmentObject } = require("../environment_object");
+const Objects = require("../objects");
 const { Util } = require("am_framework");
 const ObjectID = require("bson-objectid");
 const log = require("simple-node-logger").createSimpleLogger();
@@ -8,7 +6,7 @@ const log = require("simple-node-logger").createSimpleLogger();
 Responsible for:
   - world logic between object
 */
-class World {
+class MainWorld {
   constructor(module_world) {
     this.module_world = module_world;
 
@@ -51,7 +49,7 @@ class World {
 
     for (let id = 0; id < 5; id++) {
       // Create character
-      const character = new Character({
+      const character = new Objects.Character({
         name: "AM_" + id,
         password: "123",
         state: "",
@@ -62,7 +60,7 @@ class World {
       this.module_world.data.characters_map[character.get_name()] = character;
 
       // Create land
-      const land = new Land(
+      const land = new Objects.Land(
         {
           id: ObjectID().toHexString(),
           name: "land_" + id,
@@ -82,7 +80,7 @@ class World {
       );
 
       // Place portal at land
-      const environment_object = new EnvironmentObject({
+      const environment_object = new Objects.EnvironmentObject({
         id: ObjectID().toHexString(),
         type: "portal",
         name: "portal_" + id
@@ -102,7 +100,7 @@ class World {
       let number_of_trees = Util.get_random_int(1, 4);
 
       for (let i = 0; i < number_of_trees; i++) {
-        const environment_object = new EnvironmentObject({
+        const environment_object = new Objects.EnvironmentObject({
           id: ObjectID().toHexString(),
           type: "tree",
           name: "tree"
@@ -125,9 +123,13 @@ class World {
     this.module_world.data.admin_password = "123";
   }
 
-  on_character_enter_object(name, objects_list) {}
+  on_character_enter_object(name, objects_list) {
+    for (const object of objects_list) object.character_enter(name);
+  }
 
-  on_character_leave_object(name, objects_list) {}
+  on_character_leave_object(name, objects_list) {
+    for (const object of objects_list) object.character_leave(name);
+  }
 }
 
-module.exports = World;
+module.exports = MainWorld;

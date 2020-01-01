@@ -18,3 +18,8 @@ As **synchronous module** you can understand like:
 Contact between modules must be made by:
 
 - queens
+
+### Object and managers
+
+Objects should be used only by managers.
+Manager should be use by any other logic and others managers.

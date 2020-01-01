@@ -14,7 +14,9 @@ class EnvironmentObjectModel {
     this.schema = new Schema({
       id: { type: String, required: true, unique: true, index: true },
       type: { type: String, required: true },
-      name: { type: String, required: true }
+      name: { type: String, required: true },
+      world_id: { type: String },
+      characters_list: { type: [String] }
     });
     this.model = this.connection.model(
       "EnvironmentObject",

@@ -1,11 +1,6 @@
-const { Land } = require("../land");
-const { Character } = require("../character");
-const { EnvironmentObject } = require("../environment_object");
+const Objects = require("../objects");
 const { Database, Stopwatch } = require("am_framework");
-const CharacterModel = require("../../../models/character");
-const LandModel = require("../../../models/land");
-const SettingsModel = require("../../../models/settings");
-const EnvironmentObjectModel = require("../../../models/environment_object");
+const Models = require("../../../models");
 const log = require("simple-node-logger").createSimpleLogger();
 
 /*
@@ -32,7 +27,7 @@ class DatabaseManager {
       step: "connect",
       on_success: () => {
         if (this.module_world.data.settings.generated === false)
-          this.module_world.managers.world.generate_world();
+          this.module_world.managers.main_world.generate_world();
         this.ready = true;
         log.info("Server is running...");
       },
@@ -69,10 +64,10 @@ class DatabaseManager {
   }
 
   setup_models(connection) {
-    SettingsModel.setup(connection);
-    CharacterModel.setup(connection);
-    LandModel.setup(connection);
-    EnvironmentObjectModel.setup(connection);
+    Models.Settings.setup(connection);
+    Models.Character.setup(connection);
+    Models.Land.setup(connection);
+    Models.EnvironmentObject.setup(connection);
   }
 
   close() {
@@ -108,7 +103,7 @@ class DatabaseManager {
         });
         break;
       case "connected":
-        SettingsModel.save(this.module_world.data.settings, (...args) => {
+        Models.Settings.save(this.module_world.data.settings, (...args) => {
           this.save_data(
             Object.assign(...args, {
               on_success: on_success,
@@ -118,7 +113,7 @@ class DatabaseManager {
         });
         break;
       case "settings.save":
-        CharacterModel.save(
+        Models.Character.save(
           Object.values(this.module_world.data.characters_map),
           (...args) => {
             console.log();
@@ -132,7 +127,7 @@ class DatabaseManager {
         );
         break;
       case "character.save":
-        LandModel.save(
+        Models.Land.save(
           Object.values(this.module_world.data.lands_map),
           (...args) => {
             this.save_data(
@@ -145,7 +140,7 @@ class DatabaseManager {
         );
         break;
       case "land.save":
-        EnvironmentObjectModel.save(
+        Models.EnvironmentObject.save(
           Object.values(this.module_world.data.environment_objects_map),
           (...args) => {
             this.save_data(
@@ -179,7 +174,7 @@ class DatabaseManager {
 
     const set_characters = results_list => {
       for (const result of results_list) {
-        const character = new Character({ ...result._doc });
+        const character = new Objects.Character({ ...result._doc });
         delete character._data._id;
         delete character._data.__v;
 
@@ -189,7 +184,7 @@ class DatabaseManager {
 
     const set_lands = results_list => {
       for (const result of results_list) {
-        const land = new Land({ ...result._doc }, this.module_world);
+        const land = new Objects.Land({ ...result._doc }, this.module_world);
         delete land._id;
         delete land.__v;
 
@@ -199,7 +194,9 @@ class DatabaseManager {
 
     const set_environment_objects = results_list => {
       for (const result of results_list) {
-        const environment_object = new EnvironmentObject({ ...result._doc });
+        const environment_object = new Objects.EnvironmentObject({
+          ...result._doc
+        });
         delete environment_object._id;
         delete environment_object.__v;
 
@@ -277,7 +274,7 @@ class DatabaseManager {
         });
         break;
       case "connected":
-        SettingsModel.load((...args) => {
+        Models.Settings.load((...args) => {
           this.load_data(
             Object.assign(...args, {
               on_success: on_success,
@@ -288,7 +285,7 @@ class DatabaseManager {
         break;
       case "settings.load":
         set_settings(results);
-        CharacterModel.load_all((...args) => {
+        Models.Character.load_all((...args) => {
           this.load_data(
             Object.assign(...args, {
               on_success: on_success,
@@ -299,7 +296,7 @@ class DatabaseManager {
         break;
       case "character.load_all":
         set_characters(results);
-        LandModel.load_all((...args) => {
+        Models.Land.load_all((...args) => {
           this.load_data(
             Object.assign(...args, {
               on_success: on_success,
@@ -310,7 +307,7 @@ class DatabaseManager {
         break;
       case "land.load_all":
         set_lands(results);
-        EnvironmentObjectModel.load_all((...args) => {
+        Models.EnvironmentObject.load_all((...args) => {
           this.load_data(
             Object.assign(...args, {
               on_success: on_success,

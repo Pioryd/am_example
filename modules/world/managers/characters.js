@@ -27,6 +27,14 @@ class Characters {
     return character.get_connection_id();
   }
 
+  get_character_dimension(character_name) {
+    for (const object of Object.values(
+      this.module_world.data.environment_objects_map
+    ))
+      if (object.contains_character(character_name))
+        return object.get_dimension();
+  }
+
   get_character_land(character_name) {
     for (const land of Object.values(this.module_world.data.lands_map))
       if (land.get_character_position(character_name) != null) return land;

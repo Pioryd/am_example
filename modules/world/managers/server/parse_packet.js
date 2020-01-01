@@ -72,7 +72,7 @@ function data_full(connection, received_data, managers) {
 
   if (is_admin(character_name)) {
     send_data = {
-      lands_map: managers.world.get_lands(),
+      lands_map: managers.main_world.get_lands(),
       characters_map: managers.get_characters()
     };
   } else {
@@ -117,6 +117,7 @@ function data_world(connection, received_data, managers) {
     return;
   }
 
+  const world = managers.characters.get_character_world(character_name);
   const land = managers.characters.get_character_land(character_name);
   if (land == null) {
     handle_error(connection, received_data);
@@ -124,6 +125,7 @@ function data_world(connection, received_data, managers) {
   }
 
   send_data = {
+    world: world,
     land: land._data
   };
 

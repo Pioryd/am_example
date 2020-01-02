@@ -1,7 +1,7 @@
-const Schema = require("mongoose").Schema;
-const log = require("simple-node-logger").createSimpleLogger();
+const path = require("path");
+const Schema = require(path.join(global.node_modules_path, "mongoose")).Schema;
 
-class EnvironmentObjectModel {
+class CharacterModel {
   constructor() {
     this.connection = {};
     this.schema = {};
@@ -12,17 +12,14 @@ class EnvironmentObjectModel {
     this.connection = connection;
 
     this.schema = new Schema({
-      id: { type: String, required: true, unique: true, index: true },
-      type: { type: String, required: true },
-      name: { type: String, required: true },
-      world_id: { type: String },
-      characters_list: { type: [String] }
+      name: { type: String, required: true, unique: true, index: true },
+      password: { type: String },
+      state: { type: String },
+      action: { type: String },
+      activity: { type: String },
+      friends_list: { type: [String] }
     });
-    this.model = this.connection.model(
-      "EnvironmentObject",
-      this.schema,
-      "environment_object"
-    );
+    this.model = this.connection.model("Character", this.schema, "character");
   }
 
   save(classes_instances, callback, index = 0) {
@@ -43,7 +40,7 @@ class EnvironmentObjectModel {
 
       const data = class_instance._data;
       this.model.updateOne(
-        { id: data.id },
+        { name: data.name },
         { ...data },
         { upsert: true },
         (error, raw) => {
@@ -68,8 +65,8 @@ class EnvironmentObjectModel {
     callback({ step: this.model.collection.name + ".save" });
   }
 
-  remove(id, callback) {
-    this.model.deleteOne({ id: id }, error => {
+  remove(name, callback) {
+    this.model.deleteOne({ name: name }, error => {
       try {
         callback({
           step: this.model.collection.name + ".remove",
@@ -81,8 +78,8 @@ class EnvironmentObjectModel {
     });
   }
 
-  load(id, callback) {
-    this.model.findOne({ id: id }, (error, result) => {
+  load(name, callback) {
+    this.model.findOne({ name: name }, (error, result) => {
       try {
         callback({
           step: this.model.collection.name + ".load",
@@ -110,4 +107,4 @@ class EnvironmentObjectModel {
   }
 }
 
-module.exports = new EnvironmentObjectModel();
+module.exports = new CharacterModel();

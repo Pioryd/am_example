@@ -1,7 +1,14 @@
+const path = require("path");
+const { Database, Stopwatch } = require(path.join(
+  global.node_modules_path,
+  "am_framework"
+));
+const log = require(path.join(
+  global.node_modules_path,
+  "simple-node-logger"
+)).createSimpleLogger();
 const Objects = require("../../objects");
-const { Database, Stopwatch } = require("am_framework");
 const Models = require("./models");
-const log = require("simple-node-logger").createSimpleLogger();
 
 /*
 Responsible for:
@@ -11,7 +18,7 @@ Responsible for:
 class DatabaseManager {
   constructor(module_world) {
     this.module_world = module_world;
-    this.config = this.module_world.application.config.data;
+    this.config = this.module_world.config;
 
     this.database = new Database({
       url: this.config.module_world.database.url,
@@ -41,12 +48,20 @@ class DatabaseManager {
     this.save_data({
       on_success: () => {
         setTimeout(() => {
-          this.managers.database.close();
+          try {
+            this.module_world.managers.database.close();
+          } catch (e) {
+            console.error(e);
+          }
         }, 1000);
       },
       on_error: () => {
         setTimeout(() => {
-          this.managers.database.close();
+          try {
+            this.module_world.managers.database.close();
+          } catch (e) {
+            console.error(e);
+          }
         }, 1000);
       }
     });

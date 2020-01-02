@@ -1,5 +1,10 @@
+const path = require("path");
+const log = require(path.join(
+  global.node_modules_path,
+  "simple-node-logger"
+)).createSimpleLogger();
+const { Server } = require(path.join(global.node_modules_path, "am_framework"));
 const { ParsePacket } = require("./parse_packet");
-const { Server } = require("am_framework");
 /*
   Responsible for:
     - parse/send packets
@@ -7,7 +12,7 @@ const { Server } = require("am_framework");
 class ServerManager {
   constructor(module_world) {
     this.module_world = module_world;
-    this.config = this.module_world.application.config.data;
+    this.config = this.module_world.config;
 
     this.web_server = new Server({
       port: this.config.module_world.server.port

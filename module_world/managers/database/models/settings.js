@@ -1,4 +1,5 @@
-const Schema = require("mongoose").Schema;
+const path = require("path");
+const Schema = require(path.join(global.node_modules_path, "mongoose")).Schema;
 
 class SettingsModel {
   constructor() {

@@ -1,6 +1,11 @@
-const Manager = require("./managers");
+const path = require("path");
+const log = require(path.join(
+  global.node_modules_path,
+  "simple-node-logger"
+)).createSimpleLogger();
 const EventEmitter = require("events");
-const log = require("simple-node-logger").createSimpleLogger();
+
+const Manager = require("./managers");
 
 /* 
   ModuleWorld === EventEmiter
@@ -9,9 +14,10 @@ const log = require("simple-node-logger").createSimpleLogger();
     - data objects should use it as EventEmiter
 */
 class ModuleWorld extends EventEmitter {
-  constructor({ application }) {
+  constructor({ event_emitter, config }) {
     super();
-    this.application = application;
+    this.event_emitter = event_emitter;
+    this.config = config;
     this.data = {
       lands_map: {},
       characters_map: {},
@@ -91,7 +97,7 @@ class ModuleWorld extends EventEmitter {
   _terminate(_this) {
     try {
       log.info("Close [World] module...");
-      _this.application.removeAllListeners();
+      _this.event_emitter.removeAllListeners();
 
       // The order is important for logic
       _this.managers.server.terminate();

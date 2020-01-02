@@ -1,3 +1,9 @@
+const path = require("path");
+const log = require(path.join(
+  global.node_modules_path,
+  "simple-node-logger"
+)).createSimpleLogger();
+
 class EnvironmentObject {
   constructor(data) {
     this._data = data;

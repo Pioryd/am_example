@@ -1,25 +1,20 @@
-# Artificial mind - Preview - Server
+# Artificial mind - module_world
 
-## How to run
+## Example app config
 
-> npm start
+```JSON
+"module_world": {
+  "database": {
+    "url": "mongodb://127.0.0.1:27017",
+    "name": "am_module_world"
+  },
+  "server": {
+    "port": 3000
+  }
+}
+```
 
-## Project structure
+## Object and managers
 
-Each module is **Synchronous**, but relation between modules are **Asynchronous**.  
-As **synchronous module** you can understand like:
-
-- async/await
-- single event emitter
-- setInterval
-- setTimeout
-  - even if called once
-
-Contact between modules must be made by:
-
-- queens
-
-### Object and managers
-
-Objects should be used only by managers.
+Objects should be used only by managers.  
 Manager should be use by any other logic and others managers.

@@ -1,7 +1,13 @@
+const path = require("path");
+const log = require(path.join(
+  global.node_modules_path,
+  "simple-node-logger"
+)).createSimpleLogger();
+const { Util } = require(path.join(global.node_modules_path, "am_framework"));
+const ObjectID = require(path.join(global.node_modules_path, "bson-objectid"));
+
 const Objects = require("../objects");
-const { Util } = require("am_framework");
-const ObjectID = require("bson-objectid");
-const log = require("simple-node-logger").createSimpleLogger();
+
 /*
 Responsible for:
   - world logic between object

@@ -1,7 +1,7 @@
-const Schema = require("mongoose").Schema;
-const log = require("simple-node-logger").createSimpleLogger();
+const path = require("path");
+const Schema = require(path.join(global.node_modules_path, "mongoose")).Schema;
 
-class CharacterModel {
+class LandModel {
   constructor() {
     this.connection = {};
     this.schema = {};
@@ -12,14 +12,16 @@ class CharacterModel {
     this.connection = connection;
 
     this.schema = new Schema({
-      name: { type: String, required: true, unique: true, index: true },
-      password: { type: String },
-      state: { type: String },
-      action: { type: String },
-      activity: { type: String },
-      friends_list: { type: [String] }
+      id: { type: String, required: true, unique: true, index: true },
+      name: { type: String, required: true },
+      map: [
+        {
+          objects_list: { type: [String] },
+          characters_list: { type: [String] }
+        }
+      ]
     });
-    this.model = this.connection.model("Character", this.schema, "character");
+    this.model = this.connection.model("Land", this.schema, "land");
   }
 
   save(classes_instances, callback, index = 0) {
@@ -40,7 +42,7 @@ class CharacterModel {
 
       const data = class_instance._data;
       this.model.updateOne(
-        { name: data.name },
+        { id: data.id },
         { ...data },
         { upsert: true },
         (error, raw) => {
@@ -65,8 +67,8 @@ class CharacterModel {
     callback({ step: this.model.collection.name + ".save" });
   }
 
-  remove(name, callback) {
-    this.model.deleteOne({ name: name }, error => {
+  remove(id, callback) {
+    this.model.deleteOne({ id: id }, error => {
       try {
         callback({
           step: this.model.collection.name + ".remove",
@@ -78,8 +80,8 @@ class CharacterModel {
     });
   }
 
-  load(name, callback) {
-    this.model.findOne({ name: name }, (error, result) => {
+  load(id, callback) {
+    this.model.findOne({ id: id }, (error, result) => {
       try {
         callback({
           step: this.model.collection.name + ".load",
@@ -107,4 +109,4 @@ class CharacterModel {
   }
 }
 
-module.exports = new CharacterModel();
+module.exports = new LandModel();

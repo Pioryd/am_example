@@ -1,6 +1,6 @@
-const Objects = require("../objects");
+const Objects = require("../../objects");
 const { Database, Stopwatch } = require("am_framework");
-const Models = require("../../../models");
+const Models = require("./models");
 const log = require("simple-node-logger").createSimpleLogger();
 
 /*

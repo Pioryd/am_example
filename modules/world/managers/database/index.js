@@ -32,7 +32,7 @@ class DatabaseManager {
         log.info("Server is running...");
       },
       on_error: () => {
-        on_close();
+        on_terminate();
       }
     });
   }

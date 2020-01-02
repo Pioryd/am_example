@@ -26,10 +26,12 @@ class ModuleWorld extends EventEmitter {
     };
 
     this.ready = false;
+    this.terminate = false;
   }
 
   // Async
-  on_prepare(web_server) {
+  on_initialize() {
+    this.terminate = false;
     try {
       // The order is important for logic
       this.managers.database.initialize();
@@ -39,56 +41,76 @@ class ModuleWorld extends EventEmitter {
     } catch (e) {
       console.error(e);
     }
+
+    this.ready = true;
   }
 
   // Async
-  on_tick() {
-    if (!this.ready) return;
+  on_force_terminate() {
+    if (this.terminate) return;
+
+    console.error(
+      "Closing forced, unexpected behavior.\n" +
+        "Check data before run [World] module again."
+    );
+
+    this.on_terminate();
+  }
+
+  // Async
+  on_terminate() {
+    if (this.terminate) return;
+
+    this.terminate = true;
+  }
+
+  on_run() {
+    this._main_loop(this);
+  }
+
+  // Sync (self async)
+  _main_loop(_this) {
+    if (!_this.ready) return;
 
     try {
-      // The order is important for logic
-      this.managers.database.poll();
-      this.managers.server.poll();
-      this.managers.characters.poll();
-      this.managers.main_world.poll();
+      if (_this.terminate) {
+        _this._terminate(_this);
+        return;
+      }
+
+      _this._poll(_this);
     } catch (e) {
       console.error(e);
     }
+
+    setTimeout(() => {
+      _this._main_loop(_this);
+    }, 10);
   }
 
-  // Async
-  on_force_close() {
-    try {
-      console.error(
-        "Closing forced, unexpected behavior.\n" +
-          "Check data before run [World] module again."
-      );
-      this.application.removeAllListeners();
-
-      // The order is important for logic
-      this.managers.server.terminate();
-      this.managers.main_world.terminate();
-      this.managers.characters.terminate();
-      this.managers.database.terminate();
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  // Async
-  on_close() {
+  _terminate(_this) {
     try {
       log.info("Close [World] module...");
-      this.application.removeAllListeners();
+      _this.application.removeAllListeners();
 
       // The order is important for logic
-      this.managers.server.terminate();
-      this.managers.main_world.terminate();
-      this.managers.characters.terminate();
-      this.managers.database.terminate();
+      _this.managers.server.terminate();
+      _this.managers.main_world.terminate();
+      _this.managers.characters.terminate();
+      _this.managers.database.terminate();
     } catch (e) {
       console.error(e);
     }
+
+    this.ready = false;
+  }
+
+  _poll(_this) {
+    // The order is important for logic
+    _this.managers.database.poll();
+    _this.managers.server.poll();
+    _this.managers.characters.poll();
+    _this.managers.main_world.poll();
   }
 }
 

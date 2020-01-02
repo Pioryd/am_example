@@ -8,19 +8,6 @@ const Directories = {
   config_file_full_name: path.join(__dirname, "config.json")
 };
 
-/*
-  All application events must be listed in {Events_list}. They are used by 
-  {App.modules_manager} to automatically connect them to modules. 
-*/
-const Events_list = [
-  "on_init",
-  "on_terminate",
-  "on_prepare",
-  "on_tick",
-  "on_force_close",
-  "on_close"
-];
-
 class App extends EventEmitter {
   constructor() {
     super();
@@ -36,7 +23,6 @@ class App extends EventEmitter {
       application: this,
       event_emiter: this,
       modules_directory: Directories.modules_directory,
-      events_list: Events_list,
       disabled_modules: this.config.data.disabled_modules
     });
   }
@@ -67,18 +53,6 @@ class App extends EventEmitter {
     });
   }
 
-  _main_loop(_this) {
-    try {
-      _this.emit("on_tick");
-    } catch (e) {
-      console.error(e);
-    }
-
-    setTimeout(() => {
-      _this._main_loop(_this);
-    }, 10);
-  }
-
   // Should be called only once
   run() {
     this._init_commands();
@@ -86,16 +60,16 @@ class App extends EventEmitter {
 
     setup_exit_handlers(
       () => {
-        this.emit("on_force_close");
+        this.emit("on_force_terminate");
       },
       () => {
-        this.emit("on_force_close");
+        this.emit("on_force_terminate");
       }
     );
 
-    this.emit("on_prepare");
+    this.emit("on_initialize");
 
-    this._main_loop(this);
+    this.emit("on_run");
   }
 
   // Should be called only once
@@ -104,7 +78,7 @@ class App extends EventEmitter {
 
     this.config.terminate();
 
-    this.emit("on_close");
+    this.emit("on_terminate");
 
     setTimeout(() => {
       process.exit(0);

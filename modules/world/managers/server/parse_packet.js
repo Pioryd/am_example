@@ -53,7 +53,7 @@ function accept_connection(connection, received_data, managers) {
 
   connection.user_data.character_name = login;
   connection.user_data.password = password;
-  connection.on_close = connection => {
+  connection.on_terminate = connection => {
     managers.characters.log_off_character(login);
   };
 

@@ -1,7 +1,7 @@
 const path = require("path");
 const Schema = require(path.join(global.node_modules_path, "mongoose")).Schema;
 
-class LandModel {
+class VirtualWorldModel {
   constructor() {
     this.connection = {};
     this.schema = {};
@@ -14,14 +14,14 @@ class LandModel {
     this.schema = new Schema({
       id: { type: String, required: true, unique: true, index: true },
       name: { type: String, required: true },
-      map: [
-        {
-          objects_list: { type: [String] },
-          characters_list: { type: [String] }
-        }
-      ]
+      url: { type: String, required: true },
+      characters_list: { type: [String] }
     });
-    this.model = this.connection.model("Land", this.schema, "land");
+    this.model = this.connection.model(
+      "VirtualWorld",
+      this.schema,
+      "virtual_world"
+    );
   }
 
   save(classes_instances, callback, index = 0) {
@@ -109,4 +109,4 @@ class LandModel {
   }
 }
 
-module.exports = LandModel;
+module.exports = VirtualWorldModel;

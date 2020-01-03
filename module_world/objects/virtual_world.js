@@ -1,4 +1,4 @@
-class World {
+class VirtualWorld {
   constructor(data) {
     this._data = data;
   }
@@ -26,4 +26,4 @@ class World {
   }
 }
 
-module.exports = { World };
+module.exports = { VirtualWorld };

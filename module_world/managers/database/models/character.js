@@ -107,4 +107,4 @@ class CharacterModel {
   }
 }
 
-module.exports = new CharacterModel();
+module.exports = CharacterModel;

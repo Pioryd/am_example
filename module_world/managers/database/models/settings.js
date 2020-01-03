@@ -79,4 +79,4 @@ class SettingsModel {
   }
 }
 
-module.exports = new SettingsModel();
+module.exports = SettingsModel;

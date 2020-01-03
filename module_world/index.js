@@ -22,6 +22,7 @@ class ModuleWorld extends EventEmitter {
       lands_map: {},
       characters_map: {},
       environment_objects_map: {},
+      virtual_worlds_map: {},
       settings: { generated: false, admin_login: "", admin_password: "" }
     };
     this.managers = {

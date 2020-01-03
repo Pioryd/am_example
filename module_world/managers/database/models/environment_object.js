@@ -110,4 +110,4 @@ class EnvironmentObjectModel {
   }
 }
 
-module.exports = new EnvironmentObjectModel();
+module.exports = EnvironmentObjectModel;

@@ -15,15 +15,6 @@ Responsible for:
 class MainWorld {
   constructor(module_world) {
     this.module_world = module_world;
-
-    this.module_world.on(
-      "character_leave_object",
-      this.on_character_leave_object
-    );
-    this.module_world.on(
-      "character_enter_object",
-      this.on_character_enter_object
-    );
   }
 
   initialize() {}
@@ -124,18 +115,24 @@ class MainWorld {
       }
     }
 
+    // Add virtual worlds
+    const virtual_world = new Objects.VirtualWorld(
+      {
+        id: ObjectID().toHexString(),
+        name: test,
+        url: "http://localhost:4001",
+        characters_list: []
+      },
+      this.on_receive_virtual_world_packet
+    );
+    this.module_world.virtual_worlds_map[virtual_world.get_id()];
+
     this.module_world.data.settings.generated = true;
     this.module_world.data.settings.admin_login = "admin";
     this.module_world.data.admin_password = "123";
   }
 
-  on_character_enter_object(name, objects_list) {
-    for (const object of objects_list) object.character_enter(name);
-  }
-
-  on_character_leave_object(name, objects_list) {
-    for (const object of objects_list) object.character_leave(name);
-  }
+  on_receive_virtual_world_packet() {}
 }
 
 module.exports = MainWorld;

@@ -5,6 +5,10 @@ const SendPacket = {
 
   action_message: (connection_id, packet_id, data, managers) => {
     managers.server.send(connection_id, packet_id, data);
+  },
+
+  virtual_world: (connection_id, packet_id, data, managers) => {
+    managers.server.send(connection_id, packet_id, data);
   }
 };
 

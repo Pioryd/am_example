@@ -114,6 +114,9 @@ class ModuleWorld extends EventEmitter {
 
   _poll(_this) {
     // The order is important for logic
+    // for (const virtual_world of Object.values(_this.virtual_worlds_map))
+    //   virtual_world.poll();
+
     _this.managers.database.poll();
     _this.managers.server.poll();
     _this.managers.characters.poll();

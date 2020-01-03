@@ -53,6 +53,7 @@ class DatabaseManager {
 
   terminate() {
     save_data({
+      step: "connect",
       on_success: () => {
         setTimeout(() => {
           try {
@@ -79,7 +80,7 @@ class DatabaseManager {
     if (!this.ready) return;
 
     if (this.stopwatches_map.database_save.is_elapsed()) {
-      // change to backup_db
+      // TODO
       // log.info("Auto save to database");
       // this.save_data();
       this.stopwatches_map.database_save.reset();

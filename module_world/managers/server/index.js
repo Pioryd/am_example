@@ -5,7 +5,7 @@ const log = require(path.join(
 )).createSimpleLogger();
 const { Server } = require(path.join(global.node_modules_path, "am_framework"));
 const { ParsePacket } = require("./parse_packet");
-const { SendPacket } = require("./parse_packet");
+const { SendPacket } = require("./send_packet");
 /*
   Responsible for:
     - parse/send packets
@@ -16,33 +16,35 @@ class ServerManager {
     this.module_world = module_world;
     this.config = this.module_world.config;
 
-    this.web_server = new Server({
+    this.server = new Server({
       port: this.config.module_world.server.port
     });
   }
 
   initialize() {
-    if (this.web_server == null) {
-      log.info("Unable to set web_server");
+    if (this.server == null) {
+      log.info("Unable to set server");
       return;
     }
 
-    this.web_server.add_parse_packet_dict(this.create_parse_packet_dict());
+    this.server.add_parse_packet_dict(this.create_parse_packet_dict());
+
+    this.server.start();
   }
 
   terminate() {
-    if (this.web_server != null) {
-      this.web_server.stop();
-      this.web_server = null;
+    if (this.server != null) {
+      this.server.stop();
+      this.server = null;
     }
   }
 
   poll() {
-    this.web_server.poll();
+    this.server.poll();
   }
 
   send(connection_id, packet_id, data) {
-    this.module_world.web_server.send(connection_id, packet_id, data);
+    this.server.send(connection_id, packet_id, data);
   }
 
   create_parse_packet_dict() {

@@ -116,23 +116,25 @@ class MainWorld {
     }
 
     // Add virtual worlds
+    const vw_manager = this.module_world.managers.virtual_worlds;
     const virtual_world = new Objects.VirtualWorld(
       {
         id: ObjectID().toHexString(),
-        name: test,
+        name: "test",
         url: "http://localhost:4001",
         characters_list: []
       },
-      this.on_receive_virtual_world_packet
+      vw_manager.process_packet_received_from_user,
+      vw_manager.process_user_packet_received_from_virtual_world
     );
-    this.module_world.virtual_worlds_map[virtual_world.get_id()];
+    this.module_world.data.virtual_worlds_map[
+      virtual_world.get_id()
+    ] = virtual_world;
 
     this.module_world.data.settings.generated = true;
     this.module_world.data.settings.admin_login = "admin";
     this.module_world.data.admin_password = "123";
   }
-
-  on_receive_virtual_world_packet() {}
 }
 
 module.exports = MainWorld;

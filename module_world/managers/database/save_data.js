@@ -66,6 +66,12 @@ const save_data = ({
       );
       break;
     case "environment_object.save":
+      manager.models.virtual_world.save(
+        Object.values(manager.module_world.data.virtual_worlds_map),
+        recurrency_callback
+      );
+      break;
+    case "virtual_world.save":
       on_success();
       break;
   }

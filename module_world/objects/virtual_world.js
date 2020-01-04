@@ -2,12 +2,17 @@ const path = require("path");
 const { Client } = require(path.join(global.node_modules_path, "am_framework"));
 
 class VirtualWorld {
-  constructor(data, on_receive) {
+  constructor(data, on_character_receive, on_world_receive) {
     this._data = data;
-    this.client = new Client({ url: this._data.url, timeout: 0 });
+    this.client = new Client({
+      url: this._data.url,
+      timeout: 0,
+      auto_reconnect: true
+    });
 
     this.client.add_parse_packet_dict({
-      virtual_world: on_receive
+      character: on_character_receive,
+      world: on_world_receive
     });
 
     this.send_login_message = false;
@@ -21,12 +26,17 @@ class VirtualWorld {
     this.client.disconnect();
   }
 
-  send(data) {
-    this.client.send("virtual_world", data);
+  send(packet_id, data) {
+    this.client.send(packet_id, data);
   }
 
   poll() {
-    if (!this.send_login_message && this.client.is_connected()) {
+    if (!this.client.is_connected()) {
+      this.client.connect();
+      return;
+    }
+
+    if (!this.send_login_message) {
       this.send("login", {});
       this.send_login_message = true;
     }

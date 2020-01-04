@@ -29,7 +29,8 @@ class ModuleWorld extends EventEmitter {
       characters: new Manager.Characters(this),
       database: new Manager.Database(this),
       main_world: new Manager.MainWorld(this),
-      server: new Manager.Server(this)
+      server: new Manager.Server(this),
+      virtual_worlds: new Manager.VirtualWorlds(this)
     };
 
     this.ready = false;
@@ -45,6 +46,7 @@ class ModuleWorld extends EventEmitter {
       this.managers.server.initialize();
       this.managers.characters.initialize();
       this.managers.main_world.initialize();
+      //this.managers.virtual_worlds.initialize();
     } catch (e) {
       console.error(e);
     }
@@ -105,6 +107,7 @@ class ModuleWorld extends EventEmitter {
       _this.managers.main_world.terminate();
       _this.managers.characters.terminate();
       _this.managers.database.terminate();
+      //this.managers.virtual_worlds.poll();
     } catch (e) {
       console.error(e);
     }
@@ -114,13 +117,11 @@ class ModuleWorld extends EventEmitter {
 
   _poll(_this) {
     // The order is important for logic
-    // for (const virtual_world of Object.values(_this.virtual_worlds_map))
-    //   virtual_world.poll();
-
     _this.managers.database.poll();
     _this.managers.server.poll();
     _this.managers.characters.poll();
     _this.managers.main_world.poll();
+    // _this.managers.virtual_worlds.poll();
   }
 }
 

@@ -56,6 +56,20 @@ const load_data = ({
     }
   };
 
+  const set_virtual_worlds = results_list => {
+    for (const result of results_list) {
+      const virtual_world = new Objects.VirtualWorld({
+        ...result._doc
+      });
+      delete virtual_world._id;
+      delete virtual_world.__v;
+
+      manager.module_world.data.virtual_worlds_map[
+        virtual_world.get_id()
+      ] = virtual_world;
+    }
+  };
+
   const check_collections = collections => {
     const collections_names = [
       "settings",
@@ -152,6 +166,10 @@ const load_data = ({
       break;
     case "environment_object.load_all":
       set_environment_objects(results);
+      manager.models.virtual_world.load_all(recurrency_callback);
+      break;
+    case "virtual_world.load_all":
+      set_virtual_worlds(results);
       load_data({
         step: "check_loaded_data",
         on_success,

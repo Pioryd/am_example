@@ -23,14 +23,6 @@ class MainWorld {
 
   poll() {}
 
-  get_lands() {
-    return this.module_world.data.lands_map;
-  }
-
-  get_characters() {
-    return this.module_world.data.characters_map;
-  }
-
   /*
   NOTE:
     Currently the form of this function  cannot use object/manager functions,
@@ -47,6 +39,7 @@ class MainWorld {
     for (let id = 0; id < 5; id++) {
       // Create character
       const character = new Objects.Character({
+        id: ObjectID().toHexString(),
         name: "AM_" + id,
         password: "123",
         state: "",
@@ -54,7 +47,7 @@ class MainWorld {
         activity: "",
         friends_list: []
       });
-      this.module_world.data.characters_map[character.get_name()] = character;
+      this.module_world.data.characters_map[character.get_id()] = character;
 
       // Create land
       const land = new Objects.Land(
@@ -65,7 +58,7 @@ class MainWorld {
         },
         this.module_world
       );
-      const land_size = Util.get_random_int(10, 20);
+      const land_size = Util.get_random_int(7, 12);
       for (let i = 0; i < land_size; i++)
         land._data.map.push({ characters_list: [], objects_list: [] });
       this.module_world.data.lands_map[land.get_id()] = land;
@@ -73,7 +66,7 @@ class MainWorld {
       // Place character at land
       const character_position = Util.get_random_int(0, land_size - 1);
       land._data.map[character_position].characters_list.push(
-        character._data.name
+        character.get_id()
       );
 
       // Place portal at land
@@ -94,7 +87,7 @@ class MainWorld {
       );
 
       // Place some trees
-      let number_of_trees = Util.get_random_int(1, 4);
+      let number_of_trees = Util.get_random_int(1, 3);
 
       for (let i = 0; i < number_of_trees; i++) {
         const environment_object = new Objects.EnvironmentObject({

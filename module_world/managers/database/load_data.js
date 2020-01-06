@@ -26,17 +26,15 @@ const load_data = ({
       delete character._data._id;
       delete character._data.__v;
 
-      manager.module_world.data.characters_map[
-        character.get_name()
-      ] = character;
+      manager.module_world.data.characters_map[character.get_id()] = character;
     }
   };
 
   const set_lands = results_list => {
     for (const result of results_list) {
       const land = new Objects.Land({ ...result._doc }, manager.module_world);
-      delete land._id;
-      delete land.__v;
+      delete land._data._id;
+      delete land._data.__v;
 
       manager.module_world.data.lands_map[land.get_id()] = land;
     }
@@ -47,8 +45,8 @@ const load_data = ({
       const environment_object = new Objects.EnvironmentObject({
         ...result._doc
       });
-      delete environment_object._id;
-      delete environment_object.__v;
+      delete environment_object._data._id;
+      delete environment_object._data.__v;
 
       manager.module_world.data.environment_objects_map[
         environment_object.get_id()
@@ -61,8 +59,8 @@ const load_data = ({
       const virtual_world = new Objects.VirtualWorld({
         ...result._doc
       });
-      delete virtual_world._id;
-      delete virtual_world.__v;
+      delete virtual_world._data._id;
+      delete virtual_world._data.__v;
 
       manager.module_world.data.virtual_worlds_map[
         virtual_world.get_id()

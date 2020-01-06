@@ -38,7 +38,7 @@ class VirtualWorlds {
   }
 
   insert_character(character_name, virtual_world_id) {
-    remove_character(character_name);
+    this.remove_character(character_name);
 
     if (virtual_world_id in this.module_world.data.virtual_worlds_map) {
       const virtual_world = this.module_world.data.virtual_worlds_map[

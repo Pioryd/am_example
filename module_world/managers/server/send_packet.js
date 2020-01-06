@@ -14,11 +14,34 @@ const SendPacket = {
   data_full: (connection_id, managers, data) => {
     managers.server.send(connection_id, "data_full", data);
   },
-  data_character: (connection_id, managers, { character }) => {
-    managers.server.send(connection_id, "data_character", { character });
+  data_character: (
+    connection_id,
+    managers,
+    { id, name, password, state, action, activity, friends_list }
+  ) => {
+    managers.server.send(connection_id, "data_character", {
+      id,
+      name,
+      password,
+      state,
+      action,
+      activity,
+      friends_list
+    });
   },
-  data_world: (connection_id, managers, { world, land }) => {
-    managers.server.send(connection_id, "data_world", { world, land });
+  data_land: (connection_id, managers, { id, map }) => {
+    managers.server.send(connection_id, "data_land", { id, map });
+  },
+  data_world: (
+    connection_id,
+    managers,
+    { lands_map, characters_map, environment_objects_map }
+  ) => {
+    managers.server.send(connection_id, "data_world", {
+      lands_map,
+      characters_map,
+      environment_objects_map
+    });
   },
   action_message: (connection_id, managers, { name, text }) => {
     managers.server.send(connection_id, "action_message", { name, text });

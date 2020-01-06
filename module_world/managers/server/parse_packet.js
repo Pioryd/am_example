@@ -41,15 +41,12 @@ function accept_connection(connection, received_data, managers) {
     return false;
   }
 
-  if (managers.characters.is_character_exist(login) == null) {
-    handle_error(connection, received_data, managers);
-    return false;
-  }
-
   connection.user_data.character_name = login;
   connection.user_data.password = password;
   connection.on_close = connection => {
-    managers.characters.log_off_character(login);
+    managers.characters.log_off_character(
+      managers.characters.get_character_id_by_name(login)
+    );
   };
 
   SendPacket.login(connection.get_id(), managers, {
@@ -65,12 +62,14 @@ function data_full(connection, received_data, managers) {
 
   if (is_admin(character_name)) {
     send_data = {
-      lands_map: managers.main_world.get_lands(),
-      characters_map: managers.get_characters()
+      lands_map: managers.server.module_world.data.lands_map,
+      characters_map: managers.server.module_world.data.characters_map
     };
   } else {
-    const character = managers.characters.get_character(character_name);
-    const land = managers.characters.get_character_land(character_name);
+    const character = managers.characters._get_character_by_name(
+      character_name
+    );
+    const land = managers.characters.get_character_land(character.get_id());
     send_data = {
       character: character._data,
       land: land._data
@@ -88,10 +87,38 @@ function data_character(connection, received_data, managers) {
     return;
   }
 
-  const character = managers.characters.get_character(character_name);
+  const character = managers.characters._get_character_by_name(character_name);
 
   SendPacket.data_character(connection.get_id(), managers, {
-    character: character._data
+    id: character.get_id(),
+    name: character.get_name(),
+    password: character.get_password(),
+    state: character.get_state(),
+    action: character.get_action(),
+    activity: character.get_activity(),
+    friends_list: character.get_friends_list()
+  });
+}
+
+function data_land(connection, received_data, managers) {
+  const character_name = connection.user_data.character_name;
+
+  if (is_admin(character_name)) {
+    handle_error(connection, received_data, managers);
+    return;
+  }
+
+  const land = managers.characters.get_character_land(
+    managers.characters.get_character_id_by_name(character_name)
+  );
+  if (land == null) {
+    handle_error(connection, received_data, managers);
+    return;
+  }
+
+  SendPacket.data_land(connection.get_id(), managers, {
+    id: land._data.id,
+    map: land._data.map
   });
 }
 
@@ -102,17 +129,40 @@ function data_world(connection, received_data, managers) {
     handle_error(connection, received_data, managers);
     return;
   }
+  const lands_map = {};
+  const characters_map = {};
+  const environment_objects_map = {};
 
-  const world = managers.characters.get_character_world(character_name);
-  const land = managers.characters.get_character_land(character_name);
-  if (land == null) {
-    handle_error(connection, received_data, managers);
-    return;
+  for (const land of Object.values(
+    managers.server.module_world.data.lands_map
+  )) {
+    lands_map[land.get_id()] = { name: land._data.name };
+  }
+
+  for (const character of Object.values(
+    managers.server.module_world.data.characters_map
+  )) {
+    characters_map[character.get_id()] = {
+      name: character._data.name,
+      state: character._data.state,
+      action: character._data.action,
+      activity: character._data.activity
+    };
+  }
+
+  for (const environment_object of Object.values(
+    managers.server.module_world.data.environment_objects_map
+  )) {
+    environment_objects_map[environment_object.get_id()] = {
+      type: environment_object._data.type,
+      name: environment_object._data.name
+    };
   }
 
   SendPacket.data_world(connection.get_id(), managers, {
-    world: world,
-    land: land._data
+    lands_map,
+    characters_map,
+    environment_objects_map
   });
 }
 
@@ -125,7 +175,7 @@ function data_character_change_position(connection, received_data, managers) {
   }
 
   managers.characters.change_character_position(
-    character_name,
+    managers.characters.get_character_id_by_name(character_name),
     received_data.position_x
   );
 
@@ -141,7 +191,7 @@ function data_character_change_land(connection, received_data, managers) {
   }
 
   managers.characters.change_character_land(
-    character_name,
+    managers.characters.get_character_id_by_name(character_name),
     received_data.land_id
   );
 
@@ -157,7 +207,7 @@ function data_character_add_friend(connection, received_data, managers) {
   }
 
   managers.characters.add_character_friend_if_exist(
-    character_name,
+    managers.characters.get_character_id_by_name(character_name),
     received_data.name
   );
 
@@ -172,8 +222,10 @@ function data_character_remove_friend(connection, received_data, managers) {
     return;
   }
 
-  const character = managers.characters.get_character(character_name);
-  character.remove_friend(received_data.name);
+  managers.characters.add_character_remove_if_exist(
+    managers.characters.get_character_id_by_name(character_name),
+    received_data.name
+  );
 
   data_character(connection, received_data, managers);
 }
@@ -186,8 +238,8 @@ function data_character_change_state(connection, received_data, managers) {
     return;
   }
 
-  const character = managers.characters.get_character(character_name);
-  character.change_state(received_data.name);
+  const character = managers.characters._get_character_by_name(character_name);
+  character._change_state(received_data.name);
 
   data_character(connection, received_data, managers);
 }
@@ -200,8 +252,8 @@ function data_character_change_action(connection, received_data, managers) {
     return;
   }
 
-  const character = managers.characters.get_character(character_name);
-  character.change_action(received_data.name);
+  const character = managers.characters._get_character_by_name(character_name);
+  character._change_action(received_data.name);
 
   data_character(connection, received_data, managers);
 }
@@ -214,8 +266,8 @@ function data_character_change_activity(connection, received_data, managers) {
     return;
   }
 
-  const character = managers.characters.get_character(character_name);
-  character.change_activity(received_data.name);
+  const character = managers.characters._get_character_by_name(character_name);
+  character._change_activity(received_data.name);
 
   data_character(connection, received_data, managers);
 }
@@ -230,7 +282,7 @@ function action_message(connection, received_data, managers) {
 
   const from_character_name = character_name;
   const to_character_connection_id = managers.characters.get_character_connection_id(
-    received_data.name
+    managers.characters.get_character_id_by_name(received_data.name)
   );
 
   const text = received_data.text;
@@ -269,6 +321,7 @@ module.exports = {
     accept_connection: accept_connection,
     data_full: data_full,
     data_character: data_character,
+    data_land: data_land,
     data_world: data_world,
     data_character_change_position: data_character_change_position,
     data_character_change_land: data_character_change_land,

@@ -12,7 +12,8 @@ class CharacterModel {
     this.connection = connection;
 
     this.schema = new Schema({
-      name: { type: String, required: true, unique: true, index: true },
+      id: { type: String, required: true, unique: true, index: true },
+      name: { type: String, required: true },
       password: { type: String },
       state: { type: String },
       action: { type: String },
@@ -40,7 +41,7 @@ class CharacterModel {
 
       const data = class_instance._data;
       this.model.updateOne(
-        { name: data.name },
+        { id: data.id },
         { ...data },
         { upsert: true },
         (error, raw) => {
@@ -65,8 +66,8 @@ class CharacterModel {
     callback({ step: this.model.collection.name + ".save" });
   }
 
-  remove(name, callback) {
-    this.model.deleteOne({ name: name }, error => {
+  remove(id, callback) {
+    this.model.deleteOne({ id: id }, error => {
       try {
         callback({
           step: this.model.collection.name + ".remove",
@@ -78,8 +79,8 @@ class CharacterModel {
     });
   }
 
-  load(name, callback) {
-    this.model.findOne({ name: name }, (error, result) => {
+  load(id, callback) {
+    this.model.findOne({ id: id }, (error, result) => {
       try {
         callback({
           step: this.model.collection.name + ".load",

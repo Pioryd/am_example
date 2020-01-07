@@ -3,10 +3,10 @@ const { Database, Stopwatch } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
-const log = require(path.join(
+const logger = require(path.join(
   global.node_modules_path,
-  "simple-node-logger"
-)).createSimpleLogger();
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 const Models = require("./models");
 const { load_data } = require("./load_data");
 const { save_data } = require("./save_data");
@@ -42,7 +42,7 @@ class DatabaseManager {
         if (this.module_world.data.settings.generated === false)
           this.module_world.managers.main_world.generate_world();
         this.ready = true;
-        log.info("Server is running...");
+        logger.info("Server is running...");
       },
       on_error: () => {
         on_terminate();
@@ -59,7 +59,7 @@ class DatabaseManager {
           try {
             this.module_world.managers.database.close();
           } catch (e) {
-            console.error(e);
+            logger.error(e);
           }
         }, 1000);
       },
@@ -68,7 +68,7 @@ class DatabaseManager {
           try {
             this.module_world.managers.database.close();
           } catch (e) {
-            console.error(e);
+            logger.error(e);
           }
         }, 1000);
       },
@@ -81,7 +81,7 @@ class DatabaseManager {
 
     if (this.stopwatches_map.database_save.is_elapsed()) {
       // TODO
-      // log.info("Auto save to database");
+      // logger.info("Auto save to database");
       // this.save_data();
       this.stopwatches_map.database_save.reset();
     }

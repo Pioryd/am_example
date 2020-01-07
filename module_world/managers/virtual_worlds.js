@@ -1,8 +1,8 @@
 const path = require("path");
-const log = require(path.join(
+const logger = require(path.join(
   global.node_modules_path,
-  "simple-node-logger"
-)).createSimpleLogger();
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 
 /*
 Responsible for:
@@ -86,7 +86,7 @@ class VirtualWorlds {
     );
 
     if (connection_id == null) {
-      console.error(
+      logger.error(
         "Unable to parse packet from virtual world. Connection[" +
           connection.get_id() +
           "]"

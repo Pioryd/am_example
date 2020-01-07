@@ -1,8 +1,8 @@
 const path = require("path");
-const log = require(path.join(
+const logger = require(path.join(
   global.node_modules_path,
-  "simple-node-logger"
-)).createSimpleLogger();
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 
 class EnvironmentObject {
   constructor(data) {
@@ -27,7 +27,7 @@ class EnvironmentObject {
 
   perform_action(character_name, action) {
     if (!this._data.actions.includes(action)) {
-      log.error(
+      logger.error(
         `Unknown action [${action}] by character [${character_name}]` +
           ` on object [${this.get_id()}]`
       );

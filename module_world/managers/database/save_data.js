@@ -1,8 +1,8 @@
 const path = require("path");
-const log = require(path.join(
+const logger = require(path.join(
   global.node_modules_path,
-  "simple-node-logger"
-)).createSimpleLogger();
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 
 const save_data = ({
   step = "connect",
@@ -22,10 +22,10 @@ const save_data = ({
     );
   };
 
-  log.info("Save data to database, step:", step);
+  logger.info("Save data to database, step:", step);
 
   if (error != null) {
-    console.error(error);
+    logger.error(error);
     on_error();
     return;
   }

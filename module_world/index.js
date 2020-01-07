@@ -1,8 +1,8 @@
 const path = require("path");
-const log = require(path.join(
+const logger = require(path.join(
   global.node_modules_path,
-  "simple-node-logger"
-)).createSimpleLogger();
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 const EventEmitter = require("events");
 
 const Manager = require("./managers");
@@ -48,7 +48,7 @@ class ModuleWorld extends EventEmitter {
       this.managers.main_world.initialize();
       //this.managers.virtual_worlds.initialize();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
 
     this.ready = true;
@@ -58,7 +58,7 @@ class ModuleWorld extends EventEmitter {
   on_force_terminate() {
     if (this.terminate) return;
 
-    console.error(
+    logger.error(
       "Closing forced, unexpected behavior.\n" +
         "Check data before run [World] module again."
     );
@@ -89,7 +89,7 @@ class ModuleWorld extends EventEmitter {
 
       _this._poll(_this);
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
 
     setTimeout(() => {
@@ -99,7 +99,7 @@ class ModuleWorld extends EventEmitter {
 
   _terminate(_this) {
     try {
-      log.info("Close [World] module...");
+      logger.info("Close [World] module...");
       _this.event_emitter.removeAllListeners();
 
       // The order is important for logic
@@ -109,7 +109,7 @@ class ModuleWorld extends EventEmitter {
       _this.managers.database.terminate();
       //this.managers.virtual_worlds.poll();
     } catch (e) {
-      console.error(e);
+      logger.error(e);
     }
 
     this.ready = false;

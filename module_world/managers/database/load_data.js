@@ -1,8 +1,8 @@
 const path = require("path");
-const log = require(path.join(
+const logger = require(path.join(
   global.node_modules_path,
-  "simple-node-logger"
-)).createSimpleLogger();
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 const Objects = require("../../objects");
 
 const load_data = ({
@@ -86,7 +86,7 @@ const load_data = ({
       }
 
       if (!found) {
-        log.info(
+        logger.info(
           "Database does not include needed collections. Existed:",
           collections
         );
@@ -118,7 +118,7 @@ const load_data = ({
       Object.keys(manager.module_world.data.lands_map).length > 0 &&
       Object.keys(manager.module_world.data.characters_map).length > 0;
 
-    log.info(`Data is ${manager.ready ? "" : "NOT"} loaded correctly.`);
+    logger.info(`Data is ${manager.ready ? "" : "NOT"} loaded correctly.`);
   };
 
   const recurrency_callback = (...args) => {
@@ -131,12 +131,12 @@ const load_data = ({
     );
   };
 
-  log.info("Load data from database, step:", step);
+  logger.info("Load data from database, step:", step);
 
   if (!Array.isArray(results)) results = results == null ? [] : [results];
 
   if (error != null) {
-    log.info("load_data error:", error);
+    logger.info("load_data error:", error);
     on_error();
     return;
   }

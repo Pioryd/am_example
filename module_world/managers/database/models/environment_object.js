@@ -1,5 +1,9 @@
 const path = require("path");
 const Schema = require(path.join(global.node_modules_path, "mongoose")).Schema;
+const logger = require(path.join(
+  global.node_modules_path,
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 
 class EnvironmentObjectModel {
   constructor() {
@@ -58,7 +62,7 @@ class EnvironmentObjectModel {
               this.save(classes_instances, callback, index);
             }
           } catch (e) {
-            console.error(e);
+            logger.error(e);
           }
         }
       );
@@ -76,7 +80,7 @@ class EnvironmentObjectModel {
           error: error
         });
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       }
     });
   }
@@ -90,7 +94,7 @@ class EnvironmentObjectModel {
           results: result
         });
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       }
     });
   }
@@ -104,7 +108,7 @@ class EnvironmentObjectModel {
           results: result
         });
       } catch (e) {
-        console.error(e);
+        logger.error(e);
       }
     });
   }

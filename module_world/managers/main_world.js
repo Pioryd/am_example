@@ -1,8 +1,8 @@
 const path = require("path");
-const log = require(path.join(
+const logger = require(path.join(
   global.node_modules_path,
-  "simple-node-logger"
-)).createSimpleLogger();
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 const { Util } = require(path.join(global.node_modules_path, "am_framework"));
 const ObjectID = require(path.join(global.node_modules_path, "bson-objectid"));
 
@@ -34,7 +34,7 @@ class MainWorld {
     methods of manager and objects.
   */
   generate_world() {
-    log.info("Generating new world...");
+    logger.info("Generating new world...");
 
     for (let id = 0; id < 5; id++) {
       // Create character

@@ -9,9 +9,9 @@ function is_admin(name) {
 }
 
 function handle_error(connection, received_data, managers, message) {
-  if (message != null) console.error("Error:", message);
-  console.error("Connection ID:", connection.get_id());
-  console.error("received_data:", received_data);
+  if (message != null) logger.error("Error:", message);
+  logger.error("Connection ID:", connection.get_id());
+  logger.error("received_data:", received_data);
   //console.trace();
 
   SendPacket.error(connection.get_id(), managers, {

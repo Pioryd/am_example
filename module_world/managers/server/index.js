@@ -1,8 +1,8 @@
 const path = require("path");
-const log = require(path.join(
+const logger = require(path.join(
   global.node_modules_path,
-  "simple-node-logger"
-)).createSimpleLogger();
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 const { Server } = require(path.join(global.node_modules_path, "am_framework"));
 const { ParsePacket } = require("./parse_packet");
 const { SendPacket } = require("./send_packet");
@@ -23,7 +23,7 @@ class ServerManager {
 
   initialize() {
     if (this.server == null) {
-      log.info("Unable to set server");
+      logger.info("Unable to set server");
       return;
     }
 

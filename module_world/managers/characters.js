@@ -56,9 +56,7 @@ class Characters {
   add_character_friend_if_exist(id, friend_name) {
     const character = this._get_character_by_id(id);
     const friend = this._get_character_by_name(friend_name);
-    console.log("test", id, friend_name);
-    console.log(character == null, friend == null);
-    console.log("test", character == null || friend == null);
+
     if (character == null || friend == null) return;
 
     character._add_friend(friend_name);
@@ -127,9 +125,6 @@ class Characters {
   _get_character_by_id(id) {
     if (id in this.module_world.data.characters_map)
       return this.module_world.data.characters_map[id];
-    else {
-      console.log("EE", id, this.module_world.data.characters_map);
-    }
   }
 }
 

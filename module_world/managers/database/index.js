@@ -52,26 +52,26 @@ class DatabaseManager {
   }
 
   terminate() {
+    const close_database = () => {
+      setTimeout(() => {
+        try {
+          this.module_world.managers.database.close();
+        } catch (e) {
+          logger.error(e);
+        }
+      }, 1000);
+    };
+    const save_as_not_backup = () => {
+      this.module_world.data.settings.backup = false;
+      this.models.settings.save(
+        this.module_world.data.settings,
+        close_database
+      );
+    };
+
     save_data({
       step: "connect",
-      on_success: () => {
-        setTimeout(() => {
-          try {
-            this.module_world.managers.database.close();
-          } catch (e) {
-            logger.error(e);
-          }
-        }, 1000);
-      },
-      on_error: () => {
-        setTimeout(() => {
-          try {
-            this.module_world.managers.database.close();
-          } catch (e) {
-            logger.error(e);
-          }
-        }, 1000);
-      },
+      on_success: save_as_not_backup,
       manager: this
     });
   }
@@ -80,15 +80,21 @@ class DatabaseManager {
     if (!this.ready) return;
 
     if (this.stopwatches_map.database_save.is_elapsed()) {
-      // TODO
-      // logger.info("Auto save to database");
-      // this.save_data();
+      logger.info("Auto save to database");
+
+      this.module_world.data.settings.backup = true;
+      save_data({ step: "connect", manager: this });
+
       this.stopwatches_map.database_save.reset();
     }
   }
 
   close() {
     this.database.close();
+  }
+
+  save_backup_state(state) {
+    this.database.connect(() => {});
   }
 }
 

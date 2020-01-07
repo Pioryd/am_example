@@ -79,7 +79,7 @@ class MainWorld {
         environment_object.get_id()
       ] = environment_object;
 
-      const portal_position = Util.get_random_int(0, land_size - 1);
+      let portal_position = Util.get_random_int(0, land_size - 1);
       if (portal_position === character_position)
         if (portal_position - 1 < 0) portal_position++;
       land._data.map[portal_position].objects_list.push(

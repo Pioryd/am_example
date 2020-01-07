@@ -23,7 +23,14 @@ class ModuleWorld extends EventEmitter {
       characters_map: {},
       environment_objects_map: {},
       virtual_worlds_map: {},
-      settings: { generated: false, admin_login: "", admin_password: "" }
+      // Remember to update models if rebuild settings structure
+      settings: {
+        generated: false,
+        backup: false,
+        corrupted: false,
+        admin_login: "",
+        admin_password: ""
+      }
     };
     this.managers = {
       characters: new Manager.Characters(this),

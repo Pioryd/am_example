@@ -18,6 +18,8 @@ class SettingsModel {
     this.schema = new Schema(
       {
         generated: { type: Boolean, default: false, require: true },
+        backup: { type: Boolean, default: false, require: true },
+        corrupted: { type: Boolean, default: false, require: true },
         admin_login: { type: String, default: "admin", require: true },
         admin_password: { type: String, default: "123", require: true }
       },

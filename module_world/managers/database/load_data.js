@@ -4,6 +4,7 @@ const logger = require(path.join(
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
 const Objects = require("../../objects");
+const { repair_data } = require("./repair_data");
 
 const load_data = ({
   step = "connect",
@@ -113,6 +114,11 @@ const load_data = ({
   const check_loaded_data = () => {
     if (manager.module_world.data.settings.generated === false) return;
 
+    if (manager.module_world.data.settings.backup === true)
+      repair_data({ manager });
+
+    if (manager.module_world.data.settings.corrupted === true) return;
+
     manager.ready =
       manager.module_world.data.settings.generated === true &&
       Object.keys(manager.module_world.data.lands_map).length > 0 &&
@@ -130,8 +136,6 @@ const load_data = ({
       })
     );
   };
-
-  logger.info("Load data from database, step:", step);
 
   if (!Array.isArray(results)) results = results == null ? [] : [results];
 
@@ -179,6 +183,7 @@ const load_data = ({
       // these must be as last functions
       check_loaded_data();
       on_success();
+      logger.info("Load data from database finished.");
       break;
     default:
       break;

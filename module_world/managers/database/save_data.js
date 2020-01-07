@@ -22,8 +22,6 @@ const save_data = ({
     );
   };
 
-  logger.info("Save data to database, step:", step);
-
   if (error != null) {
     logger.error(error);
     on_error();
@@ -73,6 +71,7 @@ const save_data = ({
       break;
     case "virtual_world.save":
       on_success();
+      logger.info("Save data to database finished.");
       break;
   }
 };

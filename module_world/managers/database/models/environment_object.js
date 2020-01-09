@@ -19,8 +19,12 @@ class EnvironmentObjectModel {
       id: { type: String, required: true, unique: true, index: true },
       type: { type: String, required: true },
       name: { type: String, required: true },
-      world_id: { type: String },
-      characters_list: { type: [String] }
+      action_scripts_list: [
+        {
+          id: { type: String },
+          script: { type: String }
+        }
+      ]
     });
     this.model = this.connection.model(
       "EnvironmentObject",

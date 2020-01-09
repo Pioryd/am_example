@@ -15,6 +15,25 @@ Responsible for:
 class MainWorld {
   constructor(module_world) {
     this.module_world = module_world;
+
+    this.actions_map = {
+      enter_virtual_world: (static_args, dynamic_args) => {
+        const { virtual_world_id } = static_args;
+        const { character_id, text } = dynamic_args;
+        const name = this.module_world.managers.characters.get_character_name(
+          character_id
+        );
+        // TODO
+        logger.log(
+          "You",
+          name,
+          "are entering virtual world with ID:",
+          virtual_world_id,
+          "and yuo are saying:",
+          text
+        );
+      }
+    };
   }
 
   initialize() {}
@@ -22,6 +41,34 @@ class MainWorld {
   terminate() {}
 
   poll() {}
+
+  process_action(object_id, action_id, dynamic_args) {
+    if (!(object_id in this.module_world.data.environment_objects_map)) return;
+
+    const environment_object = this.module_world.data.environment_objects_map[
+      object_id
+    ];
+
+    environment_object.process_action_script(
+      action_id,
+      dynamic_args,
+      this.module_world.managers
+    );
+  }
+
+  create_action_script_as_string(action_id, static_args) {
+    if (!(action_id in this.actions_map)) {
+      logger.error("Wrong action ID:", action_id);
+      return;
+    }
+
+    return `(dynamic_args, managers) => {
+      managers.main_world.actions_map["${action_id}"](
+        ${JSON.stringify(static_args)}, 
+        dynamic_args
+      );
+    }`;
+  }
 
   /*
   NOTE:
@@ -37,6 +84,22 @@ class MainWorld {
     logger.info("Generating new world...");
 
     for (let id = 0; id < 5; id++) {
+      // Create virtual world
+      const vw_manager = this.module_world.managers.virtual_worlds;
+      const virtual_world = new Objects.VirtualWorld(
+        {
+          id: ObjectID().toHexString(),
+          name: "virtual_world_" + id,
+          url: "http://localhost:400" + id,
+          characters_list: []
+        },
+        vw_manager.process_packet_received_from_user,
+        vw_manager.process_user_packet_received_from_virtual_world
+      );
+      this.module_world.data.virtual_worlds_map[
+        virtual_world.get_id()
+      ] = virtual_world;
+
       // Create character
       const character = new Objects.Character({
         id: ObjectID().toHexString(),
@@ -73,7 +136,15 @@ class MainWorld {
       const environment_object = new Objects.EnvironmentObject({
         id: ObjectID().toHexString(),
         type: "portal",
-        name: "portal_" + id
+        name: "portal_" + id,
+        action_scripts_list: [
+          {
+            id: "enter_virtual_world",
+            script: this.create_action_script_as_string("enter_virtual_world", {
+              virtual_world_id: virtual_world.get_id()
+            })
+          }
+        ]
       });
       this.module_world.data.environment_objects_map[
         environment_object.get_id()
@@ -93,13 +164,14 @@ class MainWorld {
         const environment_object = new Objects.EnvironmentObject({
           id: ObjectID().toHexString(),
           type: "tree",
-          name: "tree"
+          name: "tree",
+          action_scripts_list: []
         });
         this.module_world.data.environment_objects_map[
           environment_object.get_id()
         ] = environment_object;
 
-        const tree_position = Util.get_random_int(0, land_size - 1);
+        let tree_position = Util.get_random_int(0, land_size - 1);
         if (tree_position === character_position)
           if (tree_position - 1 < 0) tree_position++;
         land._data.map[tree_position].objects_list.push(
@@ -108,22 +180,7 @@ class MainWorld {
       }
     }
 
-    // Add virtual worlds
-    const vw_manager = this.module_world.managers.virtual_worlds;
-    const virtual_world = new Objects.VirtualWorld(
-      {
-        id: ObjectID().toHexString(),
-        name: "test",
-        url: "http://localhost:4001",
-        characters_list: []
-      },
-      vw_manager.process_packet_received_from_user,
-      vw_manager.process_user_packet_received_from_virtual_world
-    );
-    this.module_world.data.virtual_worlds_map[
-      virtual_world.get_id()
-    ] = virtual_world;
-
+    // Set global settings
     this.module_world.data.settings.generated = true;
     this.module_world.data.settings.admin_login = "admin";
     this.module_world.data.admin_password = "123";

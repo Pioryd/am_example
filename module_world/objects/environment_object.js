@@ -3,10 +3,19 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
+const { Util } = require(path.join(global.node_modules_path, "am_framework"));
 
 class EnvironmentObject {
   constructor(data) {
     this._data = data;
+    this.action_scripts_list = [];
+
+    for (const action of this._data.action_scripts_list) {
+      this.action_scripts_list.push({
+        id: action.id,
+        script: Util.string_to_function(action.script)
+      });
+    }
   }
 
   get_id() {
@@ -17,25 +26,19 @@ class EnvironmentObject {
     return this._data.name;
   }
 
-  get_dimension() {
-    return this._data.world;
-  }
-
-  contains_character(name) {
-    return name in this._data.characters_list;
-  }
-
-  perform_action(character_name, action) {
-    if (!this._data.actions.includes(action)) {
+  process_action_script(action_id, dynamic_args, managers) {
+    if (!(action_id in this.action_scripts_list)) {
       logger.error(
-        `Unknown action [${action}] by character [${character_name}]` +
+        `Unknown action[${action}] with args[${dynamic_args}]` +
           ` on object [${this.get_id()}]`
       );
       return;
     }
 
-    if (action === "use") {
-      on_use(character_name);
+    try {
+      this.action_scripts_list[action_id].script(dynamic_args, managers);
+    } catch (e) {
+      logger.error(e);
     }
   }
 }

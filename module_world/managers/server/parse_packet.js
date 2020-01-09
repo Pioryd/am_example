@@ -1,3 +1,8 @@
+const path = require("path");
+const logger = require(path.join(
+  global.node_modules_path,
+  "am_framework"
+)).create_logger({ module_name: "module_world", file_name: __filename });
 const { SendPacket } = require("./send_packet");
 /*
 NOTE!
@@ -10,9 +15,12 @@ function is_admin(name) {
 
 function handle_error(connection, received_data, managers, message) {
   if (message != null) logger.error("Error:", message);
-  logger.error("Connection ID:", connection.get_id());
-  logger.error("received_data:", received_data);
-  //console.trace();
+  logger.error(
+    "Connection ID:",
+    connection.get_id(),
+    "Received_data:",
+    received_data
+  );
 
   SendPacket.error(connection.get_id(), managers, {
     received_data: received_data,
@@ -153,10 +161,19 @@ function data_world(connection, received_data, managers) {
   for (const environment_object of Object.values(
     managers.server.module_world.data.environment_objects_map
   )) {
-    environment_objects_map[environment_object.get_id()] = {
+    const object_data = {
       type: environment_object._data.type,
-      name: environment_object._data.name
+      name: environment_object._data.name,
+      actions_list: []
     };
+
+    if ("action_scripts_list" in environment_object._data) {
+      object_data.actions_list = Object.keys(
+        environment_object._data.action_scripts_list
+      );
+    }
+
+    environment_objects_map[environment_object.get_id()] = object_data;
   }
 
   SendPacket.data_world(connection.get_id(), managers, {
@@ -302,6 +319,25 @@ function action_message(connection, received_data, managers) {
   });
 }
 
+function process_script_action(connection, received_data, managers) {
+  const character_name = connection.user_data.character_name;
+
+  if (is_admin(character_name)) {
+    handle_error(connection, received_data, managers);
+    return;
+  }
+
+  const character_id = managers.characters.get_character_id_by_name(
+    character_name
+  );
+
+  managers.main_world.process_action(
+    received_data.object_id,
+    received_data.action_id,
+    { character_id, ...received_data.dynamic_args }
+  );
+}
+
 function virtual_world(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
@@ -331,6 +367,7 @@ module.exports = {
     data_character_change_action: data_character_change_action,
     data_character_change_activity: data_character_change_activity,
     action_message: action_message,
+    process_script_action: process_script_action,
     virtual_world: virtual_world
   }
 };

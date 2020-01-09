@@ -80,7 +80,7 @@ class DatabaseManager {
     if (!this.ready) return;
 
     if (this.stopwatches_map.database_save.is_elapsed()) {
-      logger.info("Auto save to database");
+      //logger.info("Auto save to database");
 
       this.module_world.data.settings.backup = true;
       save_data({ step: "connect", manager: this });

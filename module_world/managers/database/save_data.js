@@ -71,7 +71,7 @@ const save_data = ({
       break;
     case "virtual_world.save":
       on_success();
-      logger.info("Save data to database finished.");
+      //logger.info("Save data to database finished.");
       break;
   }
 };

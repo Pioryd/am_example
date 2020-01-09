@@ -20,6 +20,11 @@ class Characters {
     if (character != null) return character.get_id();
   }
 
+  get_character_name(id) {
+    const character = this._get_character_by_id(id);
+    if (character != null) return character.get_name();
+  }
+
   get_character_land(id) {
     const character = this._get_character_by_id(id);
     if (!character) return;

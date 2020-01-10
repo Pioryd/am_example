@@ -81,9 +81,7 @@ class VirtualWorlds {
     const packet_id = received_data.data;
     const data = received_data.data;
     const characters_manager = this.module_world.managers.characters;
-    const connection_id = characters_manager.get_character_connection_id(
-      character_name
-    );
+    const connection_id = characters_manager.get_connection_id(character_name);
 
     if (connection_id == null) {
       logger.error(

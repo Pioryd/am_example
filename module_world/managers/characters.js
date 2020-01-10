@@ -9,23 +9,23 @@ class Characters {
 
   poll() {}
 
-  get_character_connection_id(id) {
+  get_connection_id(id) {
     const character = this._get_character_by_id(id);
     if (character == null) return;
     return character.get_connection_id();
   }
 
-  get_character_id_by_name(character_name) {
+  get_id_by_name(character_name) {
     const character = this._get_character_by_name(character_name);
     if (character != null) return character.get_id();
   }
 
-  get_character_name(id) {
+  get_name(id) {
     const character = this._get_character_by_id(id);
     if (character != null) return character.get_name();
   }
 
-  get_character_land(id) {
+  get_land(id) {
     const character = this._get_character_by_id(id);
     if (!character) return;
 
@@ -33,15 +33,15 @@ class Characters {
       if (land.get_character_position(character.get_id()) != null) return land;
   }
 
-  change_character_position(id, position) {
+  change_position(id, position) {
     const character = this._get_character_by_id(id);
     if (!character) return;
 
     for (const land of Object.values(this.module_world.data.lands_map))
-      land.change_character_position(character.get_id(), position);
+      land.change_position(character.get_id(), position);
   }
 
-  change_character_land(id, land_id) {
+  change_land(id, land_id) {
     if (!(land_id in this.module_world.data.lands_map)) return;
 
     const character = this._get_character_by_id(id);
@@ -58,7 +58,7 @@ class Characters {
     new_land.insert_character(character.get_id());
   }
 
-  add_character_friend_if_exist(id, friend_name) {
+  add_friend_if_exist(id, friend_name) {
     const character = this._get_character_by_id(id);
     const friend = this._get_character_by_name(friend_name);
 
@@ -67,7 +67,7 @@ class Characters {
     character._add_friend(friend_name);
   }
 
-  add_character_remove_if_exist(id, friend_name) {
+  remove_friend_if_exist(id, friend_name) {
     const character = this._get_character_by_id(id);
     const friend = this._get_character_by_name(friend_name);
 
@@ -76,14 +76,14 @@ class Characters {
     character._remove_friend(friend_name);
   }
 
-  log_off_character(id) {
+  log_off(id) {
     const character = this._get_character_by_id(id);
     if (character == null) return;
 
     character._set_connection_id(null);
   }
 
-  log_in_character(connection_id, login, password) {
+  log_in(connection_id, login, password) {
     if (connection_id == null || login == null || password == null) return;
 
     // Admin

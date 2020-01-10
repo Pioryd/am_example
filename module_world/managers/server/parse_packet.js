@@ -33,7 +33,7 @@ function handle_error(connection, received_data, managers, message) {
 function accept_connection(connection, received_data, managers) {
   const login = received_data.login;
   const password = received_data.password;
-  const error = managers.characters.log_in_character(
+  const error = managers.characters.log_in(
     connection.get_id(),
     login,
     password
@@ -52,9 +52,7 @@ function accept_connection(connection, received_data, managers) {
   connection.user_data.character_name = login;
   connection.user_data.password = password;
   connection.on_close = connection => {
-    managers.characters.log_off_character(
-      managers.characters.get_character_id_by_name(login)
-    );
+    managers.characters.log_off(managers.characters.get_id_by_name(login));
   };
 
   SendPacket.login(connection.get_id(), managers, {
@@ -77,7 +75,7 @@ function data_full(connection, received_data, managers) {
     const character = managers.characters._get_character_by_name(
       character_name
     );
-    const land = managers.characters.get_character_land(character.get_id());
+    const land = managers.characters.get_land(character.get_id());
     send_data = {
       character: character._data,
       land: land._data
@@ -116,8 +114,8 @@ function data_land(connection, received_data, managers) {
     return;
   }
 
-  const land = managers.characters.get_character_land(
-    managers.characters.get_character_id_by_name(character_name)
+  const land = managers.characters.get_land(
+    managers.characters.get_id_by_name(character_name)
   );
   if (land == null) {
     handle_error(connection, received_data, managers);
@@ -191,8 +189,8 @@ function data_character_change_position(connection, received_data, managers) {
     return;
   }
 
-  managers.characters.change_character_position(
-    managers.characters.get_character_id_by_name(character_name),
+  managers.characters.change_position(
+    managers.characters.get_id_by_name(character_name),
     received_data.position_x
   );
 
@@ -207,8 +205,8 @@ function data_character_change_land(connection, received_data, managers) {
     return;
   }
 
-  managers.characters.change_character_land(
-    managers.characters.get_character_id_by_name(character_name),
+  managers.characters.change_land(
+    managers.characters.get_id_by_name(character_name),
     received_data.land_id
   );
 
@@ -223,8 +221,8 @@ function data_character_add_friend(connection, received_data, managers) {
     return;
   }
 
-  managers.characters.add_character_friend_if_exist(
-    managers.characters.get_character_id_by_name(character_name),
+  managers.characters.add_friend_if_exist(
+    managers.characters.get_id_by_name(character_name),
     received_data.name
   );
 
@@ -239,8 +237,8 @@ function data_character_remove_friend(connection, received_data, managers) {
     return;
   }
 
-  managers.characters.add_character_remove_if_exist(
-    managers.characters.get_character_id_by_name(character_name),
+  managers.characters.remove_friend_if_exist(
+    managers.characters.get_id_by_name(character_name),
     received_data.name
   );
 
@@ -298,8 +296,8 @@ function action_message(connection, received_data, managers) {
   }
 
   const from_character_name = character_name;
-  const to_character_connection_id = managers.characters.get_character_connection_id(
-    managers.characters.get_character_id_by_name(received_data.name)
+  const to_character_connection_id = managers.characters.get_connection_id(
+    managers.characters.get_id_by_name(received_data.name)
   );
 
   const text = received_data.text;
@@ -327,9 +325,7 @@ function process_script_action(connection, received_data, managers) {
     return;
   }
 
-  const character_id = managers.characters.get_character_id_by_name(
-    character_name
-  );
+  const character_id = managers.characters.get_id_by_name(character_name);
 
   managers.main_world.process_action(
     received_data.object_id,

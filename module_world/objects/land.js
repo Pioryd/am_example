@@ -52,7 +52,7 @@ class Land {
       if (this._data.map[i].objects_list.includes(id)) return i;
   }
 
-  change_character_position(id, new_position) {
+  change_position(id, new_position) {
     const current_position = this.get_character_position(id);
 
     if (current_position == null || new_position > this._data.map.length)

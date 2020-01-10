@@ -20,7 +20,7 @@ class MainWorld {
       enter_virtual_world: (static_args, dynamic_args) => {
         const { virtual_world_id } = static_args;
         const { character_id, text } = dynamic_args;
-        const name = this.module_world.managers.characters.get_character_name(
+        const name = this.module_world.managers.characters.get_name(
           character_id
         );
         // TODO

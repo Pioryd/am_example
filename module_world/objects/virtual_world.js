@@ -6,9 +6,12 @@ class VirtualWorld {
     this._data = data;
     this.client = new Client({
       url: this._data.url,
-      timeout: 0,
-      auto_reconnect: true
+      options: { timeout: 0 }
     });
+
+    this.client.events.connected = () => {
+      this.send("login", {});
+    };
 
     this.client.add_parse_packet_dict({
       character: on_character_receive,

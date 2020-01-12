@@ -27,6 +27,14 @@ class Character {
     return this._data.password;
   }
 
+  get_default_land_id() {
+    return this._data.default_land_id;
+  }
+
+  get_virtual_world_mode() {
+    return this._data.virtual_world_mode;
+  }
+
   get_state() {
     return this._data.state;
   }
@@ -57,6 +65,14 @@ class Character {
 
   _change_activity(activity) {
     this._data.activity = activity;
+  }
+
+  _change_default_land_id(default_land_id) {
+    return (this._data.default_land_id = default_land_id);
+  }
+
+  _change_virtual_world_mode(virtual_world_mode) {
+    return (this._data.virtual_world_mode = virtual_world_mode);
   }
 
   _set_connection_id(connection_id) {

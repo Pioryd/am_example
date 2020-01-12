@@ -37,26 +37,26 @@ class VirtualWorlds {
     }
   }
 
-  insert_character(character_name, virtual_world_id) {
-    this.remove_character(character_name);
+  insert_character(character_id, virtual_world_id) {
+    this.remove_character(character_id);
 
     if (virtual_world_id in this.module_world.data.virtual_worlds_map) {
       const virtual_world = this.module_world.data.virtual_worlds_map[
         virtual_world_id
       ];
-      virtual_world.character_enter(character_name);
+      virtual_world.character_enter(character_id);
     }
   }
 
-  remove_character(character_name) {
+  remove_character(character_id) {
     for (const virtual_world of Object.values(
       this.module_world.data.virtual_worlds_map
     )) {
-      virtual_world.character_leave(character_name);
+      virtual_world.character_leave(character_id);
     }
   }
 
-  process_packet_received_from_user(character_name, received_data) {
+  process_packet_received_from_character(character_id, received_data) {
     const virtual_world_id = received_data.id;
     const packet_id = received_data.packet_id;
     const data = received_data.data;
@@ -65,23 +65,23 @@ class VirtualWorlds {
     )) {
       if (
         id === virtual_world_id &&
-        virtual_world.contains_character(character_name)
+        virtual_world.contains_character(character_id)
       ) {
         virtual_world.send("character", {
-          name: character_name,
+          character_id,
           packet_id,
-          data
+          packet_data
         });
       }
     }
   }
 
   process_user_packet_received_from_virtual_world(connection, received_data) {
-    const character_name = received_data.character_name;
+    const character_id = received_data.character_id;
     const packet_id = received_data.data;
     const data = received_data.data;
     const characters_manager = this.module_world.managers.characters;
-    const connection_id = characters_manager.get_connection_id(character_name);
+    const connection_id = characters_manager.get_connection_id(character_id);
 
     if (connection_id == null) {
       logger.error(

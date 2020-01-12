@@ -19,6 +19,8 @@ class CharacterModel {
       id: { type: String, required: true, unique: true, index: true },
       name: { type: String, required: true },
       password: { type: String },
+      default_land_id: { type: String, required: true },
+      virtual_world_mode: { type: Boolean, required: true },
       state: { type: String },
       action: { type: String },
       activity: { type: String },

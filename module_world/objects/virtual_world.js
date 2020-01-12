@@ -34,16 +34,6 @@ class VirtualWorld {
   }
 
   poll() {
-    if (!this.client.is_connected()) {
-      this.client.connect();
-      return;
-    }
-
-    if (!this.send_login_message) {
-      this.send("login", {});
-      this.send_login_message = true;
-    }
-
     this.client.poll();
   }
 
@@ -55,18 +45,18 @@ class VirtualWorld {
     return this._data.name;
   }
 
-  contains_character(name) {
-    return name in this._data.characters_list;
+  contains_character(character_id) {
+    return character_id in this._data.characters_list;
   }
 
-  character_enter(character_name) {
-    if (!this._data.characters_list.contains(character_name))
-      this._data.characters_list.push(character_name);
+  character_enter(character_id) {
+    if (!this._data.characters_list.contains(character_id))
+      this._data.characters_list.push(character_id);
   }
 
-  character_leave(character_name) {
-    if (!this._data.characters_list.contains(character_name))
-      this._data.characters_list.push(character_name);
+  character_leave(character_id) {
+    if (!this._data.characters_list.contains(character_id))
+      this._data.characters_list.push(character_id);
   }
 }
 

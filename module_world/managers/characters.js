@@ -47,12 +47,9 @@ class Characters {
     const character = this._get_character_by_id(id);
     if (!character) return;
 
-    for (const land of Object.values(this.module_world.data.lands_map)) {
-      if (land.get_character_position(character.get_id()) != null) {
+    for (const land of Object.values(this.module_world.data.lands_map))
+      if (land.get_character_position(character.get_id()) != null)
         land.remove_character(character.get_id());
-        break;
-      }
-    }
 
     const new_land = this.module_world.data.lands_map[land_id];
     new_land.insert_character(character.get_id());
@@ -74,6 +71,26 @@ class Characters {
     if (character == null || friend == null) return;
 
     character._remove_friend(friend_name);
+  }
+
+  enter_virtual_world(id, virtual_world_id) {
+    const character = this._get_character_by_id(id);
+
+    for (const land of Object.values(this.module_world.data.lands_map))
+      land.remove_character(character.get_id());
+
+    character._change_virtual_world_mode(true);
+
+    this.module_world.managers.insert_character(id, virtual_world_id);
+  }
+
+  leave_virtual_world(id) {
+    this.module_world.managers.remove_character(id);
+
+    character._change_virtual_world_mode(false);
+
+    const character = this._get_character_by_id(id);
+    this.change_land(id, character.get_default_land_id());
   }
 
   log_off(id) {

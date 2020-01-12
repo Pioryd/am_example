@@ -334,6 +334,35 @@ function process_script_action(connection, received_data, managers) {
   );
 }
 
+function enter_virtual_world(connection, received_data, managers) {
+  const character_name = connection.user_data.character_name;
+
+  if (is_admin(character_name)) {
+    handle_error(connection, received_data, managers);
+    return;
+  }
+
+  const character_id = managers.characters.get_id_by_name(character_name);
+  const virtual_world_id = received_data.virtual_world_id;
+
+  // Check if character have right to enter world without use portal
+  // Currently this possibility is not nesesery.
+  // managers.characters.enter_virtual_world(character_id, virtual_world_id);
+}
+
+function leave_virtual_world(connection, received_data, managers) {
+  const character_name = connection.user_data.character_name;
+
+  if (is_admin(character_name)) {
+    handle_error(connection, received_data, managers);
+    return;
+  }
+
+  const character_id = managers.characters.get_id_by_name(character_name);
+
+  managers.characters.leave_virtual_world(character_id);
+}
+
 function virtual_world(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
@@ -342,10 +371,32 @@ function virtual_world(connection, received_data, managers) {
     return;
   }
 
-  managers.virtual_worlds.process_packet_received_from_user(
-    character_name,
+  const character_id = managers.characters.get_id_by_name(character_name);
+
+  managers.virtual_worlds.process_packet_received_from_character(
+    character_id,
     received_data
   );
+}
+
+function admin_command(connection, received_data, managers) {
+  const character_name = connection.user_data.character_name;
+
+  if (!is_admin(character_name)) {
+    handle_error(connection, received_data, managers);
+    return;
+  }
+
+  const { command, args } = received_data;
+  const commands_map =
+    managers.main_world.module_world.application.commands_map;
+
+  if (!(command in commands_map)) {
+    logger.error("Command does not exist:", command, "with args:", args);
+    return;
+  }
+
+  commands_map[command](args);
 }
 
 module.exports = {
@@ -364,6 +415,8 @@ module.exports = {
     data_character_change_activity: data_character_change_activity,
     action_message: action_message,
     process_script_action: process_script_action,
+    enter_virtual_world: enter_virtual_world,
+    leave_virtual_world: leave_virtual_world,
     virtual_world: virtual_world
   }
 };

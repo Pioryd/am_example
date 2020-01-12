@@ -19,18 +19,11 @@ class MainWorld {
     this.actions_map = {
       enter_virtual_world: (static_args, dynamic_args) => {
         const { virtual_world_id } = static_args;
-        const { character_id, text } = dynamic_args;
-        const name = this.module_world.managers.characters.get_name(
-          character_id
-        );
-        // TODO
-        logger.log(
-          "You",
-          name,
-          "are entering virtual world with ID:",
-          virtual_world_id,
-          "and yuo are saying:",
-          text
+        const { character_id } = dynamic_args;
+
+        this.module_world.managers.characters.enter_virtual_world(
+          character_id,
+          virtual_world_id
         );
       }
     };
@@ -83,34 +76,39 @@ class MainWorld {
   generate_world() {
     logger.info("Generating new world...");
 
-    for (let id = 0; id < 5; id++) {
-      // Create virtual world
-      const vw_manager = this.module_world.managers.virtual_worlds;
-      const virtual_world = new Objects.VirtualWorld(
-        {
-          id: ObjectID().toHexString(),
-          name: "virtual_world_" + id,
-          url: "http://localhost:400" + id,
-          characters_list: []
-        },
-        vw_manager.process_packet_received_from_user,
-        vw_manager.process_user_packet_received_from_virtual_world
-      );
-      this.module_world.data.virtual_worlds_map[
-        virtual_world.get_id()
-      ] = virtual_world;
-
-      // Create character
-      const character = new Objects.Character({
+    // Only 1 world for testing needs
+    // Create virtual world
+    const vw_manager = this.module_world.managers.virtual_worlds;
+    const virtual_world = new Objects.VirtualWorld(
+      {
         id: ObjectID().toHexString(),
-        name: "AM_" + id,
-        password: "123",
-        state: "",
-        action: "",
-        activity: "",
-        friends_list: []
-      });
-      this.module_world.data.characters_map[character.get_id()] = character;
+        name: "virtual_world_1",
+        url: "http://localhost:4001",
+        characters_list: []
+      },
+      vw_manager.process_packet_received_from_character,
+      vw_manager.process_user_packet_received_from_virtual_world
+    );
+    this.module_world.data.virtual_worlds_map[
+      virtual_world.get_id()
+    ] = virtual_world;
+
+    for (let id = 0; id < 5; id++) {
+      // // Create virtual world
+      // const vw_manager = this.module_world.managers.virtual_worlds;
+      // const virtual_world = new Objects.VirtualWorld(
+      //   {
+      //     id: ObjectID().toHexString(),
+      //     name: "virtual_world_" + id,
+      //     url: "http://localhost:400" + id,
+      //     characters_list: []
+      //   },
+      //   vw_manager.process_packet_received_from_character,
+      //   vw_manager.process_user_packet_received_from_virtual_world
+      // );
+      // this.module_world.data.virtual_worlds_map[
+      //   virtual_world.get_id()
+      // ] = virtual_world;
 
       // Create land
       const land = new Objects.Land(
@@ -125,6 +123,19 @@ class MainWorld {
       for (let i = 0; i < land_size; i++)
         land._data.map.push({ characters_list: [], objects_list: [] });
       this.module_world.data.lands_map[land.get_id()] = land;
+
+      // Create character
+      const character = new Objects.Character({
+        id: ObjectID().toHexString(),
+        name: "AM_" + id,
+        password: "123",
+        default_land_id: land.get_id(),
+        state: "",
+        action: "",
+        activity: "",
+        friends_list: []
+      });
+      this.module_world.data.characters_map[character.get_id()] = character;
 
       // Place character at land
       const character_position = Util.get_random_int(0, land_size - 1);

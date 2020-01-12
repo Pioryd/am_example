@@ -6,7 +6,7 @@ class VirtualWorld {
     this._data = data;
     this.client = new Client({
       url: this._data.url,
-      options: { timeout: 0 }
+      options: { timeout: 0, debug: true }
     });
 
     this.client.events.connected = () => {

@@ -17,7 +17,7 @@ class ModuleWorld extends EventEmitter {
   constructor({ event_emitter, config }) {
     super();
     this.event_emitter = event_emitter;
-    this.application = application;
+    this.application = event_emitter;
     this.config = config;
     this.data = {
       lands_map: {},
@@ -29,15 +29,16 @@ class ModuleWorld extends EventEmitter {
         generated: false,
         backup: false,
         corrupted: false,
-        admin_login: "",
-        admin_password: ""
+        admin_login: "admin",
+        admin_password: "123"
       }
     };
     this.managers = {
       characters: new Manager.Characters(this),
       database: new Manager.Database(this),
       main_world: new Manager.MainWorld(this),
-      server: new Manager.Server(this),
+      world_server: new Manager.WorldServer(this),
+      admin_server: new Manager.AdminServer(this),
       virtual_worlds: new Manager.VirtualWorlds(this)
     };
 
@@ -51,10 +52,11 @@ class ModuleWorld extends EventEmitter {
     try {
       // The order is important for logic
       this.managers.database.initialize();
-      this.managers.server.initialize();
+      this.managers.world_server.initialize();
+      this.managers.admin_server.initialize();
       this.managers.characters.initialize();
       this.managers.main_world.initialize();
-      this.managers.virtual_worlds.initialize();
+      //this.managers.virtual_worlds.initialize();
     } catch (e) {
       logger.error(e);
     }
@@ -111,11 +113,12 @@ class ModuleWorld extends EventEmitter {
       _this.event_emitter.removeAllListeners();
 
       // The order is important for logic
-      _this.managers.server.terminate();
+      _this.managers.world_server.terminate();
+      _this.managers.admin_server.terminate();
       _this.managers.main_world.terminate();
       _this.managers.characters.terminate();
       _this.managers.database.terminate();
-      _this.managers.virtual_worlds.terminate();
+      //_this.managers.virtual_worlds.terminate();
     } catch (e) {
       logger.error(e);
     }
@@ -126,10 +129,11 @@ class ModuleWorld extends EventEmitter {
   _poll(_this) {
     // The order is important for logic
     _this.managers.database.poll();
-    _this.managers.server.poll();
+    _this.managers.world_server.poll();
+    _this.managers.admin_server.poll();
     _this.managers.characters.poll();
     _this.managers.main_world.poll();
-    _this.managers.virtual_worlds.poll();
+    //_this.managers.virtual_worlds.poll();
   }
 }
 

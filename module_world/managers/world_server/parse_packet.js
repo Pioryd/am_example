@@ -9,10 +9,6 @@ NOTE!
 Classes instances like: [Character], [Land], etc use only as read only. 
 To change any data of them use [managers] methods.
 */
-function is_admin(name) {
-  return name === "admin";
-}
-
 function handle_error(connection, received_data, managers, message) {
   if (message != null) logger.error("Error:", message);
   logger.error(
@@ -56,42 +52,13 @@ function accept_connection(connection, received_data, managers) {
   };
 
   SendPacket.login(connection.get_id(), managers, {
-    character_name: login,
-    admin: is_admin(login)
+    character_name: login
   });
   return true;
 }
 
-function data_full(connection, received_data, managers) {
-  let send_data = {};
-  const character_name = connection.user_data.character_name;
-
-  if (is_admin(character_name)) {
-    send_data = {
-      lands_map: managers.server.module_world.data.lands_map,
-      characters_map: managers.server.module_world.data.characters_map
-    };
-  } else {
-    const character = managers.characters._get_character_by_name(
-      character_name
-    );
-    const land = managers.characters.get_land(character.get_id());
-    send_data = {
-      character: character._data,
-      land: land._data
-    };
-  }
-
-  SendPacket.data_full(connection.get_id(), managers, send_data);
-}
-
 function data_character(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
-
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
 
   const character = managers.characters._get_character_by_name(character_name);
 
@@ -108,11 +75,6 @@ function data_character(connection, received_data, managers) {
 
 function data_land(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
-
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
 
   const land = managers.characters.get_land(
     managers.characters.get_id_by_name(character_name)
@@ -131,22 +93,18 @@ function data_land(connection, received_data, managers) {
 function data_world(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
   const lands_map = {};
   const characters_map = {};
   const environment_objects_map = {};
 
   for (const land of Object.values(
-    managers.server.module_world.data.lands_map
+    managers.world_server.module_world.data.lands_map
   )) {
     lands_map[land.get_id()] = { name: land._data.name };
   }
 
   for (const character of Object.values(
-    managers.server.module_world.data.characters_map
+    managers.world_server.module_world.data.characters_map
   )) {
     characters_map[character.get_id()] = {
       name: character._data.name,
@@ -157,7 +115,7 @@ function data_world(connection, received_data, managers) {
   }
 
   for (const environment_object of Object.values(
-    managers.server.module_world.data.environment_objects_map
+    managers.world_server.module_world.data.environment_objects_map
   )) {
     const object_data = {
       type: environment_object._data.type,
@@ -184,11 +142,6 @@ function data_world(connection, received_data, managers) {
 function data_character_change_position(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
-
   managers.characters.change_position(
     managers.characters.get_id_by_name(character_name),
     received_data.position_x
@@ -199,11 +152,6 @@ function data_character_change_position(connection, received_data, managers) {
 
 function data_character_change_land(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
-
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
 
   managers.characters.change_land(
     managers.characters.get_id_by_name(character_name),
@@ -216,11 +164,6 @@ function data_character_change_land(connection, received_data, managers) {
 function data_character_add_friend(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
-
   managers.characters.add_friend_if_exist(
     managers.characters.get_id_by_name(character_name),
     received_data.name
@@ -231,11 +174,6 @@ function data_character_add_friend(connection, received_data, managers) {
 
 function data_character_remove_friend(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
-
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
 
   managers.characters.remove_friend_if_exist(
     managers.characters.get_id_by_name(character_name),
@@ -248,11 +186,6 @@ function data_character_remove_friend(connection, received_data, managers) {
 function data_character_change_state(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
-
   const character = managers.characters._get_character_by_name(character_name);
   character._change_state(received_data.name);
 
@@ -261,11 +194,6 @@ function data_character_change_state(connection, received_data, managers) {
 
 function data_character_change_action(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
-
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
 
   const character = managers.characters._get_character_by_name(character_name);
   character._change_action(received_data.name);
@@ -276,11 +204,6 @@ function data_character_change_action(connection, received_data, managers) {
 function data_character_change_activity(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
-
   const character = managers.characters._get_character_by_name(character_name);
   character._change_activity(received_data.name);
 
@@ -289,11 +212,6 @@ function data_character_change_activity(connection, received_data, managers) {
 
 function action_message(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
-
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
 
   const from_character_name = character_name;
   const to_character_connection_id = managers.characters.get_connection_id(
@@ -320,11 +238,6 @@ function action_message(connection, received_data, managers) {
 function process_script_action(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
-
   const character_id = managers.characters.get_id_by_name(character_name);
 
   managers.main_world.process_action(
@@ -337,11 +250,6 @@ function process_script_action(connection, received_data, managers) {
 function enter_virtual_world(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
-
   const character_id = managers.characters.get_id_by_name(character_name);
   const virtual_world_id = received_data.virtual_world_id;
 
@@ -353,11 +261,6 @@ function enter_virtual_world(connection, received_data, managers) {
 function leave_virtual_world(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
 
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
-
   const character_id = managers.characters.get_id_by_name(character_name);
 
   managers.characters.leave_virtual_world(character_id);
@@ -365,11 +268,6 @@ function leave_virtual_world(connection, received_data, managers) {
 
 function virtual_world(connection, received_data, managers) {
   const character_name = connection.user_data.character_name;
-
-  if (is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
 
   const character_id = managers.characters.get_id_by_name(character_name);
 
@@ -379,30 +277,9 @@ function virtual_world(connection, received_data, managers) {
   );
 }
 
-function admin_command(connection, received_data, managers) {
-  const character_name = connection.user_data.character_name;
-
-  if (!is_admin(character_name)) {
-    handle_error(connection, received_data, managers);
-    return;
-  }
-
-  const { command, args } = received_data;
-  const commands_map =
-    managers.main_world.module_world.application.commands_map;
-
-  if (!(command in commands_map)) {
-    logger.error("Command does not exist:", command, "with args:", args);
-    return;
-  }
-
-  commands_map[command](args);
-}
-
 module.exports = {
   ParsePacket: {
     accept_connection: accept_connection,
-    data_full: data_full,
     data_character: data_character,
     data_land: data_land,
     data_world: data_world,

@@ -103,18 +103,6 @@ class Characters {
   log_in(connection_id, login, password) {
     if (connection_id == null || login == null || password == null) return;
 
-    // Admin
-    // Many accounts(sockets) can be logged as admin,
-    // for example for multi-screen
-    if (
-      this.module_world.data.settings.admin_login.toLowerCase() ===
-        login.toLowerCase() &&
-      this.module_world.data.settings.admin_password === password.toLowerCase()
-    )
-      return;
-
-    // Characters
-    // Only one account per character
     for (const character of Object.values(
       this.module_world.data.characters_map
     )) {

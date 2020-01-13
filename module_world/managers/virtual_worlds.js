@@ -92,7 +92,7 @@ class VirtualWorlds {
       return;
     }
 
-    this.module_world.managers.server.send_packet.virtual_world(
+    this.module_world.managers.world_server.send_packet.virtual_world(
       connection_id,
       this.module_world.managers,
       { packet_id, data }

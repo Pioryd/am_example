@@ -57,7 +57,7 @@ class DatabaseManager {
         try {
           this.module_world.managers.database.close();
         } catch (e) {
-          logger.error(e);
+          logger.error(e.stack);
         }
       }, 1000);
     };

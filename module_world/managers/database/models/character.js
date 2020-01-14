@@ -62,7 +62,7 @@ class CharacterModel {
               this.save(classes_instances, callback, index);
             }
           } catch (e) {
-            logger.error(e);
+            logger.error(e.stack);
           }
         }
       );
@@ -80,7 +80,7 @@ class CharacterModel {
           error: error
         });
       } catch (e) {
-        logger.error(e);
+        logger.error(e.stack);
       }
     });
   }
@@ -94,7 +94,7 @@ class CharacterModel {
           results: result
         });
       } catch (e) {
-        logger.error(e);
+        logger.error(e.stack);
       }
     });
   }
@@ -108,7 +108,7 @@ class CharacterModel {
           results: result
         });
       } catch (e) {
-        logger.error(e);
+        logger.error(e.stack);
       }
     });
   }

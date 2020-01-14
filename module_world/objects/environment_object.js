@@ -38,7 +38,7 @@ class EnvironmentObject {
     try {
       this.action_scripts_list[action_id].script(dynamic_args, managers);
     } catch (e) {
-      logger.error(e);
+      logger.error(e.stack);
     }
   }
 }

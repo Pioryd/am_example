@@ -58,7 +58,7 @@ class ModuleWorld extends EventEmitter {
       this.managers.main_world.initialize();
       //this.managers.virtual_worlds.initialize();
     } catch (e) {
-      logger.error(e);
+      logger.error(e.stack);
     }
 
     this.ready = true;
@@ -99,7 +99,7 @@ class ModuleWorld extends EventEmitter {
 
       _this._poll(_this);
     } catch (e) {
-      logger.error(e);
+      logger.error(e.stack);
     }
 
     setTimeout(() => {
@@ -120,7 +120,7 @@ class ModuleWorld extends EventEmitter {
       _this.managers.database.terminate();
       //_this.managers.virtual_worlds.terminate();
     } catch (e) {
-      logger.error(e);
+      logger.error(e.stack);
     }
 
     this.ready = false;

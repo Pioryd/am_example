@@ -59,7 +59,7 @@ class VirtualWorlds {
   process_packet_received_from_character(character_id, received_data) {
     const virtual_world_id = received_data.id;
     const packet_id = received_data.packet_id;
-    const data = received_data.data;
+    const packet_data = received_data.packet_data;
     for (const [id, virtual_world] of Object.entries(
       this.module_world.data.virtual_worlds_map
     )) {
@@ -76,7 +76,7 @@ class VirtualWorlds {
     }
   }
 
-  process_user_packet_received_from_virtual_world(connection, received_data) {
+  process_character_packet_received_from_virtual_world(received_data) {
     const character_id = received_data.character_id;
     const packet_id = received_data.data;
     const data = received_data.data;
@@ -85,8 +85,8 @@ class VirtualWorlds {
 
     if (connection_id == null) {
       logger.error(
-        "Unable to parse packet from virtual world. Connection[" +
-          connection.get_id() +
+        "Unable to parse packet from virtual world. Character[" +
+          character_id +
           "]"
       );
       return;
@@ -99,7 +99,7 @@ class VirtualWorlds {
     );
   }
 
-  process_world_packet_received_from_virtual_world(connection, received_data) {}
+  process_world_packet_received_from_virtual_world(received_data) {}
 }
 
 module.exports = VirtualWorlds;

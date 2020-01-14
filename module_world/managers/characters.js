@@ -75,21 +75,28 @@ class Characters {
 
   enter_virtual_world(id, virtual_world_id) {
     const character = this._get_character_by_id(id);
+    if (character == null) return;
 
+    // Leave land
     for (const land of Object.values(this.module_world.data.lands_map))
-      land.remove_character(character.get_id());
+      land.remove_character(id);
 
     character._change_virtual_world_mode(true);
 
-    this.module_world.managers.insert_character(id, virtual_world_id);
+    this.module_world.managers.virtual_worlds.insert_character(
+      id,
+      virtual_world_id
+    );
   }
 
   leave_virtual_world(id) {
-    this.module_world.managers.remove_character(id);
+    const character = this._get_character_by_id(id);
+    if (character == null) return;
+
+    this.module_world.managers.virtual_worlds.remove_character(id);
 
     character._change_virtual_world_mode(false);
 
-    const character = this._get_character_by_id(id);
     this.change_land(id, character.get_default_land_id());
   }
 

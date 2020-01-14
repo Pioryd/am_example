@@ -78,7 +78,6 @@ class MainWorld {
 
     // Only 1 world for testing needs
     // Create virtual world
-    const vw_manager = this.module_world.managers.virtual_worlds;
     const virtual_world = new Objects.VirtualWorld(
       {
         id: ObjectID().toHexString(),
@@ -86,9 +85,9 @@ class MainWorld {
         url: "http://localhost:4001",
         characters_list: []
       },
-      vw_manager.process_packet_received_from_character,
-      vw_manager.process_user_packet_received_from_virtual_world
+      this.module_world.managers.virtual_worlds
     );
+
     this.module_world.data.virtual_worlds_map[
       virtual_world.get_id()
     ] = virtual_world;
@@ -97,14 +96,13 @@ class MainWorld {
       // // Create virtual world
       // const vw_manager = this.module_world.managers.virtual_worlds;
       // const virtual_world = new Objects.VirtualWorld(
-      //   {
-      //     id: ObjectID().toHexString(),
-      //     name: "virtual_world_" + id,
-      //     url: "http://localhost:400" + id,
-      //     characters_list: []
-      //   },
-      //   vw_manager.process_packet_received_from_character,
-      //   vw_manager.process_user_packet_received_from_virtual_world
+      // {
+      //   id: ObjectID().toHexString(),
+      //   name: "virtual_world_1",
+      //   url: "http://localhost:4001",
+      //   characters_list: []
+      // },
+      // this.module_world.managers.virtual_worlds
       // );
       // this.module_world.data.virtual_worlds_map[
       //   virtual_world.get_id()
@@ -130,6 +128,7 @@ class MainWorld {
         name: "AM_" + id,
         password: "123",
         default_land_id: land.get_id(),
+        virtual_world_mode: false,
         state: "",
         action: "",
         activity: "",

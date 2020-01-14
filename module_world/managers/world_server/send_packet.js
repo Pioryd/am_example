@@ -14,12 +14,24 @@ const SendPacket = {
   data_character: (
     connection_id,
     managers,
-    { id, name, password, state, action, activity, friends_list }
+    {
+      id,
+      name,
+      password,
+      default_land_id,
+      virtual_world_mode,
+      state,
+      action,
+      activity,
+      friends_list
+    }
   ) => {
     managers.world_server.send(connection_id, "data_character", {
       id,
       name,
       password,
+      default_land_id,
+      virtual_world_mode,
       state,
       action,
       activity,
@@ -32,12 +44,13 @@ const SendPacket = {
   data_world: (
     connection_id,
     managers,
-    { lands_map, characters_map, environment_objects_map }
+    { lands_map, characters_map, environment_objects_map, virtual_worlds_map }
   ) => {
     managers.world_server.send(connection_id, "data_world", {
       lands_map,
       characters_map,
-      environment_objects_map
+      environment_objects_map,
+      virtual_worlds_map
     });
   },
   action_message: (connection_id, managers, { name, text }) => {

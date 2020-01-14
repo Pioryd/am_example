@@ -57,9 +57,12 @@ const load_data = ({
 
   const set_virtual_worlds = results_list => {
     for (const result of results_list) {
-      const virtual_world = new Objects.VirtualWorld({
-        ...result._doc
-      });
+      const virtual_world = new Objects.VirtualWorld(
+        {
+          ...result._doc
+        },
+        manager.module_world.managers.virtual_worlds
+      );
       delete virtual_world._data._id;
       delete virtual_world._data.__v;
 

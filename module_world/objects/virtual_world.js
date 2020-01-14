@@ -2,20 +2,28 @@ const path = require("path");
 const { Client } = require(path.join(global.node_modules_path, "am_framework"));
 
 class VirtualWorld {
-  constructor(data, on_character_receive, on_world_receive) {
+  constructor(data, manager_virtual_worlds) {
     this._data = data;
     this.client = new Client({
       url: this._data.url,
-      options: { timeout: 0, debug: true }
+      options: { packet_timeout: 0 }
     });
 
     this.client.events.connected = () => {
-      this.send("login", {});
+      this.send("accept_connection", {});
     };
 
     this.client.add_parse_packet_dict({
-      character: on_character_receive,
-      world: on_world_receive
+      character: (...args) => {
+        manager_virtual_worlds.process_character_packet_received_from_virtual_world(
+          ...args
+        );
+      },
+      world: (...args) => {
+        manager_virtual_worlds.process_world_packet_received_from_virtual_world(
+          ...args
+        );
+      }
     });
 
     this.send_login_message = false;
@@ -46,17 +54,30 @@ class VirtualWorld {
   }
 
   contains_character(character_id) {
-    return character_id in this._data.characters_list;
+    return this._data.characters_list.includes(character_id);
   }
 
   character_enter(character_id) {
-    if (!this._data.characters_list.contains(character_id))
+    if (!this.contains_character(character_id))
       this._data.characters_list.push(character_id);
+
+    this.send("world", {
+      packet_id: "character_enter",
+      packet_data: { character_id }
+    });
   }
 
   character_leave(character_id) {
-    if (!this._data.characters_list.contains(character_id))
-      this._data.characters_list.push(character_id);
+    if (this.contains_character(character_id))
+      this._data.characters_list.splice(
+        this._data.characters_list.indexOf(character_id),
+        1
+      );
+
+    this.send("world", {
+      packet_id: "character_leave",
+      packet_data: { character_id }
+    });
   }
 }
 

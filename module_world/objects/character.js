@@ -68,11 +68,11 @@ class Character {
   }
 
   _change_default_land_id(default_land_id) {
-    return (this._data.default_land_id = default_land_id);
+    this._data.default_land_id = default_land_id;
   }
 
   _change_virtual_world_mode(virtual_world_mode) {
-    return (this._data.virtual_world_mode = virtual_world_mode);
+    this._data.virtual_world_mode = virtual_world_mode;
   }
 
   _set_connection_id(connection_id) {

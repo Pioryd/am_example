@@ -56,7 +56,7 @@ class ModuleWorld extends EventEmitter {
       this.managers.admin_server.initialize();
       this.managers.characters.initialize();
       this.managers.main_world.initialize();
-      //this.managers.virtual_worlds.initialize();
+      this.managers.virtual_worlds.initialize();
     } catch (e) {
       logger.error(e.stack);
     }
@@ -118,7 +118,7 @@ class ModuleWorld extends EventEmitter {
       _this.managers.main_world.terminate();
       _this.managers.characters.terminate();
       _this.managers.database.terminate();
-      //_this.managers.virtual_worlds.terminate();
+      _this.managers.virtual_worlds.terminate();
     } catch (e) {
       logger.error(e.stack);
     }
@@ -133,7 +133,7 @@ class ModuleWorld extends EventEmitter {
     _this.managers.admin_server.poll();
     _this.managers.characters.poll();
     _this.managers.main_world.poll();
-    //_this.managers.virtual_worlds.poll();
+    _this.managers.virtual_worlds.poll();
   }
 }
 

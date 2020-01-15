@@ -27,7 +27,7 @@ class Characters {
 
   get_land(id) {
     const character = this._get_character_by_id(id);
-    if (!character) return;
+    if (character == null) return;
 
     for (const land of Object.values(this.module_world.data.lands_map))
       if (land.get_character_position(character.get_id()) != null) return land;
@@ -81,7 +81,7 @@ class Characters {
     for (const land of Object.values(this.module_world.data.lands_map))
       land.remove_character(id);
 
-    character._change_virtual_world_mode(true);
+    character._change_virtual_world_id(virtual_world_id);
 
     this.module_world.managers.virtual_worlds.insert_character(
       id,
@@ -95,7 +95,7 @@ class Characters {
 
     this.module_world.managers.virtual_worlds.remove_character(id);
 
-    character._change_virtual_world_mode(false);
+    character._change_virtual_world_id("");
 
     this.change_land(id, character.get_default_land_id());
   }

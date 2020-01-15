@@ -20,7 +20,7 @@ class CharacterModel {
       name: { type: String, required: true },
       password: { type: String },
       default_land_id: { type: String, required: true },
-      virtual_world_mode: { type: Boolean, required: true },
+      virtual_world_id: { type: String, required: true },
       state: { type: String },
       action: { type: String },
       activity: { type: String },

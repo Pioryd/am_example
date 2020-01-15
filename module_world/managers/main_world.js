@@ -128,7 +128,7 @@ class MainWorld {
         name: "AM_" + id,
         password: "123",
         default_land_id: land.get_id(),
-        virtual_world_mode: false,
+        virtual_world_id: "",
         state: "",
         action: "",
         activity: "",

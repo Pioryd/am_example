@@ -57,7 +57,10 @@ class VirtualWorlds {
   }
 
   process_packet_received_from_character(character_id, received_data) {
-    const virtual_world_id = received_data.id;
+    const characters_manager = this.module_world.managers.characters;
+    const character = characters_manager._get_character_by_id(character_id);
+
+    const virtual_world_id = character.get_virtual_world_id();
     const packet_id = received_data.packet_id;
     const packet_data = received_data.packet_data;
     for (const [id, virtual_world] of Object.entries(
@@ -72,20 +75,24 @@ class VirtualWorlds {
           packet_id,
           packet_data
         });
+        return;
       }
     }
+
+    console.log("Unable to process_packet_received_from_character");
   }
 
   process_character_packet_received_from_virtual_world(received_data) {
     const character_id = received_data.character_id;
-    const packet_id = received_data.data;
-    const data = received_data.data;
+    const packet_id = received_data.packet_id;
+    const data = received_data.packet_data;
+
     const characters_manager = this.module_world.managers.characters;
     const connection_id = characters_manager.get_connection_id(character_id);
 
     if (connection_id == null) {
       logger.error(
-        "Unable to parse packet from virtual world. Character[" +
+        "Unable to parse CHARACTER packet from virtual world. Character[" +
           character_id +
           "]"
       );
@@ -99,7 +106,11 @@ class VirtualWorlds {
     );
   }
 
-  process_world_packet_received_from_virtual_world(received_data) {}
+  process_world_packet_received_from_virtual_world(received_data) {
+    console.error(
+      "process_world_packet_received_from_virtual_world is NOT supported yet"
+    );
+  }
 }
 
 module.exports = VirtualWorlds;

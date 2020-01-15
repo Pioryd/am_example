@@ -31,8 +31,8 @@ class Character {
     return this._data.default_land_id;
   }
 
-  get_virtual_world_mode() {
-    return this._data.virtual_world_mode;
+  get_virtual_world_id() {
+    return this._data.virtual_world_id;
   }
 
   get_state() {
@@ -71,8 +71,8 @@ class Character {
     this._data.default_land_id = default_land_id;
   }
 
-  _change_virtual_world_mode(virtual_world_mode) {
-    this._data.virtual_world_mode = virtual_world_mode;
+  _change_virtual_world_id(virtual_world_id) {
+    this._data.virtual_world_id = virtual_world_id;
   }
 
   _set_connection_id(connection_id) {

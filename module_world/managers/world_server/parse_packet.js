@@ -72,7 +72,7 @@ function data_character(connection, received_data, managers) {
     name: character.get_name(),
     password: character.get_password(),
     default_land_id: character.get_default_land_id(),
-    virtual_world_mode: character.get_virtual_world_mode(),
+    virtual_world_id: character.get_virtual_world_id(),
     state: character.get_state(),
     action: character.get_action(),
     activity: character.get_activity(),

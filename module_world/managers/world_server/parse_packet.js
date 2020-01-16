@@ -222,7 +222,7 @@ function action_message(connection, received_data, managers) {
 
   const from_character_name = character.get_name();
   const to_character_connection_id = managers.characters.get_connection_id(
-    character_id
+    managers.characters.get_id_by_name(received_data.name)
   );
 
   const text = received_data.text;

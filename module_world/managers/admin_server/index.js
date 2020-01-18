@@ -17,7 +17,8 @@ class ServerManager {
     this.config = this.module_world.config;
 
     this.server = new Server({
-      port: this.config.module_world.admin_server.port
+      port: this.config.module_world.admin_server.port,
+      options: { packet_timeout: 0 }
     });
   }
 

@@ -30,30 +30,32 @@ function accept_connection(connection, received_data, managers) {
   const login = received_data.login;
   const password = received_data.password;
 
+  const config = managers.admin_server.config;
   if (
-    managers.admin_server.module_world.data.settings.admin_login.toLowerCase() !==
+    config.module_world.admin_server.login.toLowerCase() !==
       login.toLowerCase() ||
-    managers.admin_server.module_world.data.settings.admin_password !==
-      password.toLowerCase()
+    config.module_world.admin_server.password !== password.toLowerCase()
   ) {
     handle_error(
       connection,
       received_data,
       managers,
-      "Unable to character_authenticate. Login:" +
-        login +
-        "Password:" +
-        password
+      `Unable to accept connection. Login: ${login} Password: ${password}`
     );
     return false;
   }
 
-  connection.user_data.character_name = login;
-  connection.user_data.password = password;
   connection.on_close = connection => {};
 
-  // Command
-  const { command, args } = received_data;
+  SendPacket.login(connection.get_id(), managers, {
+    character_name: login
+  });
+  return true;
+}
+
+function process_script(connection, received_data, managers) {
+  const { script } = received_data;
+  const command = "script";
   const commands_map =
     managers.main_world.module_world.application.commands_map;
 
@@ -62,16 +64,27 @@ function accept_connection(connection, received_data, managers) {
     return false;
   }
 
-  logger.log(`Executing command[${command}] with args[${args[0]}]`);
-  commands_map[command](args[0]);
+  logger.log(
+    `Executing command[${command}] with arg[${
+      script.length >= 10 ? `${script.substr(0, 10)}...` : script
+    }]`
+  );
+  commands_map[command](script);
+}
 
-  return false;
+function scripts_list(connection, received_data, managers) {
+  const app = managers.main_world.module_world.application;
 
-  //  return true;
+  const scripts_list = app.get_scripts_list();
+  SendPacket.scripts_list(connection.get_id(), managers, {
+    scripts_list
+  });
 }
 
 module.exports = {
   ParsePacket: {
-    accept_connection: accept_connection
+    accept_connection: accept_connection,
+    process_script: process_script,
+    scripts_list: scripts_list
   }
 };

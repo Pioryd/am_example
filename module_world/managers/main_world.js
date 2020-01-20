@@ -93,21 +93,6 @@ class MainWorld {
     ] = virtual_world;
 
     for (let id = 0; id < 5; id++) {
-      // // Create virtual world
-      // const vw_manager = this.module_world.managers.virtual_worlds;
-      // const virtual_world = new Objects.VirtualWorld(
-      // {
-      //   id: ObjectID().toHexString(),
-      //   name: "virtual_world_1",
-      //   url: "http://localhost:4001",
-      //   characters_list: []
-      // },
-      // this.module_world.managers.virtual_worlds
-      // );
-      // this.module_world.data.virtual_worlds_map[
-      //   virtual_world.get_id()
-      // ] = virtual_world;
-
       // Create land
       const land = new Objects.Land(
         {
@@ -167,26 +152,35 @@ class MainWorld {
         environment_object.get_id()
       );
 
-      // Place some trees
-      let number_of_trees = Util.get_random_int(1, 3);
+      // Place some objects
+      const objects_types_list = [
+        "cactus",
+        "rock",
+        "mushroom_red",
+        "spikes",
+        "bush",
+        "plant",
+        "mushroom_brown"
+      ];
+      for (let pos = 0; pos < land_size; pos++) {
+        if (pos === portal_position) continue;
 
-      for (let i = 0; i < number_of_trees; i++) {
+        const object_type =
+          objects_types_list[
+            Util.get_random_int(0, objects_types_list.length - 1)
+          ];
+
         const environment_object = new Objects.EnvironmentObject({
           id: ObjectID().toHexString(),
-          type: "tree",
-          name: "tree",
+          type: object_type,
+          name: object_type.replace("_", " "),
           action_scripts_list: []
         });
         this.module_world.data.environment_objects_map[
           environment_object.get_id()
         ] = environment_object;
 
-        let tree_position = Util.get_random_int(0, land_size - 1);
-        if (tree_position === character_position)
-          if (tree_position - 1 < 0) tree_position++;
-        land._data.map[tree_position].objects_list.push(
-          environment_object.get_id()
-        );
+        land._data.map[pos].objects_list.push(environment_object.get_id());
       }
     }
 

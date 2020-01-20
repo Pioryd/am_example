@@ -27,6 +27,10 @@ class Character {
     return this._data.password;
   }
 
+  get_outfit() {
+    return this._data.outfit;
+  }
+
   get_default_land_id() {
     return this._data.default_land_id;
   }

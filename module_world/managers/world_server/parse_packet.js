@@ -71,6 +71,7 @@ function data_character(connection, received_data, managers) {
     id: character.get_id(),
     name: character.get_name(),
     password: character.get_password(),
+    outfit: character.get_outfit(),
     default_land_id: character.get_default_land_id(),
     virtual_world_id: character.get_virtual_world_id(),
     state: character.get_state(),
@@ -113,6 +114,7 @@ function data_world(connection, received_data, managers) {
   )) {
     characters_map[character.get_id()] = {
       name: character._data.name,
+      outfit: character._data.outfit,
       state: character._data.state,
       action: character._data.action,
       activity: character._data.activity

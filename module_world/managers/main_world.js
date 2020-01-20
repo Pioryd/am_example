@@ -112,6 +112,7 @@ class MainWorld {
         id: ObjectID().toHexString(),
         name: "AM_" + id,
         password: "123",
+        outfit: Util.get_random_int(1, 3),
         default_land_id: land.get_id(),
         virtual_world_id: "",
         state: "",

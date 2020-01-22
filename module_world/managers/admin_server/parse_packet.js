@@ -57,7 +57,7 @@ function process_script(connection, received_data, managers) {
   const { script } = received_data;
   const command = "script";
   const commands_map =
-    managers.main_world.module_world.application.commands_map;
+    managers.admin_server.module_world.application.commands_map;
 
   if (!(command in commands_map)) {
     logger.error("Command does not exist:", command, "with args:", args);
@@ -72,8 +72,47 @@ function process_script(connection, received_data, managers) {
   commands_map[command](script);
 }
 
+function module_data(connection, received_data, managers) {
+  const lands_map = {};
+  const characters_map = {};
+  const environment_objects_map = {};
+  const virtual_worlds_map = {};
+
+  for (const land of Object.values(
+    managers.admin_server.module_world.data.lands_map
+  )) {
+    lands_map[land.get_id()] = land._data;
+  }
+
+  for (const character of Object.values(
+    managers.admin_server.module_world.data.characters_map
+  )) {
+    characters_map[character.get_id()] = character._data;
+  }
+
+  for (const environment_object of Object.values(
+    managers.admin_server.module_world.data.environment_objects_map
+  )) {
+    environment_objects_map[environment_object.get_id()] =
+      environment_object._data;
+  }
+
+  for (const virtual_world of Object.values(
+    managers.admin_server.module_world.data.virtual_worlds_map
+  )) {
+    virtual_worlds_map[virtual_world.get_id()] = virtual_world._data;
+  }
+
+  SendPacket.module_data(connection.get_id(), managers, {
+    lands_map,
+    characters_map,
+    environment_objects_map,
+    virtual_worlds_map
+  });
+}
+
 function scripts_list(connection, received_data, managers) {
-  const app = managers.main_world.module_world.application;
+  const app = managers.admin_server.module_world.application;
 
   const scripts_list = app.get_scripts_list();
   SendPacket.scripts_list(connection.get_id(), managers, {
@@ -84,6 +123,7 @@ function scripts_list(connection, received_data, managers) {
 module.exports = {
   ParsePacket: {
     accept_connection: accept_connection,
+    module_data: module_data,
     process_script: process_script,
     scripts_list: scripts_list
   }

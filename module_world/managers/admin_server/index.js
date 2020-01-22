@@ -10,7 +10,7 @@ const { SendPacket } = require("./send_packet");
   Responsible for:
     - parse/send packets
 */
-class ServerManager {
+class AdminServerManager {
   constructor(module_world) {
     this.send_packet = SendPacket;
     this.module_world = module_world;
@@ -63,4 +63,4 @@ class ServerManager {
   }
 }
 
-module.exports = ServerManager;
+module.exports = AdminServerManager;

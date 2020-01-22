@@ -11,6 +11,9 @@ const SendPacket = {
       character_name
     });
   },
+  module_data: (connection_id, managers, data) => {
+    managers.admin_server.send(connection_id, "module_data", data);
+  },
   scripts_list: (connection_id, managers, { scripts_list }) => {
     managers.admin_server.send(connection_id, "scripts_list", {
       scripts_list

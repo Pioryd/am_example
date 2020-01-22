@@ -25,8 +25,6 @@ class VirtualWorld {
         );
       }
     });
-
-    this.send_login_message = false;
   }
 
   connect() {

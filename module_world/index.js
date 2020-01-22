@@ -28,9 +28,7 @@ class ModuleWorld extends EventEmitter {
       settings: {
         generated: false,
         backup: false,
-        corrupted: false,
-        admin_login: "admin",
-        admin_password: "123"
+        corrupted: false
       }
     };
     this.managers = {

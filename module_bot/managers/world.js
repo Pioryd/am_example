@@ -11,6 +11,11 @@ class World {
   constructor(module_bot) {
     this.module_bot = module_bot;
 
+    this.client = new Client({
+      url: this._data.url,
+      options: { packet_timeout: 0 }
+    });
+
     this.client.events.connected = () => {
       this._send("accept_connection", {});
     };

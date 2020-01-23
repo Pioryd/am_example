@@ -68,7 +68,7 @@ class ModuleWorld extends EventEmitter {
 
     logger.error(
       "Closing forced, unexpected behavior.\n" +
-        "Check data before run [World] module again."
+        "Check data before run module again."
     );
 
     this.on_terminate();
@@ -107,7 +107,7 @@ class ModuleWorld extends EventEmitter {
 
   _terminate(_this) {
     try {
-      logger.info("Close [World] module...");
+      logger.info("Close module...");
       _this.event_emitter.removeAllListeners();
 
       // The order is important for logic

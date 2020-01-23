@@ -38,7 +38,7 @@ class ModuleBot extends EventEmitter {
     this.managers = {
       //character: new Manager.Character(this),
       //database: new Manager.Database(this),
-      //world: new Manager.Core(this),
+      world: new Manager.World(this),
       admin_server: new Manager.AdminServer(this)
       //virtual_world: new Manager.VirtualWorld(this)
     };
@@ -55,7 +55,7 @@ class ModuleBot extends EventEmitter {
       //this.managers.database.initialize();
       this.managers.admin_server.initialize();
       //this.managers.character.initialize();
-      //this.managers.world.initialize();
+      this.managers.world.initialize();
       //this.managers.virtual_world.initialize();
     } catch (e) {
       logger.error(e.stack);
@@ -70,7 +70,7 @@ class ModuleBot extends EventEmitter {
 
     logger.error(
       "Closing forced, unexpected behavior.\n" +
-        "Check data before run [World] module again."
+        "Check data before run module again."
     );
 
     this.on_terminate();
@@ -109,12 +109,12 @@ class ModuleBot extends EventEmitter {
 
   _terminate(_this) {
     try {
-      logger.info("Close [World] module...");
+      logger.info("Close module...");
       _this.event_emitter.removeAllListeners();
 
       // The order is important for logic
       _this.managers.admin_server.terminate();
-      //_this.managers.world.terminate();
+      _this.managers.world.terminate();
       //_this.managers.character.terminate();
       //_this.managers.database.terminate();
       //_this.managers.virtual_world.terminate();
@@ -130,7 +130,7 @@ class ModuleBot extends EventEmitter {
     //_this.managers.database.poll();
     _this.managers.admin_server.poll();
     //_this.managers.character.poll();
-    //_this.managers.world.poll();
+    _this.managers.world.poll();
     //_this.managers.virtual_world.poll();
   }
 }

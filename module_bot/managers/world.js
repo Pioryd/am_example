@@ -13,7 +13,7 @@ class World {
 
     this.client = new Client({
       url: this.module_bot.config.module_bot.world_client.url,
-      options: { packet_timeout: 0, send_delay: 500 }
+      options: { packet_timeout: 0, send_delay: 2000 }
     });
   }
 
@@ -67,16 +67,16 @@ class World {
         this.send_data_world({});
       },
       action_message: data => {
-        set_state_packets_action_message([
-          ...state_packets_action_message,
+        this.module_bot.data.action_message_packets = [
+          ...this.module_bot.data.action_message_packets,
           { ...data }
-        ]);
+        ];
       },
       virtual_world: data => {
-        set_state_packets_virtual_world([
-          ...state_packets_virtual_world,
+        this.module_bot.data.virtual_world_packets = [
+          ...this.module_bot.data.virtual_world_packets,
           { ...data }
-        ]);
+        ];
       }
     });
   }

@@ -28,6 +28,8 @@ class ModuleBot extends EventEmitter {
         environment_objects_map: { environment_objects_map: "test" },
         virtual_worlds_map: { virtual_worlds_map: "test" }
       },
+      action_message_packets: [],
+      virtual_world_packets: [],
       // Remember to update models if rebuild settings structure
       settings: {
         generated: false,

@@ -17,7 +17,8 @@ class WorldServer {
     this.config = this.module_world.config;
 
     this.server = new Server({
-      port: this.config.module_world.world_server.port
+      port: this.config.module_world.world_server.port,
+      options: { packet_timeout: 0 }
     });
   }
 

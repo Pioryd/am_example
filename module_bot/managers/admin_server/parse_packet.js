@@ -57,7 +57,7 @@ function process_script(connection, received_data, managers) {
   const { script } = received_data;
   const command = "script";
   const commands_map =
-    managers.admin_server.module_bot.application.commands_map;
+    managers.admin_server.module_bot.application._commands_map;
 
   if (!(command in commands_map)) {
     logger.error("Command does not exist:", command, "with args:", args);

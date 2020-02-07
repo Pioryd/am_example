@@ -62,7 +62,7 @@
     "signals": [
       {
         "triggers": {
-          "stres": { "min": "81", "max": "100" }
+          "stres": { "min": "50", "max": "100" }
         },
         "actions": {
           "script_terminate": "script"

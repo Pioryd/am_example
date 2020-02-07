@@ -1,18 +1,33 @@
 {
-  "id": "System_01",
-  "events": {
-    "start": "api.system.start",
-    "form_signal": "api.system.form_signal",
-    "add": "api.system.form_remove",
-    "remove": "api.system.form_remove",
-    "update": "api.system.form_update"
-  },
-  "programs": {
-    "Mechanical": {
-      "Live": { "max_forms": 1, "forms": { "Live": {} } },
-      "Stress": { "max_forms": 1, "forms": { "Stress ": {} } },
-      "VirtualWorld": { "max_forms": 1, "forms": { "VirtualWorld ": {} } },
-      "Rest": { "max_forms": 1, "forms": { "Rest ": {} } }
+  "id": "Animal_ID",
+  "name": "Animal",
+  "programs": [
+    {
+      "id": "Mechanical_ID",
+      "name": "Mechanical",
+      "rules": [
+        {
+          "triggers": {
+            "forms_count": { "value": 0 }
+          },
+          "actions": {
+            "form_run": "Live"
+          }
+        }
+      ],
+      "signals": [
+        {
+          "triggers": {
+            "stres": { "min": 91, "max": 100 },
+            "energy": { "min": 0, "max": 10 }
+          },
+          "actions": {
+            "form_run": "Stress"
+          }
+        }
+      ],
+      "events": [],
+      "forms": ["Live", "Stress", "VirtualWorld", "Rest"]
     }
-  }
+  ]
 }

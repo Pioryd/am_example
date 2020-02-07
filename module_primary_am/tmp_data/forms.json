@@ -1,0 +1,94 @@
+[
+  {
+    "name": "Live",
+    "id": "Live_ID",
+    "rules": [],
+    "signals": [],
+    "events": [],
+    "scripts": []
+  },
+  {
+    "name": "Stres",
+    "id": "Stres_ID",
+    "rules": [],
+    "signals": [],
+    "events": [],
+    "scripts": []
+  },
+  {
+    "name": "VirtualWorld",
+    "id": "VirtualWorld_ID",
+    "rules": [],
+    "signals": [
+      {
+        "triggers": {
+          "choice": { "any": {} }
+        },
+        "actions": {
+          "script_run": "make_choice",
+          "script_set_data": {
+            "script": "make_choice",
+            "data": "enemy_choice"
+          }
+        }
+      }
+    ],
+    "events": [],
+    "scripts": [
+      {
+        "type": "script",
+        "name": "make_choice",
+        "id": "make_choice_ID",
+        "data": { "enemy_choice": "" },
+        "root_scope": {
+          "type": "scope",
+          "id": "make_choice_0",
+          "instructions": [
+            {
+              "type": "api",
+              "id": "make_choice_1",
+              "args": ["enemy_choice:script.data.enemy_choice"],
+              "name": "virtual_world.make_choice"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "Rest",
+    "id": "Rest_ID",
+    "rules": [],
+    "signals": [
+      {
+        "triggers": {
+          "stres": { "min": "81", "max": "100" }
+        },
+        "actions": {
+          "script_terminate": "script"
+        }
+      }
+    ],
+    "events": [],
+    "scripts": [
+      {
+        "type": "script",
+        "name": "rest",
+        "id": "rest_id",
+        "data": { "sleep": true },
+        "root_scope": {
+          "type": "while",
+          "id": "rest_0",
+          "condition": "script.data.sleep === true",
+          "instructions": [
+            {
+              "type": "api",
+              "id": "rest_2",
+              "name": "character.go_sleep"
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

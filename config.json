@@ -1,0 +1,24 @@
+{
+  "app": {
+    "modules": {
+      "map": {
+        "module_animal": "module_animal"
+      },
+      "paths_auto_find": [],
+      "disabled": []
+    },
+    "node_modules_rel_path": "node_modules",
+    "close_app_delay": 5000,
+    "auto_run_scripts": ["net_msg_on"]
+  },
+  "module_animal": {
+    "world_client": {
+      "url": "http://localhost:3100"
+    },
+    "admin_server": {
+      "login": "admin",
+      "password": "123",
+      "port": 3103
+    }
+  }
+}

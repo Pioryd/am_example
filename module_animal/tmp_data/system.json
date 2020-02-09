@@ -18,7 +18,6 @@
       "signals": [
         {
           "triggers": {
-            "stres": { "min": 91, "max": 100 },
             "energy": { "min": 0, "max": 10 }
           },
           "actions": {

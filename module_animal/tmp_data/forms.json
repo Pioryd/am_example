@@ -2,18 +2,118 @@
   {
     "name": "Live",
     "id": "Live_ID",
-    "rules": [],
+    "rules": [
+      {
+        "triggers": {
+          "script_processed": { "value": "plan" }
+        },
+        "actions": {
+          "run_script": "plan"
+        }
+      }
+    ],
     "signals": [],
     "events": [],
-    "scripts": []
+    "scripts": [
+      {
+        "type": "if",
+        "name": "plan",
+        "id": "plan_0",
+        "data": {
+          "rest_form_name": "Rest",
+          "portal_doors_id": "some_id",
+          "virtual_world_form_name": "some_id"
+        },
+        "conditions": {
+          "root.data.character.land_id !== root.data.character.default_land_id": [
+            {
+              "type": "api",
+              "id": "plan_1",
+              "args": ["land_id:root.data.character.default_land_id"],
+              "name": "character.change_land"
+            }
+          ],
+          "root.data.character.stress > 50": [
+            {
+              "type": "api",
+              "id": "plan_2",
+              "name": "character.leave_virtual_world"
+            },
+            {
+              "type": "api",
+              "id": "plan_3",
+              "args": ["name:script.data.rest_form_name"],
+              "name": "system.form_run"
+            }
+          ],
+          "root.data.character.energy < 100": [
+            {
+              "type": "api",
+              "id": "plan_4",
+              "args": ["name:script.data.portal_doors_id"],
+              "name": "character.use_object"
+            },
+            {
+              "type": "api",
+              "id": "plan_5",
+              "args": ["name:script.data.virtual_world_form_name"],
+              "name": "system.form_run"
+            }
+          ]
+        }
+      }
+    ]
   },
   {
     "name": "Stres",
     "id": "Stres_ID",
-    "rules": [],
-    "signals": [],
+    "rules": [
+      {
+        "triggers": {
+          "script_processed": { "value": "help_center" }
+        },
+        "actions": {
+          "run_script": "help_center"
+        }
+      }
+    ],
+    "signals": [
+      {
+        "triggers": {
+          "energy": { "min": "80", "max": "100" }
+        },
+        "actions": {
+          "form_terminate": "Stres"
+        }
+      }
+    ],
     "events": [],
-    "scripts": []
+    "scripts": [
+      {
+        "type": "script",
+        "name": "help_center",
+        "id": "help_center_id",
+        "data": { "recover_land_id": 7 },
+        "root_scope": {
+          "type": "while",
+          "id": "help_center_0",
+          "condition": "root.data.world.character.land_id !== script.data.recover_land_id",
+          "instructions": [
+            {
+              "type": "api",
+              "id": "help_center_1",
+              "args": ["land_id:script.data.recover_land_id"],
+              "name": "character.change_land"
+            },
+            {
+              "type": "internal",
+              "id": "help_center_3",
+              "command": "sleep 1000"
+            }
+          ]
+        }
+      }
+    ]
   },
   {
     "name": "VirtualWorld",
@@ -62,7 +162,7 @@
     "signals": [
       {
         "triggers": {
-          "stres": { "min": "50", "max": "100" }
+          "stres": { "min": "0", "max": "20" }
         },
         "actions": {
           "script_terminate": "script"

@@ -1,5 +1,5 @@
 {
-  "name": "am_project_animal",
+  "name": "am_app_project_animal",
   "version": "0.0.1",
   "description": "AM - Project animal",
   "engines": {
@@ -27,10 +27,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Pioryd/am_project_animal.git"
+    "url": "git+https://github.com/Pioryd/am_app_project_animal.git"
   },
   "bugs": {
-    "url": "https://github.com/Pioryd/am_project_animal/issues"
+    "url": "https://github.com/Pioryd/am_app_project_animal/issues"
   },
-  "homepage": "https://github.com/Pioryd/am_project_animal#readme"
+  "homepage": "https://github.com/Pioryd/am_app_project_animal#readme"
 }

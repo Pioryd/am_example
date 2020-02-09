@@ -25,7 +25,7 @@ const SendPacket = {
       action,
       activity,
       energy,
-      stres,
+      stress,
       friends_list
     }
   ) => {
@@ -40,7 +40,7 @@ const SendPacket = {
       action,
       activity,
       energy,
-      stres,
+      stress,
       friends_list
     });
   },

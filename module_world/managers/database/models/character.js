@@ -26,7 +26,7 @@ class CharacterModel {
       action: { type: String },
       activity: { type: String },
       energy: { type: Number, required: true },
-      stres: { type: Number, required: true },
+      stress: { type: Number, required: true },
       friends_list: { type: [String] }
     });
     this.model = this.connection.model("Character", this.schema, "character");

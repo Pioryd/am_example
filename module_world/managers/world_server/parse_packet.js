@@ -78,7 +78,7 @@ function data_character(connection, received_data, managers) {
     action: character.get_action(),
     activity: character.get_activity(),
     energy: character.get_energy(),
-    stres: character.get_stres(),
+    stress: character.get_stress(),
     friends_list: character.get_friends_list()
   });
 }
@@ -121,7 +121,7 @@ function data_world(connection, received_data, managers) {
       action: character._data.action,
       activity: character._data.activity,
       energy: character._data.energy,
-      stres: character._data.stres
+      stress: character._data.stress
     };
   }
 

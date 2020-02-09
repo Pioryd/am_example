@@ -21,7 +21,7 @@ class MainWorld {
 
     this.stopwatches_map = {
       energy: new Stopwatch(1 * 100),
-      stres: new Stopwatch(1 * 100)
+      stress: new Stopwatch(1 * 100)
     };
 
     this.actions_map = {
@@ -58,22 +58,22 @@ class MainWorld {
       this.stopwatches_map.energy.reset();
     }
 
-    if (this.stopwatches_map.stres.is_elapsed()) {
-      const increase_stres = () => {
+    if (this.stopwatches_map.stress.is_elapsed()) {
+      const increase_stress = () => {
         for (const [id, character] of Object.entries(
           this.module_world.data.characters_map
         )) {
           if (character.get_virtual_world_id() != "") {
-            this.module_world.managers.characters.change_stres(
+            this.module_world.managers.characters.change_stress(
               id,
-              character.get_stres() + 1
+              character.get_stress() + 1
             );
           }
         }
       };
 
-      increase_stres();
-      this.stopwatches_map.stres.reset();
+      increase_stress();
+      this.stopwatches_map.stress.reset();
     }
   }
 
@@ -161,7 +161,7 @@ class MainWorld {
         action: "",
         activity: "",
         energy: 100,
-        stres: 0,
+        stress: 0,
         friends_list: []
       });
       this.module_world.data.characters_map[character.get_id()] = character;

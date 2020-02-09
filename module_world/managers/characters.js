@@ -62,11 +62,11 @@ class Characters {
     character._change_energy(Math.min(Math.max(value, 0), 100));
   }
 
-  change_stres(id, value) {
+  change_stress(id, value) {
     const character = this._get_character_by_id(id);
     if (!character) return;
 
-    character._change_stres(Math.min(Math.max(value, 0), 100));
+    character._change_stress(Math.min(Math.max(value, 0), 100));
   }
 
   add_friend_if_exist(id, friend_name) {

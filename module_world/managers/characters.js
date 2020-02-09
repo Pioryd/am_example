@@ -55,6 +55,20 @@ class Characters {
     new_land.insert_character(character.get_id());
   }
 
+  change_energy(id, value) {
+    const character = this._get_character_by_id(id);
+    if (!character) return;
+
+    character._change_energy(Math.min(Math.max(value, 0), 100));
+  }
+
+  change_stres(id, value) {
+    const character = this._get_character_by_id(id);
+    if (!character) return;
+
+    character._change_stres(Math.min(Math.max(value, 0), 100));
+  }
+
   add_friend_if_exist(id, friend_name) {
     const character = this._get_character_by_id(id);
     const friend = this._get_character_by_name(friend_name);

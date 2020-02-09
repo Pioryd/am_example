@@ -5,6 +5,8 @@ Data format:
   state: string
   action: string
   activity: string
+  energy: number
+  stres: number
   friends_list: array<string>
   }>
 */
@@ -51,6 +53,14 @@ class Character {
     return this._data.activity;
   }
 
+  get_energy() {
+    return this._data.energy;
+  }
+
+  get_stres() {
+    return this._data.stres;
+  }
+
   get_friends_list() {
     return [...this._data.friends_list];
   }
@@ -71,6 +81,13 @@ class Character {
     this._data.activity = activity;
   }
 
+  _change_energy(energy) {
+    this._data.energy = energy;
+  }
+
+  _change_stres(stres) {
+    this._data.stres = stres;
+  }
   _change_default_land_id(default_land_id) {
     this._data.default_land_id = default_land_id;
   }

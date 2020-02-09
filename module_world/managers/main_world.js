@@ -3,7 +3,10 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
-const { Util } = require(path.join(global.node_modules_path, "am_framework"));
+const { Util, Stopwatch } = require(path.join(
+  global.node_modules_path,
+  "am_framework"
+));
 const ObjectID = require(path.join(global.node_modules_path, "bson-objectid"));
 
 const Objects = require("../objects");
@@ -15,6 +18,11 @@ Responsible for:
 class MainWorld {
   constructor(module_world) {
     this.module_world = module_world;
+
+    this.stopwatches_map = {
+      energy: new Stopwatch(1 * 100),
+      stres: new Stopwatch(1 * 100)
+    };
 
     this.actions_map = {
       enter_virtual_world: (static_args, dynamic_args) => {
@@ -33,7 +41,41 @@ class MainWorld {
 
   terminate() {}
 
-  poll() {}
+  poll() {
+    if (this.stopwatches_map.energy.is_elapsed()) {
+      const consume_energy = () => {
+        for (const [id, character] of Object.entries(
+          this.module_world.data.characters_map
+        )) {
+          this.module_world.managers.characters.change_energy(
+            id,
+            character.get_energy() - 1
+          );
+        }
+      };
+
+      consume_energy();
+      this.stopwatches_map.energy.reset();
+    }
+
+    if (this.stopwatches_map.stres.is_elapsed()) {
+      const increase_stres = () => {
+        for (const [id, character] of Object.entries(
+          this.module_world.data.characters_map
+        )) {
+          if (character.get_virtual_world_id() != "") {
+            this.module_world.managers.characters.change_stres(
+              id,
+              character.get_stres() + 1
+            );
+          }
+        }
+      };
+
+      increase_stres();
+      this.stopwatches_map.stres.reset();
+    }
+  }
 
   process_action(object_id, action_id, dynamic_args) {
     if (!(object_id in this.module_world.data.environment_objects_map)) return;
@@ -118,6 +160,8 @@ class MainWorld {
         state: "",
         action: "",
         activity: "",
+        energy: 100,
+        stres: 0,
         friends_list: []
       });
       this.module_world.data.characters_map[character.get_id()] = character;

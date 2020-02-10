@@ -20,8 +20,8 @@ class MainWorld {
     this.module_world = module_world;
 
     this.stopwatches_map = {
-      energy: new Stopwatch(1 * 100),
-      stress: new Stopwatch(1 * 100)
+      energy: new Stopwatch(1 * 1000),
+      stress: new Stopwatch(1 * 1000)
     };
 
     this.actions_map = {
@@ -50,7 +50,7 @@ class MainWorld {
           if (character.get_virtual_world_id() === "") {
             this.module_world.managers.characters.change_energy(
               id,
-              character.get_energy() - 1
+              character.get_energy() - 5
             );
           }
         }
@@ -73,35 +73,35 @@ class MainWorld {
       this.stopwatches_map.energy.reset();
     }
 
-    if (this.stopwatches_map.stres.is_elapsed()) {
-      const decrease_stres = () => {
+    if (this.stopwatches_map.stress.is_elapsed()) {
+      const decrease_stress = () => {
         for (const [id, character] of Object.entries(
           this.module_world.data.characters_map
         )) {
           if (character.get_virtual_world_id() === "") {
-            this.module_world.managers.characters.change_stres(
+            this.module_world.managers.characters.change_stress(
               id,
-              character.get_stres() - 10
+              character.get_stress() - 5
             );
           }
         }
       };
-      const increase_stres = () => {
+      const increase_stress = () => {
         for (const [id, character] of Object.entries(
           this.module_world.data.characters_map
         )) {
           if (character.get_virtual_world_id() != "") {
-            this.module_world.managers.characters.change_stres(
+            this.module_world.managers.characters.change_stress(
               id,
-              character.get_stres() + 1
+              character.get_stress() + 5
             );
           }
         }
       };
 
-      decrease_stres();
-      increase_stres();
-      this.stopwatches_map.stres.reset();
+      decrease_stress();
+      increase_stress();
+      this.stopwatches_map.stress.reset();
     }
   }
 

@@ -2,7 +2,7 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_bot", file_name: __filename });
+)).create_logger({ module_name: "module_animal", file_name: __filename });
 const { SendPacket } = require("./send_packet");
 /*
 NOTE!
@@ -32,9 +32,9 @@ function accept_connection(connection, received_data, managers) {
 
   const config = managers.admin_server.config;
   if (
-    config.module_bot.admin_server.login.toLowerCase() !==
+    config.module_animal.admin_server.login.toLowerCase() !==
       login.toLowerCase() ||
-    config.module_bot.admin_server.password !== password.toLowerCase()
+    config.module_animal.admin_server.password !== password.toLowerCase()
   ) {
     handle_error(
       connection,
@@ -57,7 +57,7 @@ function process_script(connection, received_data, managers) {
   const { script } = received_data;
   const command = "script";
   const commands_map =
-    managers.admin_server.module_bot.application._commands_map;
+    managers.admin_server.module_animal.application._commands_map;
 
   if (!(command in commands_map)) {
     logger.error("Command does not exist:", command, "with args:", args);
@@ -76,12 +76,12 @@ function module_data(connection, received_data, managers) {
   SendPacket.module_data(
     connection.get_id(),
     managers,
-    managers.admin_server.module_bot.data
+    managers.admin_server.module_animal.data
   );
 }
 
 function scripts_list(connection, received_data, managers) {
-  const app = managers.admin_server.module_bot.application;
+  const app = managers.admin_server.module_animal.application;
 
   const scripts_list = app.get_scripts_list();
   SendPacket.scripts_list(connection.get_id(), managers, {

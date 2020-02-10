@@ -1,6 +1,6 @@
 console.log("test");
 
-const world_manager = modules.module_bot.managers.world;
+const world_manager = modules.module_animal.managers.world;
 
 function change_position(position_x) {
   world_manager.send_data_character_change_position({

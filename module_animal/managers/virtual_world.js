@@ -2,14 +2,14 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_bot", file_name: __filename });
+)).create_logger({ module_name: "module_animal", file_name: __filename });
 
 /*
 Responsible for:
 */
 class VirtualWorld {
-  constructor(module_bot) {
-    this.module_bot = module_bot;
+  constructor(module_animal) {
+    this.module_animal = module_animal;
   }
 
   // Only for testing needs

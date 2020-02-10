@@ -2,18 +2,12 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_bot", file_name: __filename });
+)).create_logger({ module_name: "module_animal", file_name: __filename });
 const EventEmitter = require("events");
 
 const Manager = require("./managers");
 
-/* 
-  ModuleBot === EventEmiter
-  But:
-    - managers should use it as ModuleBot
-    - data objects should use it as EventEmiter
-*/
-class ModuleBot extends EventEmitter {
+class ModuleAnimal extends EventEmitter {
   constructor({ event_emitter, config }) {
     super();
     this.event_emitter = event_emitter;
@@ -137,4 +131,4 @@ class ModuleBot extends EventEmitter {
   }
 }
 
-module.exports = { ModuleBot };
+module.exports = { ModuleAnimal };

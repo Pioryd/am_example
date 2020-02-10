@@ -2,7 +2,7 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_bot", file_name: __filename });
+)).create_logger({ module_name: "module_animal", file_name: __filename });
 const { Server } = require(path.join(global.node_modules_path, "am_framework"));
 const { ParsePacket } = require("./parse_packet");
 const { SendPacket } = require("./send_packet");
@@ -11,13 +11,13 @@ const { SendPacket } = require("./send_packet");
     - parse/send packets
 */
 class AdminServerManager {
-  constructor(module_bot) {
+  constructor(module_animal) {
     this.send_packet = SendPacket;
-    this.module_bot = module_bot;
-    this.config = this.module_bot.config;
+    this.module_animal = module_animal;
+    this.config = this.module_animal.config;
 
     this.server = new Server({
-      port: this.config.module_bot.admin_server.port,
+      port: this.config.module_animal.admin_server.port,
       options: { packet_timeout: 0 }
     });
   }
@@ -55,7 +55,7 @@ class AdminServerManager {
         return ParsePacket[packet_id](
           connection,
           data,
-          this.module_bot.managers
+          this.module_animal.managers
         );
       };
     }

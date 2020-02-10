@@ -175,16 +175,21 @@
         "type": "script",
         "name": "rest",
         "id": "rest_id",
-        "data": { "sleep": true },
+        "data": {},
         "root_scope": {
           "type": "while",
           "id": "rest_0",
-          "condition": "script.data.sleep === true",
+          "condition": "root.data.world.character.virtual_world_id === ''",
           "instructions": [
             {
               "type": "api",
+              "id": "rest_1",
+              "name": "character.leave_virtual_world"
+            },
+            {
+              "type": "internal",
               "id": "rest_2",
-              "name": "character.go_sleep"
+              "command": "sleep 1000"
             }
           ]
         }

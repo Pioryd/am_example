@@ -2,8 +2,8 @@
 // For its for using scripts
 
 class Character {
-  constructor(module_bot) {
-    this.module_bot = module_bot;
+  constructor(module_animal) {
+    this.module_animal = module_animal;
   }
 
   initialize() {}

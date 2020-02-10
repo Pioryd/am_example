@@ -2,17 +2,17 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_bot", file_name: __filename });
+)).create_logger({ module_name: "module_animal", file_name: __filename });
 const { Client } = require(path.join(global.node_modules_path, "am_framework"));
 /*
 Responsible for:
 */
 class World {
-  constructor(module_bot) {
-    this.module_bot = module_bot;
+  constructor(module_animal) {
+    this.module_animal = module_animal;
 
     this.client = new Client({
-      url: this.module_bot.config.module_bot.world_client.url,
+      url: this.module_animal.config.module_animal.world_client.url,
       options: { packet_timeout: 0, send_delay: 2000 }
     });
   }
@@ -55,26 +55,26 @@ class World {
         this.send_data_world({});
       },
       data_character: data => {
-        this.module_bot.data.character_data = { ...data };
+        this.module_animal.data.character_data = { ...data };
         this.send_data_character({});
       },
       data_land: data => {
-        this.module_bot.data.land_data = { ...data };
+        this.module_animal.data.land_data = { ...data };
         this.send_data_land({});
       },
       data_world: data => {
-        this.module_bot.data.world_data = { ...data };
+        this.module_animal.data.world_data = { ...data };
         this.send_data_world({});
       },
       action_message: data => {
-        this.module_bot.data.action_message_packets = [
-          ...this.module_bot.data.action_message_packets,
+        this.module_animal.data.action_message_packets = [
+          ...this.module_animal.data.action_message_packets,
           { ...data }
         ];
       },
       virtual_world: data => {
-        this.module_bot.data.virtual_world_packets = [
-          ...this.module_bot.data.virtual_world_packets,
+        this.module_animal.data.virtual_world_packets = [
+          ...this.module_animal.data.virtual_world_packets,
           { ...data }
         ];
       }

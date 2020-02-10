@@ -7,19 +7,24 @@ const { Client } = require(path.join(global.node_modules_path, "am_framework"));
 /*
 Responsible for:
 */
-class World {
+class WorldClient {
   constructor(module_animal) {
     this.module_animal = module_animal;
 
+    const { url } = this.module_animal.config.module_animal.world_client;
     this.client = new Client({
-      url: this.module_animal.config.module_animal.world_client.url,
-      options: { packet_timeout: 0, send_delay: 2000 }
+      url,
+      options: { packet_timeout: 0, send_delay: 1000 }
     });
   }
 
   initialize() {
+    const {
+      login,
+      password
+    } = this.module_animal.config.module_animal.world_client;
     this.client.events.connected = () => {
-      this._send("accept_connection", { login: "AM_1", password: "123" });
+      this._send("accept_connection", { login, password });
     };
     this._add_parse_packet_dict();
 
@@ -150,4 +155,4 @@ class World {
   }
 }
 
-module.exports = World;
+module.exports = WorldClient;

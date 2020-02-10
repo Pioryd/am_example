@@ -1,11 +1,9 @@
-const Character = require("./character");
-const World = require("./world");
+const AM = require("./am");
 const AdminServer = require("./admin_server");
-const VirtualWorld = require("./virtual_world");
+const WorldClient = require("./world_client");
 
 module.exports = {
-  Character,
-  World,
+  AM,
   AdminServer,
-  VirtualWorld
+  WorldClient
 };

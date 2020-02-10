@@ -14,13 +14,13 @@ class ModuleAnimal extends EventEmitter {
     this.application = event_emitter;
     this.config = config;
     this.data = {
-      character_data: { character_data: "test" },
-      land_data: { land_data: "test" },
+      character_data: { character_data: {} },
+      land_data: { land_data: {} },
       world_data: {
-        lands_map: { lands_map: "test" },
-        characters_map: { characters_map: "test" },
-        environment_objects_map: { environment_objects_map: "test" },
-        virtual_worlds_map: { virtual_worlds_map: "test" }
+        lands_map: { lands_map: {} },
+        characters_map: { characters_map: {} },
+        environment_objects_map: { environment_objects_map: {} },
+        virtual_worlds_map: { virtual_worlds_map: {} }
       },
       action_message_packets: [],
       virtual_world_packets: [],
@@ -32,11 +32,9 @@ class ModuleAnimal extends EventEmitter {
       }
     };
     this.managers = {
-      //character: new Manager.Character(this),
-      //database: new Manager.Database(this),
-      world: new Manager.World(this),
-      admin_server: new Manager.AdminServer(this)
-      //virtual_world: new Manager.VirtualWorld(this)
+      am: new Manager.AM(this),
+      admin_server: new Manager.AdminServer(this),
+      world_client: new Manager.WorldClient(this)
     };
 
     this.ready = false;
@@ -48,11 +46,9 @@ class ModuleAnimal extends EventEmitter {
     this.terminate = false;
     try {
       // The order is important for logic
-      //this.managers.database.initialize();
+      this.managers.am.initialize();
       this.managers.admin_server.initialize();
-      //this.managers.character.initialize();
-      this.managers.world.initialize();
-      //this.managers.virtual_world.initialize();
+      this.managers.world_client.initialize();
     } catch (e) {
       logger.error(e.stack);
     }
@@ -110,10 +106,8 @@ class ModuleAnimal extends EventEmitter {
 
       // The order is important for logic
       _this.managers.admin_server.terminate();
-      _this.managers.world.terminate();
-      //_this.managers.character.terminate();
-      //_this.managers.database.terminate();
-      //_this.managers.virtual_world.terminate();
+      _this.managers.world_client.terminate();
+      _this.managers.am.terminate();
     } catch (e) {
       logger.error(e.stack);
     }
@@ -123,11 +117,9 @@ class ModuleAnimal extends EventEmitter {
 
   _poll(_this) {
     // The order is important for logic
-    //_this.managers.database.poll();
     _this.managers.admin_server.poll();
-    //_this.managers.character.poll();
-    _this.managers.world.poll();
-    //_this.managers.virtual_world.poll();
+    _this.managers.world_client.poll();
+    _this.managers.am.poll();
   }
 }
 

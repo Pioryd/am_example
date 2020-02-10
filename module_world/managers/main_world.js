@@ -43,37 +43,65 @@ class MainWorld {
 
   poll() {
     if (this.stopwatches_map.energy.is_elapsed()) {
-      const consume_energy = () => {
+      const decrease_energy = () => {
         for (const [id, character] of Object.entries(
           this.module_world.data.characters_map
         )) {
-          this.module_world.managers.characters.change_energy(
-            id,
-            character.get_energy() - 1
-          );
+          if (character.get_virtual_world_id() === "") {
+            this.module_world.managers.characters.change_energy(
+              id,
+              character.get_energy() - 1
+            );
+          }
         }
       };
-
-      consume_energy();
-      this.stopwatches_map.energy.reset();
-    }
-
-    if (this.stopwatches_map.stress.is_elapsed()) {
-      const increase_stress = () => {
+      const increase_energy = () => {
         for (const [id, character] of Object.entries(
           this.module_world.data.characters_map
         )) {
           if (character.get_virtual_world_id() != "") {
-            this.module_world.managers.characters.change_stress(
+            this.module_world.managers.characters.change_energy(
               id,
-              character.get_stress() + 1
+              character.get_energy() + 10
             );
           }
         }
       };
 
-      increase_stress();
-      this.stopwatches_map.stress.reset();
+      decrease_energy();
+      increase_energy();
+      this.stopwatches_map.energy.reset();
+    }
+
+    if (this.stopwatches_map.stres.is_elapsed()) {
+      const decrease_stres = () => {
+        for (const [id, character] of Object.entries(
+          this.module_world.data.characters_map
+        )) {
+          if (character.get_virtual_world_id() === "") {
+            this.module_world.managers.characters.change_stres(
+              id,
+              character.get_stres() - 10
+            );
+          }
+        }
+      };
+      const increase_stres = () => {
+        for (const [id, character] of Object.entries(
+          this.module_world.data.characters_map
+        )) {
+          if (character.get_virtual_world_id() != "") {
+            this.module_world.managers.characters.change_stres(
+              id,
+              character.get_stres() + 1
+            );
+          }
+        }
+      };
+
+      decrease_stres();
+      increase_stres();
+      this.stopwatches_map.stres.reset();
     }
   }
 

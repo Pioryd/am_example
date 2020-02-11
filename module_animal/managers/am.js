@@ -2,8 +2,8 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_jankenpon", file_name: __filename });
-const { ScriptingSystem, Util, Stopwatch } = require(path.join(
+)).create_logger({ module_name: "module_animal", file_name: __filename });
+const { ScriptingSystem, Stopwatch } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));

@@ -4,6 +4,7 @@ module.exports = [
     id: "Live_ID",
     rules: [
       {
+        type: "system",
         triggers: {
           form_init: { value: "Live" },
           script_processed: { value: "plan" }
@@ -13,8 +14,6 @@ module.exports = [
         }
       }
     ],
-    signals: [],
-    events: [],
     scripts: [
       {
         type: "script",
@@ -54,6 +53,7 @@ module.exports = [
     id: "Stress_ID",
     rules: [
       {
+        type: "system",
         triggers: {
           form_init: { value: "Stress" },
           script_processed: { value: "first_aid" }
@@ -63,8 +63,6 @@ module.exports = [
         }
       }
     ],
-    signals: [],
-    events: [],
     scripts: [
       {
         type: "script",
@@ -90,9 +88,9 @@ module.exports = [
   {
     name: "VirtualWorld",
     id: "VirtualWorld_ID",
-    rules: [],
-    signals: [
+    rules: [
       {
+        type: "signal",
         triggers: {
           choice: { any: {} }
         },
@@ -105,7 +103,6 @@ module.exports = [
         }
       }
     ],
-    events: [],
     scripts: [
       {
         type: "script",

@@ -7,16 +7,16 @@ module.exports = {
       name: "Mechanical",
       rules: [
         {
+          type: "program",
           triggers: {
             forms_count: { value: 0 }
           },
           actions: {
             form_run: "Live"
           }
-        }
-      ],
-      signals: [
+        },
         {
+          type: "signal",
           triggers: {
             energy: { min: 0, max: 40 }
           },
@@ -25,6 +25,7 @@ module.exports = {
           }
         },
         {
+          type: "signal",
           triggers: {
             inside_virtual_world: { value: true }
           },
@@ -33,6 +34,7 @@ module.exports = {
           }
         },
         {
+          type: "signal",
           triggers: {
             stress: { min: "80", max: "100" }
           },
@@ -41,7 +43,6 @@ module.exports = {
           }
         }
       ],
-      events: [],
       forms: ["Live", "Stress", "VirtualWorld"]
     }
   ]

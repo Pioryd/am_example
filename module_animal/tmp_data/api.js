@@ -3,18 +3,24 @@ const { Util } = require(path.join(global.node_modules_path, "am_framework"));
 
 module.exports = {
   character: {
-    change_land: (script_id, query_id, timeout, return_value, args) => {
+    change_land: (root, script_id, query_id, timeout, return_value, args) => {
       const { land_id } = args;
       const { world_client } = root.ext.module_animal.managers;
       world_client.send_data_character_change_land({
         land_id
       });
     },
-    leave_virtual_world: (script_id, query_id, timeout, return_value, args) => {
+    leave_virtual_world: function(
+      script_id,
+      query_id,
+      timeout,
+      return_value,
+      args
+    ) {
       const { world_client } = root.ext.module_animal.managers;
       world_client.send_leave_virtual_world();
     },
-    use_object: (script_id, query_id, timeout, return_value, args) => {
+    use_object: (root, script_id, query_id, timeout, return_value, args) => {
       const { id } = args;
       const script_action_doors = {
         object_id: id,
@@ -26,12 +32,13 @@ module.exports = {
     }
   },
   system: {
-    form_run: (script_id, query_id, timeout, return_value, args) => {
+    form_run: (root, script_id, query_id, timeout, return_value, args) => {
+      const { name } = args;
       root.system._current_program._run_form(name);
     }
   },
   virtual_world: {
-    make_choice: (script_id, query_id, timeout, return_value, args) => {
+    make_choice: (root, script_id, query_id, timeout, return_value, args) => {
       const { enemy_choice } = args;
       const { data } = root.ext.module_animal;
       const { world_client } = root.ext.module_animal.managers;

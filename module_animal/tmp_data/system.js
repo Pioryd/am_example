@@ -18,15 +18,31 @@ module.exports = {
       signals: [
         {
           triggers: {
-            energy: { min: 0, max: 10 }
+            energy: { min: 0, max: 40 }
           },
           actions: {
-            form_run: "Stress"
+            form_run: "Live"
+          }
+        },
+        {
+          triggers: {
+            inside_virtual_world: { value: true }
+          },
+          actions: {
+            form_run: "VirtualWorld"
+          }
+        },
+        {
+          triggers: {
+            stress: { min: "80", max: "100" }
+          },
+          actions: {
+            form_terminate: "Stress"
           }
         }
       ],
       events: [],
-      forms: ["Live", "Stress", "VirtualWorld", "Rest"]
+      forms: ["Live", "Stress", "VirtualWorld"]
     }
   ]
 };

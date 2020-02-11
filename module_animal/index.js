@@ -50,7 +50,7 @@ class ModuleAnimal extends EventEmitter {
       this.managers.admin_server.initialize();
       this.managers.world_client.initialize();
     } catch (e) {
-      logger.error(e.stack);
+      logger.error(e, e.stack);
     }
 
     this.ready = true;
@@ -91,7 +91,7 @@ class ModuleAnimal extends EventEmitter {
 
       _this._poll(_this);
     } catch (e) {
-      logger.error(e.stack);
+      logger.error(e, e.stack);
     }
 
     setTimeout(() => {
@@ -109,7 +109,7 @@ class ModuleAnimal extends EventEmitter {
       _this.managers.world_client.terminate();
       _this.managers.am.terminate();
     } catch (e) {
-      logger.error(e.stack);
+      logger.error(e, e.stack);
     }
 
     this.ready = false;

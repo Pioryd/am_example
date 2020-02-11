@@ -3,10 +3,15 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_jankenpon", file_name: __filename });
-const { Util, Stopwatch } = require(path.join(
+const { ScriptingSystem, Util, Stopwatch } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
+
+// Draft -> Database
+const tmp_data_api = require("../tmp_data/api");
+const tmp_data_forms = require("../tmp_data/forms");
+const tmp_data_system = require("../tmp_data/system");
 
 class AM {
   constructor(module_animal) {
@@ -15,15 +20,27 @@ class AM {
     this.stopwatches_map = {
       check_data: new Stopwatch(1 * 1000)
     };
+
+    this.scripting_system_root = new ScriptingSystem.Root();
   }
 
-  initialize() {}
+  initialize() {
+    this.scripting_system_root.install_system(tmp_data_system);
+    this.scripting_system_root.install_forms(tmp_data_forms);
+    this.scripting_system_root.install_api(tmp_data_api);
+    this.scripting_system_root.install_data(this.module_animal.data);
+    this.scripting_system_root.install_ext({
+      module_animal: this.module_animal
+    });
+  }
 
-  terminate() {}
+  terminate() {
+    this.scripting_system_root.terminate();
+  }
 
   poll() {
     if (this.stopwatches_map.check_data.is_elapsed()) {
-      this.check_data();
+      scripting_system_root.process();
       this.parse_virtual_world_packets();
       this.stopwatches_map.check_data.reset();
     }
@@ -47,59 +64,6 @@ class AM {
     const locked_length = virtual_world_packets.length;
     for (let i = 0; i < locked_length; i++)
       parse_packet(virtual_world_packets.shift());
-  }
-
-  check_data() {
-    const {
-      default_land_id,
-      virtual_world_id,
-      energy,
-      stress
-    } = this.module_animal.data.character_data;
-    const world_client = this.module_animal.managers.world_client;
-
-    // Te id powinno by wyszukane
-    const script_action_doors = {
-      object_id: "5e419cbb6204d91bf8bfb29e",
-      action_id: 0,
-      dynamic_args: {}
-    };
-
-    // statistics
-    if (virtual_world_id != "") {
-      if (stress > 80) {
-        world_client.send_leave_virtual_world();
-      } else {
-        // Game in virtual world
-        if (this.module_animal.data.virtual_world_data == null) {
-          world_client.send_virtual_world({
-            packet_id: "data",
-            packet_data: {}
-          });
-          return;
-        }
-
-        const choices = ["rock", "paper", "scissors"];
-        const chosen_choice = choices[Util.get_random_int(0, 2)];
-
-        world_client.send_virtual_world({
-          packet_id: "message",
-          packet_data: { text: chosen_choice }
-        });
-        world_client.send_virtual_world({ packet_id: "data", packet_data: {} });
-      }
-    } else {
-      this.module_animal.data.virtual_world_data = null;
-
-      if (energy < 20 && stress < 20) {
-        world_client.send_process_script_action(script_action_doors);
-      } else if (energy < 10) {
-        world_client.send_data_character_change_land({
-          land_id: default_land_id
-        });
-        world_client.send_process_script_action(script_action_doors);
-      }
-    }
   }
 }
 

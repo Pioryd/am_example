@@ -11,6 +11,7 @@ module.exports = {
       });
     },
     leave_virtual_world: function(
+      root,
       script_id,
       query_id,
       timeout,

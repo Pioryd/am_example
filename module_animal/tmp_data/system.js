@@ -7,7 +7,7 @@ module.exports = {
       name: "Mechanical",
       rules: [
         {
-          type: "program",
+          type: "system",
           triggers: {
             forms_count: { value: 0 }
           },
@@ -18,7 +18,7 @@ module.exports = {
         {
           type: "signal",
           triggers: {
-            energy: { min: 0, max: 40 }
+            energy: { priority: 3, min: 0, max: 20 }
           },
           actions: {
             form_run: "Live"
@@ -27,7 +27,7 @@ module.exports = {
         {
           type: "signal",
           triggers: {
-            inside_virtual_world: { value: true }
+            inside_virtual_world: { priority: 1, value: true }
           },
           actions: {
             form_run: "VirtualWorld"
@@ -36,10 +36,10 @@ module.exports = {
         {
           type: "signal",
           triggers: {
-            stress: { min: "80", max: "100" }
+            stress: { priority: 2, min: "80", max: "100" }
           },
           actions: {
-            form_terminate: "Stress"
+            form_run: "Stress"
           }
         }
       ],

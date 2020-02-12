@@ -9,7 +9,7 @@
     },
     "node_modules_rel_path": "node_modules",
     "close_app_delay": 5000,
-    "auto_run_scripts": ["net_msg_on"]
+    "auto_run_scripts": ["net_msg_off"]
   },
   "module_animal": {
     "world_client": {

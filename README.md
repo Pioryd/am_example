@@ -1,5 +1,7 @@
 # Artificial Mind - Module World
 
+![Node.js CI](https://github.com/Pioryd/am_module_world/workflows/Node.js%20CI/badge.svg?branch=master)
+
 ## Install
 
 ```powershell

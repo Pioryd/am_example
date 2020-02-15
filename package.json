@@ -22,7 +22,7 @@
   },
   "directories": {},
   "scripts": {
-    "test": "mocha lib/**/*.js",
+    "test": "mocha ./test/**/*.js",
     "start": "node index.js"
   },
   "repository": {

@@ -21,5 +21,5 @@ function main() {
 try {
   main();
 } catch (e) {
-  logger.error(e.stack);
+  logger.error(e, e.stack);
 }

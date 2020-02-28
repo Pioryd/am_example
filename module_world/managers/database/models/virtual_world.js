@@ -61,7 +61,7 @@ class VirtualWorldModel {
               this.save(classes_instances, callback, index);
             }
           } catch (e) {
-            logger.error(e.stack);
+            logger.error(e, e.stack);
           }
         }
       );
@@ -79,7 +79,7 @@ class VirtualWorldModel {
           error: error
         });
       } catch (e) {
-        logger.error(e.stack);
+        logger.error(e, e.stack);
       }
     });
   }
@@ -93,7 +93,7 @@ class VirtualWorldModel {
           results: result
         });
       } catch (e) {
-        logger.error(e.stack);
+        logger.error(e, e.stack);
       }
     });
   }
@@ -107,7 +107,7 @@ class VirtualWorldModel {
           results: result
         });
       } catch (e) {
-        logger.error(e.stack);
+        logger.error(e, e.stack);
       }
     });
   }

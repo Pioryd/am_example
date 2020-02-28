@@ -51,7 +51,7 @@ class SettingsModel {
             results: raw
           });
         } catch (e) {
-          logger.error(e.stack);
+          logger.error(e, e.stack);
         }
       }
     );
@@ -65,7 +65,7 @@ class SettingsModel {
           error: error
         });
       } catch (e) {
-        logger.error(e.stack);
+        logger.error(e, e.stack);
       }
     });
   }
@@ -79,7 +79,7 @@ class SettingsModel {
           results: result
         });
       } catch (e) {
-        logger.error(e.stack);
+        logger.error(e, e.stack);
       }
     });
   }

@@ -1,14 +1,17 @@
-# Artificial Mind - Module World
+# Artificial Mind - App World
 
-![Node.js CI](https://github.com/Pioryd/am_module_world/workflows/Node.js%20CI/badge.svg?branch=master)
+![Node.js CI](https://github.com/Pioryd/am_app_world/workflows/Node.js%20CI/badge.svg?branch=master)
 
-## Install
+## Install and run
 
 ```powershell
 npm install
+npm start
 ```
 
-## Project structure
+## Module World
+
+### Structure
 
 Each module is **Synchronous**, but relation between modules are **Asynchronous**.  
 As **synchronous module** you can understand like:
@@ -24,7 +27,7 @@ Contact between modules must be made by:
 - queens
 - client-server protocol
 
-## Object and managers
+### Object and managers
 
 - Objects should be used only by managers.
 - Manager should be use by any other logic and others managers.

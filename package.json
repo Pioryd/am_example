@@ -1,7 +1,7 @@
 {
-  "name": "am_module_world",
+  "name": "am_app_world",
   "version": "0.0.1",
-  "description": "AM - Module world",
+  "description": "AM app world",
   "engines": {
     "node": ">=6"
   },
@@ -27,10 +27,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Pioryd/am_module_world.git"
+    "url": "git+https://github.com/Pioryd/am_app_world.git"
   },
   "bugs": {
-    "url": "https://github.com/Pioryd/am_module_world/issues"
+    "url": "https://github.com/Pioryd/am_app_world/issues"
   },
-  "homepage": "https://github.com/Pioryd/am_module_world#readme"
+  "homepage": "https://github.com/Pioryd/am_app_world#readme"
 }

@@ -1,0 +1,28 @@
+{
+  "app": {
+    "modules": {
+      "map": {
+        "module_world": ""
+      },
+      "paths_auto_find": [],
+      "disabled": []
+    },
+    "node_modules_rel_path": "node_modules",
+    "close_app_delay": 5000,
+    "auto_run_scripts": ["net_msg_on"]
+  },
+  "module_world": {
+    "database": {
+      "url": "mongodb://127.0.0.1:27017",
+      "name": "am_world"
+    },
+    "world_server": {
+      "port": 3100
+    },
+    "admin_server": {
+      "login": "admin",
+      "password": "123",
+      "port": 3101
+    }
+  }
+}

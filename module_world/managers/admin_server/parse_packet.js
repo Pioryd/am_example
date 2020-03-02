@@ -120,11 +120,40 @@ function scripts_list(connection, received_data, managers) {
   });
 }
 
+function get_am_data(connection, received_data, managers) {
+  const form_list = [];
+  const system_list = [];
+  const script_list = [];
+  const api_list = [];
+
+  SendPacket.get_am_data(connection.get_id(), managers, {
+    form_list,
+    system_list,
+    script_list,
+    api_list
+  });
+}
+
+function update_am_data(connection, received_data, managers) {
+  const form_list = [];
+  const system_list = [];
+  const script_list = [];
+  const api_list = [];
+
+  SendPacket.update_am_data(connection.get_id(), managers, {
+    form_list,
+    system_list,
+    script_list,
+    api_list
+  });
+}
 module.exports = {
   ParsePacket: {
     accept_connection: accept_connection,
     module_data: module_data,
     process_script: process_script,
-    scripts_list: scripts_list
+    scripts_list: scripts_list,
+    get_am_data,
+    update_am_data
   }
 };

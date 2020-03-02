@@ -24,7 +24,11 @@ class DatabaseManager {
       character: new Models.Character(),
       environment_object: new Models.EnvironmentObject(),
       settings: new Models.Settings(),
-      virtual_world: new Models.VirtualWorld()
+      virtual_world: new Models.VirtualWorld(),
+      am_form: new Models.AM_Form(),
+      am_program: new Models.AM_Program(),
+      am_script: new Models.AM_Script(),
+      am_system: new Models.AM_System()
     };
     this.ready = false;
     this.stopwatches_map = { database_save: new Stopwatch(5 * 1000) };

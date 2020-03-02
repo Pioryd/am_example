@@ -15,18 +15,13 @@ class SettingsModel {
   setup(connection) {
     this.connection = connection;
 
-    this.schema = new Schema(
-      {
-        generated: { type: Boolean, default: false, require: true },
-        backup: { type: Boolean, default: false, require: true },
-        corrupted: { type: Boolean, default: false, require: true },
-        admin_login: { type: String, default: "admin", require: true },
-        admin_password: { type: String, default: "123", require: true }
-      },
-      {
-        capped: { size: 1024, max: 1 }
-      }
-    );
+    this.schema = new Schema({
+      generated: { type: Boolean, default: false, require: true },
+      backup: { type: Boolean, default: false, require: true },
+      corrupted: { type: Boolean, default: false, require: true },
+      admin_login: { type: String, default: "admin", require: true },
+      admin_password: { type: String, default: "123", require: true }
+    });
     this.model = this.connection.model("Settings", this.schema, "settings");
   }
 

@@ -70,9 +70,39 @@ const save_data = ({
       );
       break;
     case "virtual_world.save":
-      on_success();
-      //logger.info("Save data to database finished.");
+      manager.models.am_form.save(
+        Object.values(manager.module_world.data.am_forms_map),
+        recurrency_callback
+      );
       break;
+    case "am_form.save":
+      manager.models.am_program.save(
+        Object.values(manager.module_world.data.am_programs_map),
+        recurrency_callback
+      );
+      break;
+    case "am_program.save":
+      manager.models.am_script.save(
+        Object.values(manager.module_world.data.am_scripts_map),
+        recurrency_callback
+      );
+      break;
+    case "am_script.save":
+      manager.models.am_system.save(
+        Object.values(manager.module_world.data.am_systems_map),
+        recurrency_callback
+      );
+      break;
+    case "virtual_world.save":
+      manager.models.am_form.save(
+        Object.values(manager.module_world.data.am_form_map),
+        recurrency_callback
+      );
+      break;
+    // case "virtual_world.save":
+    //   on_success();
+    //   //logger.info("Save data to database finished.");
+    //   break;
   }
 };
 

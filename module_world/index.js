@@ -24,6 +24,10 @@ class ModuleWorld extends EventEmitter {
       characters_map: {},
       environment_objects_map: {},
       virtual_worlds_map: {},
+      am_forms_map: {},
+      am_programs_map: {},
+      am_scripts_map: {},
+      am_systems_map: {},
       // Remember to update models if rebuild settings structure
       settings: {
         generated: false,
@@ -37,7 +41,8 @@ class ModuleWorld extends EventEmitter {
       main_world: new Manager.MainWorld(this),
       world_server: new Manager.WorldServer(this),
       admin_server: new Manager.AdminServer(this),
-      virtual_worlds: new Manager.VirtualWorlds(this)
+      virtual_worlds: new Manager.VirtualWorlds(this),
+      am: new Manager.AM(this)
     };
 
     this.ready = false;
@@ -55,6 +60,7 @@ class ModuleWorld extends EventEmitter {
       this.managers.characters.initialize();
       this.managers.main_world.initialize();
       this.managers.virtual_worlds.initialize();
+      this.managers.am.initialize();
     } catch (e) {
       logger.error(e, e.stack);
     }
@@ -117,6 +123,7 @@ class ModuleWorld extends EventEmitter {
       _this.managers.characters.terminate();
       _this.managers.database.terminate();
       _this.managers.virtual_worlds.terminate();
+      _this.managers.am.terminate();
     } catch (e) {
       logger.error(e, e.stack);
     }
@@ -132,6 +139,7 @@ class ModuleWorld extends EventEmitter {
     _this.managers.characters.poll();
     _this.managers.main_world.poll();
     _this.managers.virtual_worlds.poll();
+    _this.managers.am.poll();
   }
 }
 

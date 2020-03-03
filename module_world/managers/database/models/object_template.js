@@ -5,8 +5,8 @@ const logger = require(path.join(
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
 
-// Must be given [model_name] and [field_name] to prevent add "s" to field name
-// in database
+// Must be given [model_name] and [field_name] to prevent add "s" to
+// collections names
 class ModelTemplate {
   constructor(model_name, field_name, schema_source) {
     this.model_name = model_name;

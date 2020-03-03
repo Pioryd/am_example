@@ -19,10 +19,10 @@ const SendPacket = {
       scripts_list
     });
   },
-  get_am_data: (connection_id, managers, { data }) => {
+  get_am_data: (connection_id, managers, data) => {
     managers.admin_server.send(connection_id, "get_am_data", data);
   },
-  update_am_data: (connection_id, managers, { data }) => {
+  update_am_data: (connection_id, managers, data) => {
     managers.admin_server.send(connection_id, "update_am_data", data);
   }
 };

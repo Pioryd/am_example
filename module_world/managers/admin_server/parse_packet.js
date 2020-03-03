@@ -4,6 +4,8 @@ const logger = require(path.join(
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
 const { SendPacket } = require("./send_packet");
+const AM = require("../../am");
+
 /*
 NOTE!
 Classes instances like: [Character], [Land], etc use only as read only. 
@@ -121,30 +123,71 @@ function scripts_list(connection, received_data, managers) {
 }
 
 function get_am_data(connection, received_data, managers) {
-  const form_list = [];
-  const system_list = [];
-  const script_list = [];
-  const api_list = [];
+  const module_data = managers.admin_server.module_world.data;
+  const forms_list = [];
+  const programs_list = [];
+  const scripts_list = [];
+  const systems_list = [];
+
+  for (const id of Object.keys(module_data.am_forms_map)) forms_list.push(id);
+  for (const id of Object.keys(module_data.am_programs_map))
+    programs_list.push(id);
+  for (const id of Object.keys(module_data.am_scripts_map))
+    scripts_list.push(id);
+  for (const id of Object.keys(module_data.am_systems_map))
+    systems_list.push(id);
 
   SendPacket.get_am_data(connection.get_id(), managers, {
-    form_list,
-    system_list,
-    script_list,
-    api_list
+    forms_list,
+    programs_list,
+    scripts_list,
+    systems_list
   });
 }
 
 function update_am_data(connection, received_data, managers) {
-  const form_list = [];
-  const system_list = [];
-  const script_list = [];
-  const api_list = [];
+  const { action_id, type, id, object } = received_data;
+  const module_data = managers.admin_server.module_world.data;
+
+  let message = "Unknown";
+
+  const maps = {
+    form: module_data.am_forms_map,
+    program: module_data.am_programs_map,
+    script: module_data.am_scripts_map,
+    system: module_data.am_systems_map
+  };
+  const classes = {
+    form: AM.Form,
+    program: AM.Program,
+    script: AM.Script,
+    system: AM.System
+  };
+
+  let map = maps[type];
+
+  if (!(type in maps)) {
+    message = "Wrong type";
+  } else if (id === "") {
+    message = "Wrong id";
+  } else if (!(id in map)) {
+    map[id] = new classes[type](
+      { ...object, id },
+      manager.module_world.managers.am
+    );
+    message = `Added type[${type}] id[${id}]`;
+  } else if (object == null) {
+    delete map[id];
+    message = `Removed type[${type}] id[${id}]`;
+  } else {
+    // "id: map[id].get_id()" to be sure id wont be override
+    map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
+    message = `Updated type[${type}] id[${id}]`;
+  }
 
   SendPacket.update_am_data(connection.get_id(), managers, {
-    form_list,
-    system_list,
-    script_list,
-    api_list
+    action_id,
+    message
   });
 }
 module.exports = {

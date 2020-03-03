@@ -5,23 +5,23 @@ const logger = require(path.join(
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
 
+// Must be given [model_name] and [field_name] to prevent add "s" to field name
+// in database
 class ModelTemplate {
   constructor(model_name, field_name, schema_source) {
     this.model_name = model_name;
     this.field_name = field_name;
     this.schema_source = schema_source;
     this.connection = {};
-    this.schema = {};
     this.model = {};
   }
 
   setup(connection) {
     this.connection = connection;
 
-    this.schema = new Schema(this.schema_source);
     this.model = this.connection.model(
       this.model_name,
-      this.schema,
+      new Schema(this.schema_source),
       this.field_name
     );
   }

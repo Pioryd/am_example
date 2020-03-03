@@ -5,8 +5,11 @@ const logger = require(path.join(
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
 
-class AM_FormModel {
-  constructor() {
+class ModelTemplate {
+  constructor(model_name, field_name, schema_source) {
+    this.model_name = model_name;
+    this.field_name = field_name;
+    this.schema_source = schema_source;
     this.connection = {};
     this.schema = {};
     this.model = {};
@@ -15,13 +18,12 @@ class AM_FormModel {
   setup(connection) {
     this.connection = connection;
 
-    this.schema = new Schema({
-      id: { type: String, required: true, unique: true, index: true },
-      name: { type: String, required: true },
-      rules: { type: [Object] },
-      scripts: { type: [String] }
-    });
-    this.model = this.connection.model("AmForm", this.schema, "am_form");
+    this.schema = new Schema(this.schema_source);
+    this.model = this.connection.model(
+      this.model_name,
+      this.schema,
+      this.field_name
+    );
   }
 
   save(classes_instances, callback, index = 0) {
@@ -109,4 +111,4 @@ class AM_FormModel {
   }
 }
 
-module.exports = AM_FormModel;
+module.exports = ModelTemplate;

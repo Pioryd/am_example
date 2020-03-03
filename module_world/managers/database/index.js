@@ -19,17 +19,7 @@ class DatabaseManager {
   constructor(module_world) {
     this.module_world = module_world;
     this.config = this.module_world.config;
-    this.models = {
-      land: new Models.Land(),
-      character: new Models.Character(),
-      environment_object: new Models.EnvironmentObject(),
-      settings: new Models.Settings(),
-      virtual_world: new Models.VirtualWorld(),
-      am_form: new Models.AM_Form(),
-      am_program: new Models.AM_Program(),
-      am_script: new Models.AM_Script(),
-      am_system: new Models.AM_System()
-    };
+    this.models = Models;
     this.ready = false;
     this.stopwatches_map = { database_save: new Stopwatch(5 * 1000) };
     this.database = new Database({

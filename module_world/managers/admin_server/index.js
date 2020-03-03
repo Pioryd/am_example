@@ -4,15 +4,13 @@ const logger = require(path.join(
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
 const { Server } = require(path.join(global.node_modules_path, "am_framework"));
-const { ParsePacket } = require("./parse_packet");
-const { SendPacket } = require("./send_packet");
+const ParsePacket = require("./parse_packet");
 /*
   Responsible for:
     - parse/send packets
 */
 class AdminServerManager {
   constructor(module_world) {
-    this.send_packet = SendPacket;
     this.module_world = module_world;
     this.config = this.module_world.config;
 

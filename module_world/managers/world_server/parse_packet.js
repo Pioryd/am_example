@@ -3,7 +3,7 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
-const { SendPacket } = require("./send_packet");
+
 /*
 NOTE!
 Classes instances like: [Character], [Land], etc use only as read only. 
@@ -18,295 +18,263 @@ function handle_error(connection, received_data, managers, message) {
     received_data
   );
 
-  SendPacket.error(connection.get_id(), managers, {
+  managers.world_server.send(connection.get_id(), "error", {
+    connection_id: connection.get_id(),
     received_data: received_data,
     error: message != null ? message : ""
   });
 }
 
-// Parse functions
-
-function accept_connection(connection, received_data, managers) {
-  const login = received_data.login;
-  const password = received_data.password;
-  const error = managers.characters.log_in(
-    connection.get_id(),
-    login,
-    password
-  );
-
-  if (error != null) {
-    handle_error(
-      connection,
-      received_data,
-      managers,
-      "Unable to character_authenticate. Error: " + error
+module.exports = {
+  accept_connection: (connection, received_data, managers) => {
+    const login = received_data.login;
+    const password = received_data.password;
+    const error = managers.characters.log_in(
+      connection.get_id(),
+      login,
+      password
     );
-    return false;
-  }
 
-  const character = managers.characters._get_character_by_name(login);
-  if (character == null) {
-    handle_error(connection, received_data, managers, "Character not found.");
-    return;
-  }
-
-  connection.user_data.character_id = character.get_id();
-  connection.on_close = connection => {
-    managers.characters.log_off(character.get_id());
-  };
-
-  SendPacket.login(connection.get_id(), managers, {
-    character_name: login
-  });
-  return true;
-}
-
-function data_character(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
-
-  const character = managers.characters._get_character_by_id(character_id);
-
-  SendPacket.data_character(connection.get_id(), managers, {
-    id: character.get_id(),
-    name: character.get_name(),
-    password: character.get_password(),
-    outfit: character.get_outfit(),
-    default_land_id: character.get_default_land_id(),
-    virtual_world_id: character.get_virtual_world_id(),
-    state: character.get_state(),
-    action: character.get_action(),
-    activity: character.get_activity(),
-    energy: character.get_energy(),
-    stress: character.get_stress(),
-    friends_list: character.get_friends_list()
-  });
-}
-
-function data_land(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
-
-  const packet_data = {};
-
-  const land = managers.characters.get_land(character_id);
-  if (land != null) {
-    packet_data.id = land._data.id;
-    packet_data.map = land._data.map;
-  }
-
-  SendPacket.data_land(connection.get_id(), managers, packet_data);
-}
-
-function data_world(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
-
-  const lands_map = {};
-  const characters_map = {};
-  const environment_objects_map = {};
-  const virtual_worlds_map = {};
-
-  for (const land of Object.values(
-    managers.world_server.module_world.data.lands_map
-  )) {
-    lands_map[land.get_id()] = { name: land._data.name };
-  }
-
-  for (const character of Object.values(
-    managers.world_server.module_world.data.characters_map
-  )) {
-    characters_map[character.get_id()] = {
-      name: character._data.name,
-      outfit: character._data.outfit,
-      state: character._data.state,
-      action: character._data.action,
-      activity: character._data.activity,
-      energy: character._data.energy,
-      stress: character._data.stress
-    };
-  }
-
-  for (const environment_object of Object.values(
-    managers.world_server.module_world.data.environment_objects_map
-  )) {
-    const object_data = {
-      type: environment_object._data.type,
-      name: environment_object._data.name,
-      actions_list: []
-    };
-
-    if ("action_scripts_list" in environment_object._data) {
-      object_data.actions_list = Object.keys(
-        environment_object._data.action_scripts_list
+    if (error != null) {
+      handle_error(
+        connection,
+        received_data,
+        managers,
+        "Unable to character_authenticate. Error: " + error
       );
+      return false;
     }
 
-    environment_objects_map[environment_object.get_id()] = object_data;
-  }
+    const character = managers.characters._get_character_by_name(login);
+    if (character == null) {
+      handle_error(connection, received_data, managers, "Character not found.");
+      return;
+    }
 
-  for (const virtual_world of Object.values(
-    managers.world_server.module_world.data.virtual_worlds_map
-  )) {
-    const object_data = {
-      name: virtual_world._data.name,
-      characters_list: [...virtual_world._data.characters_list]
+    connection.user_data.character_id = character.get_id();
+    connection.on_close = connection => {
+      managers.characters.log_off(character.get_id());
     };
 
-    virtual_worlds_map[virtual_world.get_id()] = object_data;
-  }
+    managers.world_server.send(connection.get_id(), "login", {
+      character_name: login
+    });
+    return true;
+  },
+  data_character: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-  SendPacket.data_world(connection.get_id(), managers, {
-    lands_map,
-    characters_map,
-    environment_objects_map,
-    virtual_worlds_map
-  });
-}
+    const character = managers.characters._get_character_by_id(character_id);
 
-function data_character_change_position(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    managers.world_server.send(connection.get_id(), "data_character", {
+      id: character.get_id(),
+      name: character.get_name(),
+      password: character.get_password(),
+      outfit: character.get_outfit(),
+      default_land_id: character.get_default_land_id(),
+      virtual_world_id: character.get_virtual_world_id(),
+      state: character.get_state(),
+      action: character.get_action(),
+      activity: character.get_activity(),
+      energy: character.get_energy(),
+      stress: character.get_stress(),
+      friends_list: character.get_friends_list()
+    });
+  },
+  data_land: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-  managers.characters.change_position(character_id, received_data.position_x);
+    const packet_data = {};
 
-  data_world(connection, received_data, managers);
-}
+    const land = managers.characters.get_land(character_id);
+    if (land != null) {
+      packet_data.id = land._data.id;
+      packet_data.map = land._data.map;
+    }
 
-function data_character_change_land(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    managers.world_server.send(connection.get_id(), "data_land", packet_data);
+  },
+  data_world: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-  managers.characters.change_land(character_id, received_data.land_id);
+    const lands_map = {};
+    const characters_map = {};
+    const environment_objects_map = {};
+    const virtual_worlds_map = {};
 
-  data_world(connection, received_data, managers);
-}
+    for (const land of Object.values(
+      managers.world_server.module_world.data.lands_map
+    )) {
+      lands_map[land.get_id()] = { name: land._data.name };
+    }
 
-function data_character_add_friend(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    for (const character of Object.values(
+      managers.world_server.module_world.data.characters_map
+    )) {
+      characters_map[character.get_id()] = {
+        name: character._data.name,
+        outfit: character._data.outfit,
+        state: character._data.state,
+        action: character._data.action,
+        activity: character._data.activity,
+        energy: character._data.energy,
+        stress: character._data.stress
+      };
+    }
 
-  managers.characters.add_friend_if_exist(character_id, received_data.name);
+    for (const environment_object of Object.values(
+      managers.world_server.module_world.data.environment_objects_map
+    )) {
+      const object_data = {
+        type: environment_object._data.type,
+        name: environment_object._data.name,
+        actions_list: []
+      };
 
-  data_character(connection, received_data, managers);
-}
+      if ("action_scripts_list" in environment_object._data) {
+        object_data.actions_list = Object.keys(
+          environment_object._data.action_scripts_list
+        );
+      }
 
-function data_character_remove_friend(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+      environment_objects_map[environment_object.get_id()] = object_data;
+    }
 
-  managers.characters.remove_friend_if_exist(character_id, received_data.name);
+    for (const virtual_world of Object.values(
+      managers.world_server.module_world.data.virtual_worlds_map
+    )) {
+      const object_data = {
+        name: virtual_world._data.name,
+        characters_list: [...virtual_world._data.characters_list]
+      };
 
-  data_character(connection, received_data, managers);
-}
+      virtual_worlds_map[virtual_world.get_id()] = object_data;
+    }
 
-function data_character_change_state(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    managers.world_server.send(connection.get_id(), "data_world", {
+      lands_map,
+      characters_map,
+      environment_objects_map,
+      virtual_worlds_map
+    });
+  },
+  data_character_change_position: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-  const character = managers.characters._get_character_by_id(character_id);
-  character._change_state(received_data.name);
+    managers.characters.change_position(character_id, received_data.position_x);
 
-  data_character(connection, received_data, managers);
-}
+    data_world(connection, received_data, managers);
+  },
+  data_character_change_land: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-function data_character_change_action(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    managers.characters.change_land(character_id, received_data.land_id);
 
-  const character = managers.characters._get_character_by_id(character_id);
-  character._change_action(received_data.name);
+    data_world(connection, received_data, managers);
+  },
+  data_character_add_friend: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-  data_character(connection, received_data, managers);
-}
+    managers.characters.add_friend_if_exist(character_id, received_data.name);
 
-function data_character_change_activity(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    data_character(connection, received_data, managers);
+  },
+  data_character_remove_friend: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-  const character = managers.characters._get_character_by_id(character_id);
-  character._change_activity(received_data.name);
-
-  data_character(connection, received_data, managers);
-}
-
-function action_message(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
-
-  const character = managers.characters._get_character_by_id(character_id);
-
-  const from_character_name = character.get_name();
-  const to_character_connection_id = managers.characters.get_connection_id(
-    managers.characters.get_id_by_name(received_data.name)
-  );
-
-  const text = received_data.text;
-
-  if (
-    text == null ||
-    from_character_name == null ||
-    to_character_connection_id == null
-  ) {
-    handle_error(
-      connection,
-      received_data,
-      managers,
-      "Wrong action message data."
+    managers.characters.remove_friend_if_exist(
+      character_id,
+      received_data.name
     );
-    return;
-  }
 
-  SendPacket.action_message(to_character_connection_id, managers, {
-    name: from_character_name,
-    text: text
-  });
-}
+    data_character(connection, received_data, managers);
+  },
+  data_character_change_state: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-function process_script_action(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    const character = managers.characters._get_character_by_id(character_id);
+    character._change_state(received_data.name);
 
-  managers.main_world.process_action(
-    received_data.object_id,
-    received_data.action_id,
-    { character_id, ...received_data.dynamic_args }
-  );
-}
+    data_character(connection, received_data, managers);
+  },
+  data_character_change_action: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-function enter_virtual_world(connection, received_data, managers) {
-  logger.error(
-    "Currently is not used",
-    "(Server logic allow only enter by object - action message)"
-  );
-  // const character_id = connection.user_data.character_id;
+    const character = managers.characters._get_character_by_id(character_id);
+    character._change_action(received_data.name);
 
-  // const virtual_world_id = received_data.id;
+    data_character(connection, received_data, managers);
+  },
+  data_character_change_activity: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-  // managers.characters.enter_virtual_world(character_id, virtual_world_id);
-}
+    const character = managers.characters._get_character_by_id(character_id);
+    character._change_activity(received_data.name);
 
-function leave_virtual_world(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    data_character(connection, received_data, managers);
+  },
+  action_message: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
 
-  managers.characters.leave_virtual_world(character_id);
-}
+    const character = managers.characters._get_character_by_id(character_id);
 
-function virtual_world(connection, received_data, managers) {
-  const character_id = connection.user_data.character_id;
+    const from_character_name = character.get_name();
+    const to_character_connection_id = managers.characters.get_connection_id(
+      managers.characters.get_id_by_name(received_data.name)
+    );
 
-  managers.virtual_worlds.process_packet_received_from_character(
-    character_id,
-    received_data
-  );
-}
+    const text = received_data.text;
 
-module.exports = {
-  ParsePacket: {
-    accept_connection: accept_connection,
-    data_character: data_character,
-    data_land: data_land,
-    data_world: data_world,
-    data_character_change_position: data_character_change_position,
-    data_character_change_land: data_character_change_land,
-    data_character_add_friend: data_character_add_friend,
-    data_character_remove_friend: data_character_remove_friend,
-    data_character_change_state: data_character_change_state,
-    data_character_change_action: data_character_change_action,
-    data_character_change_activity: data_character_change_activity,
-    action_message: action_message,
-    process_script_action: process_script_action,
-    enter_virtual_world: enter_virtual_world,
-    leave_virtual_world: leave_virtual_world,
-    virtual_world: virtual_world
+    if (
+      text == null ||
+      from_character_name == null ||
+      to_character_connection_id == null
+    ) {
+      handle_error(
+        connection,
+        received_data,
+        managers,
+        "Wrong action message data."
+      );
+      return;
+    }
+
+    managers.world_server.send(connection.get_id(), "action_message", {
+      name: from_character_name,
+      text: text
+    });
+  },
+  process_script_action: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
+
+    managers.main_world.process_action(
+      received_data.object_id,
+      received_data.action_id,
+      { character_id, ...received_data.dynamic_args }
+    );
+  },
+  enter_virtual_world: (connection, received_data, managers) => {
+    logger.error(
+      "Currently is not used",
+      "(Server logic allow only enter by object - action message)"
+    );
+    // const character_id = connection.user_data.character_id;
+
+    // const virtual_world_id = received_data.id;
+
+    // managers.characters.enter_virtual_world(character_id, virtual_world_id);
+  },
+  leave_virtual_world: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
+
+    managers.characters.leave_virtual_world(character_id);
+  },
+  virtual_world: (connection, received_data, managers) => {
+    const character_id = connection.user_data.character_id;
+
+    managers.virtual_worlds.process_packet_received_from_character(
+      character_id,
+      received_data
+    );
   }
 };

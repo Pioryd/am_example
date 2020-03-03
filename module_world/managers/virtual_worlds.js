@@ -99,9 +99,9 @@ class VirtualWorlds {
       return;
     }
 
-    this.module_world.managers.world_server.send_packet.virtual_world(
+    this.module_world.managers.world_server.send(
       connection_id,
-      this.module_world.managers,
+      "virtual_world",
       { packet_id, data }
     );
   }

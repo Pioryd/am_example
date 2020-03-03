@@ -60,7 +60,7 @@ const save_data = ({
     case "land.save":
       manager.models.environment_object.save(
         Object.values(manager.module_world.data.environment_objects_map),
-        recurrency_callback
+        recurrency_callbackE
       );
       break;
     case "environment_object.save":

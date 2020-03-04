@@ -7,6 +7,72 @@ const Objects = require("../../objects");
 const AM = require("../../am");
 const { repair_data } = require("./repair_data");
 
+const db_objects_map = {
+  settings: {
+    model_load_fn: "load",
+    collection_key: null,
+    data: "settings",
+    object_class: null,
+    manager: null
+  },
+  character: {
+    model_load_fn: "load_all",
+    collection_key: "id",
+    data: "characters_map",
+    object_class: Objects.Character,
+    manager: null
+  },
+  land: {
+    model_load_fn: "load_all",
+    collection_key: "id",
+    data: "lands_map",
+    object_class: Objects.Land,
+    manager: "module_world"
+  },
+  environment_object: {
+    model_load_fn: "load_all",
+    collection_key: "id",
+    data: "environment_objects_map",
+    object_class: Objects.EnvironmentObject,
+    manager: null
+  },
+  virtual_world: {
+    model_load_fn: "load_all",
+    collection_key: "id",
+    data: "virtual_worlds_map",
+    object_class: Objects.VirtualWorld,
+    manager: "virtual_worlds"
+  },
+  am_form: {
+    model_load_fn: "load_all",
+    collection_key: "id",
+    data: "am_forms_map",
+    object_class: AM.Form,
+    manager: "am"
+  },
+  am_program: {
+    model_load_fn: "load_all",
+    collection_key: "id",
+    data: "am_programs_map",
+    object_class: AM.Program,
+    manager: "am"
+  },
+  am_script: {
+    model_load_fn: "load_all",
+    collection_key: "id",
+    data: "am_scripts_map",
+    object_class: AM.Script,
+    manager: "am"
+  },
+  am_system: {
+    model_load_fn: "load_all",
+    collection_key: "id",
+    data: "am_systems_map",
+    object_class: AM.System,
+    manager: "am"
+  }
+};
+
 const load_data = ({
   step = "connect",
   error = null,
@@ -15,135 +81,8 @@ const load_data = ({
   on_error = () => {},
   manager
 }) => {
-  const set_settings = results_list => {
-    if (results_list.length <= 0) return;
-    manager.module_world.data.settings = results_list[0]._doc;
-    delete manager.module_world.data.settings._id;
-    delete manager.module_world.data.settings.__v;
-  };
-
-  const set_characters = results_list => {
-    for (const result of results_list) {
-      const character = new Objects.Character({ ...result._doc });
-      delete character._data._id;
-      delete character._data.__v;
-
-      manager.module_world.data.characters_map[character.get_id()] = character;
-    }
-  };
-
-  const set_lands = results_list => {
-    for (const result of results_list) {
-      const land = new Objects.Land({ ...result._doc }, manager.module_world);
-      delete land._data._id;
-      delete land._data.__v;
-
-      manager.module_world.data.lands_map[land.get_id()] = land;
-    }
-  };
-
-  const set_environment_objects = results_list => {
-    for (const result of results_list) {
-      const environment_object = new Objects.EnvironmentObject({
-        ...result._doc
-      });
-      delete environment_object._data._id;
-      delete environment_object._data.__v;
-
-      manager.module_world.data.environment_objects_map[
-        environment_object.get_id()
-      ] = environment_object;
-    }
-  };
-
-  const set_virtual_worlds = results_list => {
-    for (const result of results_list) {
-      const virtual_world = new Objects.VirtualWorld(
-        {
-          ...result._doc
-        },
-        manager.module_world.managers.virtual_worlds
-      );
-      delete virtual_world._data._id;
-      delete virtual_world._data.__v;
-
-      manager.module_world.data.virtual_worlds_map[
-        virtual_world.get_id()
-      ] = virtual_world;
-    }
-  };
-
-  const set_am_forms = results_list => {
-    for (const result of results_list) {
-      const am_form = new AM.Form(
-        {
-          ...result._doc
-        },
-        manager.module_world.managers.am
-      );
-      delete am_form._data._id;
-      delete am_form._data.__v;
-
-      manager.module_world.data.am_forms_map[am_form.get_id()] = am_form;
-    }
-  };
-
-  const set_am_programs = results_list => {
-    for (const result of results_list) {
-      const am_program = new AM.Program(
-        {
-          ...result._doc
-        },
-        manager.module_world.managers.am
-      );
-      delete am_program._data._id;
-      delete am_program._data.__v;
-
-      manager.module_world.data.am_programs_map[
-        am_program.get_id()
-      ] = am_program;
-    }
-  };
-
-  const set_am_scripts = results_list => {
-    for (const result of results_list) {
-      const am_script = new AM.Script(
-        {
-          ...result._doc
-        },
-        manager.module_world.managers.am
-      );
-      delete am_script._data._id;
-      delete am_script._data.__v;
-
-      manager.module_world.data.am_scripts_map[am_script.get_id()] = am_script;
-    }
-  };
-
-  const set_am_systems = results_list => {
-    for (const result of results_list) {
-      const am_system = new AM.System(
-        {
-          ...result._doc
-        },
-        manager.module_world.managers.am
-      );
-      delete am_system._data._id;
-      delete am_system._data.__v;
-
-      manager.module_world.data.am_systems_map[am_system.get_id()] = am_system;
-    }
-  };
-
   const check_collections = collections => {
-    const collections_names = [
-      "settings",
-      "character",
-      "land",
-      "environment_object"
-    ];
-
-    for (const collection_name of collections_names) {
+    for (const collection_name of Object.keys(db_objects_map)) {
       let found = false;
       for (const collection of collections) {
         if (collection_name === collection.name) {
@@ -193,14 +132,98 @@ const load_data = ({
     logger.info(`Data is ${manager.ready ? "" : "NOT"} loaded correctly.`);
   };
 
-  const recurrency_callback = (...args) => {
-    load_data(
-      Object.assign(...args, {
+  const load_db_object = last_step => {
+    const load_object = (results_list, db_object) => {
+      const model_load_fn_list = {
+        load: () => {
+          if (results_list.length <= 0) return;
+
+          if (db_object.object_class == null) {
+            db_object.data = { ...results_list[0]._doc };
+          } else if (db_object.manager != null) {
+            db_object.data = new db_object.object_class(
+              {
+                ...results_list[0]._doc
+              },
+              manager.module_world.managers[db_object.manager]
+            );
+          } else {
+            db_object.data = new db_object.object_class({
+              ...results_list[0]._doc
+            });
+          }
+
+          delete db_object._id;
+          delete db_object.__v;
+        },
+        load_all: () => {
+          for (const result of results_list) {
+            let new_object = {};
+            if (db_object.object_class == null) {
+              new_object = { ...result._doc };
+            } else if (db_object.manager != null) {
+              new_object = new db_object.object_class(
+                { ...result._doc },
+                manager.module_world.managers[db_object.manager]
+              );
+            } else {
+              new_object = new db_object.object_class({ ...result._doc });
+            }
+
+            delete new_object._data._id;
+            delete new_object._data.__v;
+
+            db_object.data[result._doc[db_object.collection_key]] = new_object;
+          }
+        }
+      };
+
+      model_load_fn_list[db_object.model_load_fn]();
+    };
+
+    let db_object = null;
+    let collection_name = null;
+    let next_db_object = null;
+    let next_collection_name = null;
+
+    if (Object.keys(db_objects_map).length === 0) {
+      db_object = null;
+    } else if (last_step === "") {
+      collection_name = Object.keys(db_objects_map)[0];
+      db_object = Object.values(db_objects_map)[0];
+    } else {
+      collection_name = last_step.split(".")[0];
+      db_object = db_objects_map[collection_name];
+    }
+
+    const keys = Object.keys(db_objects_map);
+    if (keys.indexOf(collection_name) < keys.length - 1) {
+      next_collection_name = keys.indexOf(collection_name) + 1;
+      next_db_object = db_objects_map[next_collection_name];
+    }
+
+    if (db_object != null) load_object(results, db_object);
+
+    if (next_db_object != null) {
+      manager.models[next_collection_name][next_db_object.model_load_fn](
+        (...args) => {
+          load_data(
+            Object.assign(...args, {
+              on_success,
+              on_error,
+              manager
+            })
+          );
+        }
+      );
+    } else {
+      load_data({
+        step: "check_loaded_data",
         on_success,
         on_error,
         manager
-      })
-    );
+      });
+    }
   };
 
   if (!Array.isArray(results)) results = results == null ? [] : [results];
@@ -211,64 +234,18 @@ const load_data = ({
     return;
   }
 
-  switch (step) {
-    case "connect":
-      manager.database.connect(collections => {
-        check_collections(collections);
-      });
-      break;
-    case "connected":
-      manager.models.settings.load(recurrency_callback);
-      break;
-    case "settings.load":
-      set_settings(results);
-      manager.models.character.load_all(recurrency_callback);
-      break;
-    case "character.load_all":
-      set_characters(results);
-      manager.models.land.load_all(recurrency_callback);
-      break;
-    case "land.load_all":
-      set_lands(results);
-      manager.models.environment_object.load_all(recurrency_callback);
-      break;
-    case "environment_object.load_all":
-      set_environment_objects(results);
-      manager.models.virtual_world.load_all(recurrency_callback);
-      break;
-    case "virtual_world.load_all":
-      set_virtual_worlds(results);
-      manager.models.am_form.load_all(recurrency_callback);
-      break;
-    case "am_form.load_all":
-      set_am_forms(results);
-      manager.models.am_program.load_all(recurrency_callback);
-      break;
-    case "am_program.load_all":
-      set_am_programs(results);
-      manager.models.am_script.load_all(recurrency_callback);
-      break;
-    case "am_script.load_all":
-      set_am_scripts(results);
-      manager.models.am_system.load_all(recurrency_callback);
-      break;
-    case "am_system.load_all":
-      set_am_systems(results);
-      load_data({
-        step: "check_loaded_data",
-        on_success,
-        on_error,
-        manager
-      });
-      break;
-    case "check_loaded_data":
-      // these must be as last functions
-      check_loaded_data();
-      on_success();
-      logger.info("Load data from database finished.");
-      break;
-    default:
-      break;
+  if (step === "connect") {
+    manager.database.connect(collections => {
+      check_collections(collections);
+    });
+  } else if (step === "connected") {
+    load_db_object("");
+  } else if (step === "check_loaded_data") {
+    check_loaded_data();
+    on_success();
+    logger.info("Load data from database finished.");
+  } else {
+    load_db_object(step);
   }
 };
 

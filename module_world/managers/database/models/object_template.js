@@ -27,6 +27,8 @@ class ModelTemplate {
   }
 
   save(classes_instances, callback, index = 0) {
+    classes_instances = Object.values(classes_instances);
+
     if (!Array.isArray(classes_instances))
       classes_instances = [classes_instances];
 

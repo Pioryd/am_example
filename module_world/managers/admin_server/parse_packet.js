@@ -33,8 +33,8 @@ module.exports = {
 
     const config = managers.admin_server.config;
     if (
-      config.module_world.admin_server.login == null ||
-      config.module_world.admin_server.password == null ||
+      login == null ||
+      password == null ||
       config.module_world.admin_server.login.toLowerCase() !==
         login.toLowerCase() ||
       config.module_world.admin_server.password !== password.toLowerCase()

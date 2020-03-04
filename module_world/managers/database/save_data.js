@@ -12,14 +12,48 @@ const save_data = ({
   on_error = () => {},
   manager
 }) => {
-  const recurrency_callback = (...args) => {
-    save_data(
-      Object.assign(...args, {
+  const save_db_object = last_step => {
+    let db_object = null;
+    let collection_name = null;
+    let next_db_object = null;
+    let next_collection_name = null;
+
+    if (Object.keys(manager.db_objects_map).length === 0) {
+      db_object = null;
+    } else if (last_step === "") {
+      collection_name = Object.keys(manager.db_objects_map)[0];
+      db_object = Object.values(manager.db_objects_map)[0];
+    } else {
+      collection_name = last_step.split(".")[0];
+      db_object = manager.db_objects_map[collection_name];
+    }
+
+    const keys = Object.keys(manager.db_objects_map);
+    if (keys.indexOf(collection_name) < keys.length - 1) {
+      next_collection_name = keys.indexOf(collection_name) + 1;
+      next_db_object = manager.db_objects_map[next_collection_name];
+    }
+
+    if (next_db_object != null) {
+      manager.db_objects[next_collection_name].model[
+        next_db_object.model_save_fn
+      ]((...args) => {
+        save_data(
+          Object.assign(...args, {
+            on_success,
+            on_error,
+            manager
+          })
+        );
+      });
+    } else {
+      save_data({
+        step: "db_object_loaded",
         on_success,
         on_error,
         manager
-      })
-    );
+      });
+    }
   };
 
   if (error != null) {
@@ -28,80 +62,21 @@ const save_data = ({
     return;
   }
 
-  switch (step) {
-    case "connect":
-      manager.database.connect(() => {
-        save_data({
-          step: "connected",
-          on_success,
-          on_error,
-          manager
-        });
+  if (step === "connect") {
+    manager.database.connect(() => {
+      save_data({
+        step: "connected",
+        on_success,
+        on_error,
+        manager
       });
-      break;
-    case "connected":
-      manager.models.settings.save(
-        manager.module_world.data.settings,
-        recurrency_callback
-      );
-      break;
-    case "settings.save":
-      manager.models.character.save(
-        manager.module_world.data.characters_map,
-        recurrency_callback
-      );
-      break;
-    case "character.save":
-      manager.models.land.save(
-        manager.module_world.data.lands_map,
-        recurrency_callback
-      );
-      break;
-    case "land.save":
-      manager.models.environment_object.save(
-        manager.module_world.data.environment_objects_map,
-        recurrency_callback
-      );
-      break;
-    case "environment_object.save":
-      manager.models.virtual_world.save(
-        manager.module_world.data.virtual_worlds_map,
-        recurrency_callback
-      );
-      break;
-    case "virtual_world.save":
-      manager.models.am_form.save(
-        manager.module_world.data.am_forms_map,
-        recurrency_callback
-      );
-      break;
-    case "am_form.save":
-      manager.models.am_program.save(
-        manager.module_world.data.am_programs_map,
-        recurrency_callback
-      );
-      break;
-    case "am_program.save":
-      manager.models.am_script.save(
-        manager.module_world.data.am_scripts_map,
-        recurrency_callback
-      );
-      break;
-    case "am_script.save":
-      manager.models.am_system.save(
-        manager.module_world.data.am_systems_map,
-        recurrency_callback
-      );
-      break;
-    case "virtual_world.save":
-      manager.models.am_form.save(
-        manager.module_world.data.am_form_map,
-        recurrency_callback
-      );
-      break;
-    case "am_form.save":
-      on_success();
-      break;
+    });
+  } else if (step === "connected") {
+    save_db_object("");
+  } else if (step === "db_object_loaded") {
+    on_success();
+  } else {
+    save_db_object(step);
   }
 };
 

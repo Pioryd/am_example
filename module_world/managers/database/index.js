@@ -7,7 +7,7 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
-const Models = require("./models");
+const { db_objects_map } = require("./db_objects_map");
 const { load_data } = require("./load_data");
 const { save_data } = require("./save_data");
 /*
@@ -19,13 +19,18 @@ class DatabaseManager {
   constructor(module_world) {
     this.module_world = module_world;
     this.config = this.module_world.config;
-    this.models = Models;
+    this.db_objects_map = db_objects_map;
     this.ready = false;
     this.stopwatches_map = { database_save: new Stopwatch(5 * 1000) };
+
+    const models = {};
+    for (const [key, value] of Object.entries(db_objects_map))
+      models[key] = value.model;
+
     this.database = new Database({
       url: this.config.module_world.database.url,
       name: this.config.module_world.database.name,
-      models: this.models
+      models
     });
   }
 
@@ -57,7 +62,7 @@ class DatabaseManager {
     };
     const save_as_not_backup = () => {
       this.module_world.data.settings.backup = false;
-      this.models.settings.save(
+      this.db_objects_map.settings.model.save(
         this.module_world.data.settings,
         close_database
       );

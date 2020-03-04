@@ -3,75 +3,10 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
+// [Objects] and [AM] used as called as string
 const Objects = require("../../objects");
 const AM = require("../../am");
 const { repair_data } = require("./repair_data");
-
-const db_objects_map = {
-  settings: {
-    model_load_fn: "load",
-    collection_key: null,
-    data: "settings",
-    object_class: null,
-    manager: null
-  },
-  character: {
-    model_load_fn: "load_all",
-    collection_key: "id",
-    data: "characters_map",
-    object_class: Objects.Character,
-    manager: null
-  },
-  land: {
-    model_load_fn: "load_all",
-    collection_key: "id",
-    data: "lands_map",
-    object_class: Objects.Land,
-    manager: "module_world"
-  },
-  environment_object: {
-    model_load_fn: "load_all",
-    collection_key: "id",
-    data: "environment_objects_map",
-    object_class: Objects.EnvironmentObject,
-    manager: null
-  },
-  virtual_world: {
-    model_load_fn: "load_all",
-    collection_key: "id",
-    data: "virtual_worlds_map",
-    object_class: Objects.VirtualWorld,
-    manager: "virtual_worlds"
-  },
-  am_form: {
-    model_load_fn: "load_all",
-    collection_key: "id",
-    data: "am_forms_map",
-    object_class: AM.Form,
-    manager: "am"
-  },
-  am_program: {
-    model_load_fn: "load_all",
-    collection_key: "id",
-    data: "am_programs_map",
-    object_class: AM.Program,
-    manager: "am"
-  },
-  am_script: {
-    model_load_fn: "load_all",
-    collection_key: "id",
-    data: "am_scripts_map",
-    object_class: AM.Script,
-    manager: "am"
-  },
-  am_system: {
-    model_load_fn: "load_all",
-    collection_key: "id",
-    data: "am_systems_map",
-    object_class: AM.System,
-    manager: "am"
-  }
-};
 
 const load_data = ({
   step = "connect",
@@ -82,7 +17,7 @@ const load_data = ({
   manager
 }) => {
   const check_collections = collections => {
-    for (const collection_name of Object.keys(db_objects_map)) {
+    for (const collection_name of Object.keys(manager.db_objects_map)) {
       let found = false;
       for (const collection of collections) {
         if (collection_name === collection.name) {
@@ -133,7 +68,7 @@ const load_data = ({
   };
 
   const load_db_object = last_step => {
-    const load_object = (results_list, db_object) => {
+    const create_objects = (results_list, db_object) => {
       const model_load_fn_list = {
         load: () => {
           if (results_list.length <= 0) return;
@@ -173,7 +108,7 @@ const load_data = ({
             delete new_object._data._id;
             delete new_object._data.__v;
 
-            db_object.data[result._doc[db_object.collection_key]] = new_object;
+            db_object.data[result._doc[db_object.collection_uid]] = new_object;
           }
         }
       };
@@ -186,36 +121,36 @@ const load_data = ({
     let next_db_object = null;
     let next_collection_name = null;
 
-    if (Object.keys(db_objects_map).length === 0) {
+    if (Object.keys(manager.db_objects_map).length === 0) {
       db_object = null;
     } else if (last_step === "") {
-      collection_name = Object.keys(db_objects_map)[0];
-      db_object = Object.values(db_objects_map)[0];
+      collection_name = Object.keys(manager.db_objects_map)[0];
+      db_object = Object.values(manager.db_objects_map)[0];
     } else {
       collection_name = last_step.split(".")[0];
-      db_object = db_objects_map[collection_name];
+      db_object = manager.db_objects_map[collection_name];
     }
 
-    const keys = Object.keys(db_objects_map);
+    const keys = Object.keys(manager.db_objects_map);
     if (keys.indexOf(collection_name) < keys.length - 1) {
       next_collection_name = keys.indexOf(collection_name) + 1;
-      next_db_object = db_objects_map[next_collection_name];
+      next_db_object = manager.db_objects_map[next_collection_name];
     }
 
-    if (db_object != null) load_object(results, db_object);
+    if (db_object != null) create_objects(results, db_object);
 
     if (next_db_object != null) {
-      manager.models[next_collection_name][next_db_object.model_load_fn](
-        (...args) => {
-          load_data(
-            Object.assign(...args, {
-              on_success,
-              on_error,
-              manager
-            })
-          );
-        }
-      );
+      manager.db_objects[next_collection_name].model[
+        next_db_object.model_load_fn
+      ]((...args) => {
+        load_data(
+          Object.assign(...args, {
+            on_success,
+            on_error,
+            manager
+          })
+        );
+      });
     } else {
       load_data({
         step: "check_loaded_data",

@@ -7,7 +7,7 @@ const logger = require(path.join(
 
 // Must be given [model_name] and [field_name] to prevent add "s" to
 // collections names
-class ModelTemplate {
+class Default {
   constructor(model_name, field_name, schema_source) {
     this.model_name = model_name;
     this.field_name = field_name;
@@ -113,4 +113,4 @@ class ModelTemplate {
   }
 }
 
-module.exports = ModelTemplate;
+module.exports = Default;

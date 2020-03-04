@@ -33,6 +33,8 @@ module.exports = {
 
     const config = managers.admin_server.config;
     if (
+      config.module_world.admin_server.login == null ||
+      config.module_world.admin_server.password == null ||
       config.module_world.admin_server.login.toLowerCase() !==
         login.toLowerCase() ||
       config.module_world.admin_server.password !== password.toLowerCase()
@@ -41,7 +43,7 @@ module.exports = {
         connection,
         received_data,
         managers,
-        `Unable to accept connection. Login: ${login} Password: ${password}`
+        `Unable to accept connection. Login[${login}] Password[${password}]`
       );
       return false;
     }

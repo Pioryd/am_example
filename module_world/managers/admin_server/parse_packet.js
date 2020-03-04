@@ -3,7 +3,7 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
-const AM = require("../../am");
+const Objects = require("../../objects");
 
 /*
 NOTE!
@@ -153,12 +153,6 @@ module.exports = {
       script: module_data.am_scripts_map,
       system: module_data.am_systems_map
     };
-    const classes = {
-      form: AM.Form,
-      program: AM.Program,
-      script: AM.Script,
-      system: AM.System
-    };
 
     let map = maps[type];
 
@@ -167,10 +161,7 @@ module.exports = {
     } else if (id === "") {
       message = "Wrong id";
     } else if (!(id in map)) {
-      map[id] = new classes[type](
-        { ...object, id },
-        manager.module_world.managers.am
-      );
+      map[id] = new Objects.Default({ ...object, id });
       message = `Added type[${type}] id[${id}]`;
     } else if (object == null) {
       delete map[id];

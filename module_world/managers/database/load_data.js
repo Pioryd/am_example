@@ -3,9 +3,8 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
-// [Objects] and [AM] used as called as string
+// [Objects] used as called as string
 const Objects = require("../../objects");
-const AM = require("../../am");
 const { repair_data } = require("./repair_data");
 
 const load_data = ({

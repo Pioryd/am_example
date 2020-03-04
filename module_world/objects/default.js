@@ -5,7 +5,7 @@ const logger = require(path.join(
 )).create_logger({ module_name: "module_world", file_name: __filename });
 const { Util } = require(path.join(global.node_modules_path, "am_framework"));
 
-class Form {
+class Default {
   constructor(data) {
     this._data = data;
   }
@@ -19,4 +19,4 @@ class Form {
   }
 }
 
-module.exports = { Form };
+module.exports = { Default };

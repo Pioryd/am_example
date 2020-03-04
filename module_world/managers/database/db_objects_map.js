@@ -94,8 +94,8 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_forms_map",
-    object_class: "AM.Form",
-    manager: "am"
+    object_class: "Objects.Default",
+    manager: null
   },
   am_program: {
     model: new Models.Default("AM_Program", "am_program", {
@@ -108,8 +108,8 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_programs_map",
-    object_class: "AM.Program",
-    manager: "am"
+    object_class: "Objects.Default",
+    manager: null
   },
   am_script: {
     model: new Models.Default("AM_Script", "am_script", {
@@ -122,8 +122,8 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_scripts_map",
-    object_class: "AM.Script",
-    manager: "am"
+    object_class: "Objects.Default",
+    manager: null
   },
   am_system: {
     model: new Models.Default("AM_System", "am_system", {
@@ -135,8 +135,8 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_systems_map",
-    object_class: "AM.System",
-    manager: "am"
+    object_class: "Objects.Default",
+    manager: null
   }
 };
 

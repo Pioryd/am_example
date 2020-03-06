@@ -36,11 +36,11 @@ Contact between modules must be made by:
 
 ### Database objects
 
-Add new object data into [managers/database/db_objects_map.js]
+Add new object data into [`managers/database/db_objects_map.js`]
 
 - use one of models or add new
   - default model:
-    - schema must use UID as key[id]
+    - schema must use UID as key[`id`]
 - use one of object classes or add new
   - default class
     - manager should be null
@@ -49,14 +49,14 @@ Add new object data into [managers/database/db_objects_map.js]
 
 You can create one from the template:
 
-- default.js
+- [`default.js`]
 
 Or You can create Your own class:
 
 - possible parameters:
   - First - data
   - Second(optional) - manager
-- after create one, You must add it to [objects/index.js] [module.exports]
+- after create one, You must add it to [`objects/index.js`] [`module.exports`]
 
 ### Managers
 
@@ -67,7 +67,7 @@ Each manager class:
   - terminate()
   - poll()
 - must be placed in main module file
-  - added to manager list [this.managers]
+  - added to manager list [`this.managers`]
   - placed in:
     - on_initialize()
     - _terminate()

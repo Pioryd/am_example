@@ -158,28 +158,28 @@ module.exports = {
       virtual_worlds_map
     });
   },
-  data_character_change_position: (connection, received_data, managers) => {
+  character_change_position: (connection, received_data, managers) => {
     const character_id = connection.user_data.character_id;
 
     managers.characters.change_position(character_id, received_data.position_x);
 
     data_world(connection, received_data, managers);
   },
-  data_character_change_land: (connection, received_data, managers) => {
+  character_change_land: (connection, received_data, managers) => {
     const character_id = connection.user_data.character_id;
 
     managers.characters.change_land(character_id, received_data.land_id);
 
     data_world(connection, received_data, managers);
   },
-  data_character_add_friend: (connection, received_data, managers) => {
+  character_add_friend: (connection, received_data, managers) => {
     const character_id = connection.user_data.character_id;
 
     managers.characters.add_friend_if_exist(character_id, received_data.name);
 
     data_character(connection, received_data, managers);
   },
-  data_character_remove_friend: (connection, received_data, managers) => {
+  character_remove_friend: (connection, received_data, managers) => {
     const character_id = connection.user_data.character_id;
 
     managers.characters.remove_friend_if_exist(
@@ -189,7 +189,7 @@ module.exports = {
 
     data_character(connection, received_data, managers);
   },
-  data_character_change_state: (connection, received_data, managers) => {
+  character_change_state: (connection, received_data, managers) => {
     const character_id = connection.user_data.character_id;
 
     const character = managers.characters._get_character_by_id(character_id);
@@ -197,7 +197,7 @@ module.exports = {
 
     data_character(connection, received_data, managers);
   },
-  data_character_change_action: (connection, received_data, managers) => {
+  character_change_action: (connection, received_data, managers) => {
     const character_id = connection.user_data.character_id;
 
     const character = managers.characters._get_character_by_id(character_id);
@@ -205,7 +205,7 @@ module.exports = {
 
     data_character(connection, received_data, managers);
   },
-  data_character_change_activity: (connection, received_data, managers) => {
+  character_change_activity: (connection, received_data, managers) => {
     const character_id = connection.user_data.character_id;
 
     const character = managers.characters._get_character_by_id(character_id);

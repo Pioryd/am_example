@@ -57,7 +57,7 @@ module.exports = {
     };
 
     managers.world_server.send(connection.get_id(), "accept_connection", {
-      character_name: login
+      user_name: login
     });
     return true;
   },

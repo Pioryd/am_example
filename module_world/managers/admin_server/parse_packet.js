@@ -49,8 +49,8 @@ module.exports = {
     }
 
     connection.on_close = connection => {};
-    managers.admin_server.send(connection.get_id(), "login", {
-      character_name: login
+    managers.admin_server.send(connection.get_id(), "accept_connection", {
+      user_name: login
     });
     return true;
   },

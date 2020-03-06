@@ -56,7 +56,7 @@ module.exports = {
       managers.characters.log_off(character.get_id());
     };
 
-    managers.world_server.send(connection.get_id(), "login", {
+    managers.world_server.send(connection.get_id(), "accept_connection", {
       character_name: login
     });
     return true;

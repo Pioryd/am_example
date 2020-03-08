@@ -9,6 +9,13 @@ npm install
 npm start
 ```
 
+## First run
+
+1. Run module
+2. Close by execute command "close"
+
+It's necessary for correctly create first database collections and data.
+
 ## Module World
 
 ### Structure
@@ -63,14 +70,14 @@ Or You can create Your own class:
 Each manager class:
 
 - must contains:
-  - initialize()
-  - terminate()
-  - poll()
+  - [`initialize()`]
+  - [`terminate()`]
+  - [`poll()`]
 - must be placed in main module file
   - added to manager list [`this.managers`]
   - placed in:
-    - on_initialize()
-    - _terminate()
-    - _poll()
+    - [`on_initialize()`]
+    - [`_terminate()`]
+    - [`_poll()`]
 
 ## More informations at [Artificial Mind](https://www.artificialmind.dev/)

@@ -3,6 +3,8 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
+const ObjectID = require(path.join(global.node_modules_path, "bson-objectid"));
+
 const Objects = require("../../objects");
 
 /*
@@ -119,6 +121,20 @@ module.exports = {
       scripts_list
     });
   },
+  data_am_form: (connection, received_data, managers) => {
+    const { action_id } = received_data;
+    const module_data = managers.admin_server.module_world.data;
+
+    const forms = [];
+
+    for (const form of Object.values(module_data.am_forms_map))
+      forms.push(form._data);
+
+    managers.admin_server.send(connection.get_id(), "data_am_form", {
+      action_id,
+      forms
+    });
+  },
   get_am_data: (connection, received_data, managers) => {
     const module_data = managers.admin_server.module_world.data;
     const forms_list = [];
@@ -139,6 +155,38 @@ module.exports = {
       programs_list,
       scripts_list,
       systems_list
+    });
+  },
+  update_am_form: (connection, received_data, managers) => {
+    const { action_id, id, object } = received_data;
+    const module_data = managers.admin_server.module_world.data;
+    const map = module_data.am_forms_map;
+
+    let message = "Unknown";
+
+    if (id === "") {
+      const id = ObjectID().toHexString();
+      map[id] = new Objects.Default({
+        name: "new_" + id,
+        id,
+        rules: [],
+        scripts: []
+      });
+      message = `Added id[${id}]`;
+    } else if (!(id in map)) {
+      message = `Wrong id[${id}]`;
+    } else if (object == null) {
+      delete map[id];
+      message = `Removed id[${id}]`;
+    } else {
+      // "id: map[id].get_id()" to be sure id wont be override
+      map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
+      message = `Updated id[${id}]`;
+    }
+
+    managers.admin_server.send(connection.get_id(), "update_am_form", {
+      action_id,
+      message
     });
   },
   update_am_data: (connection, received_data, managers) => {

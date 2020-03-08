@@ -38,8 +38,9 @@ class DatabaseManager {
     load_data({
       step: "connect",
       on_success: () => {
-        if (this.module_world.data.settings.generated === false)
+        if (this.module_world.data.settings.generated !== true)
           this.module_world.managers.main_world.generate_world();
+
         this.ready = true;
         logger.info("Server is running...");
       },
@@ -79,7 +80,7 @@ class DatabaseManager {
     if (!this.ready) return;
 
     if (this.stopwatches_map.database_save.is_elapsed()) {
-      //logger.info("Auto save to database");
+      logger.info("Auto save to database");
 
       this.module_world.data.settings.backup = true;
       save_data({ step: "connect", manager: this });

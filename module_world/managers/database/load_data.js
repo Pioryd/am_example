@@ -27,7 +27,9 @@ const load_data = ({
 
       if (!found) {
         logger.info(
-          "Database does not include needed collections. Existed:",
+          "Database does not include collection [" +
+            collection_name +
+            "]. Existed:",
           collections
         );
 
@@ -73,16 +75,22 @@ const load_data = ({
           if (results_list.length <= 0) return;
 
           if (db_object.object_class == null) {
-            db_object.data = { ...results_list[0]._doc };
+            manager.module_world.data[db_object.data] = {
+              ...results_list[0]._doc
+            };
           } else if (db_object.manager != null) {
-            db_object.data = new db_object.object_class(
+            manager.module_world.data[
+              db_object.data
+            ] = new db_object.object_class(
               {
                 ...results_list[0]._doc
               },
               manager.module_world.managers[db_object.manager]
             );
           } else {
-            db_object.data = new db_object.object_class({
+            manager.module_world.data[
+              db_object.data
+            ] = new db_object.object_class({
               ...results_list[0]._doc
             });
           }
@@ -96,18 +104,21 @@ const load_data = ({
             if (db_object.object_class == null) {
               new_object = { ...result._doc };
             } else if (db_object.manager != null) {
-              new_object = new db_object.object_class(
+              new_object = new Objects[db_object.object_class](
                 { ...result._doc },
                 manager.module_world.managers[db_object.manager]
               );
             } else {
-              new_object = new db_object.object_class({ ...result._doc });
+              new_object = new Objects[db_object.object_class]({
+                ...result._doc
+              });
             }
 
             delete new_object._data._id;
             delete new_object._data.__v;
-
-            db_object.data[result._doc[db_object.collection_uid]] = new_object;
+            manager.module_world.data[db_object.data][
+              result._doc[db_object.collection_uid]
+            ] = new_object;
           }
         }
       };
@@ -123,23 +134,23 @@ const load_data = ({
     if (Object.keys(manager.db_objects_map).length === 0) {
       db_object = null;
     } else if (last_step === "") {
-      collection_name = Object.keys(manager.db_objects_map)[0];
-      db_object = Object.values(manager.db_objects_map)[0];
+      next_collection_name = Object.keys(manager.db_objects_map)[0];
+      next_db_object = Object.values(manager.db_objects_map)[0];
     } else {
       collection_name = last_step.split(".")[0];
       db_object = manager.db_objects_map[collection_name];
-    }
 
-    const keys = Object.keys(manager.db_objects_map);
-    if (keys.indexOf(collection_name) < keys.length - 1) {
-      next_collection_name = keys.indexOf(collection_name) + 1;
-      next_db_object = manager.db_objects_map[next_collection_name];
+      const keys = Object.keys(manager.db_objects_map);
+      if (keys.indexOf(collection_name) < keys.length - 1) {
+        next_collection_name = keys[keys.indexOf(collection_name) + 1];
+        next_db_object = manager.db_objects_map[next_collection_name];
+      }
     }
 
     if (db_object != null) create_objects(results, db_object);
 
     if (next_db_object != null) {
-      manager.db_objects[next_collection_name].model[
+      manager.db_objects_map[next_collection_name].model[
         next_db_object.model_load_fn
       ]((...args) => {
         load_data(
@@ -152,7 +163,7 @@ const load_data = ({
       });
     } else {
       load_data({
-        step: "check_loaded_data",
+        step: "db_object_loaded",
         on_success,
         on_error,
         manager
@@ -174,7 +185,7 @@ const load_data = ({
     });
   } else if (step === "connected") {
     load_db_object("");
-  } else if (step === "check_loaded_data") {
+  } else if (step === "db_object_loaded") {
     check_loaded_data();
     on_success();
     logger.info("Load data from database finished.");

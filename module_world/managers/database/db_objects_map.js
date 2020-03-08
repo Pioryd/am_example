@@ -29,7 +29,7 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "characters_map",
-    object_class: "Objects.Character",
+    object_class: "Character",
     manager: null
   },
   land: {
@@ -47,7 +47,7 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "lands_map",
-    object_class: "Objects.Land",
+    object_class: "Land",
     manager: "module_world"
   },
   environment_object: {
@@ -66,7 +66,7 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "environment_objects_map",
-    object_class: "Objects.EnvironmentObject",
+    object_class: "EnvironmentObject",
     manager: null
   },
   virtual_world: {
@@ -80,7 +80,7 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "virtual_worlds_map",
-    object_class: "Objects.VirtualWorld",
+    object_class: "VirtualWorld",
     manager: "virtual_worlds"
   },
   am_form: {
@@ -94,7 +94,7 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_forms_map",
-    object_class: "Objects.Default",
+    object_class: "Default",
     manager: null
   },
   am_program: {
@@ -108,7 +108,7 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_programs_map",
-    object_class: "Objects.Default",
+    object_class: "Default",
     manager: null
   },
   am_script: {
@@ -122,7 +122,7 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_scripts_map",
-    object_class: "Objects.Default",
+    object_class: "Default",
     manager: null
   },
   am_system: {
@@ -135,7 +135,7 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_systems_map",
-    object_class: "Objects.Default",
+    object_class: "Default",
     manager: null
   }
 };

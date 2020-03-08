@@ -38,8 +38,7 @@ class Default {
 
       if (class_instance == null) {
         callback({
-          step: this.model.collection.name + ".save",
-          error: "class_instance is null"
+          step: this.model.collection.name + ".save"
         });
         return;
       }

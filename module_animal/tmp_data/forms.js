@@ -5,13 +5,15 @@ module.exports = [
     rules: [
       {
         type: "system",
-        triggers: {
-          form_init: { value: "Live" },
-          script_processed: { value: "plan" }
-        },
-        actions: {
-          script_run: "plan"
-        }
+        triggers: [
+          { form_init: { value: "Live" } },
+          { script_processed: { value: "plan" } }
+        ],
+        actions: [
+          {
+            script_run: "plan"
+          }
+        ]
       }
     ],
     scripts: [
@@ -54,13 +56,17 @@ module.exports = [
     rules: [
       {
         type: "system",
-        triggers: {
-          form_init: { value: "Stress" },
-          script_processed: { value: "first_aid" }
-        },
-        actions: {
-          script_run: "first_aid"
-        }
+        triggers: [
+          {
+            form_init: { value: "Stress" }
+          },
+          { script_processed: { value: "first_aid" } }
+        ],
+        actions: [
+          {
+            script_run: "first_aid"
+          }
+        ]
       }
     ],
     scripts: [
@@ -91,16 +97,20 @@ module.exports = [
     rules: [
       {
         type: "signal",
-        triggers: {
-          choice: { any: {} }
-        },
-        actions: {
-          script_run: "make_choice",
-          script_set_data: {
-            script: "make_choice",
-            data: "enemy_choice"
+        triggers: [
+          {
+            choice: { any: {} }
           }
-        }
+        ],
+        actions: [
+          { script_run: "make_choice" },
+          {
+            script_set_data: {
+              script: "make_choice",
+              data: "enemy_choice"
+            }
+          }
+        ]
       }
     ],
     scripts: [

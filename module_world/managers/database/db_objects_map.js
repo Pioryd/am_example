@@ -87,8 +87,8 @@ const db_objects_map = {
     model: new Models.Default("AM_Form", "am_form", {
       id: { type: String, required: true, unique: true, index: true },
       name: { type: String, required: true },
-      rules: { type: [Object] },
-      scripts: { type: [String] }
+      rules: { type: [Object], required: true },
+      scripts: { type: [String], required: true }
     }),
     model_load_fn: "load_all",
     model_save_fn: "save",
@@ -101,13 +101,26 @@ const db_objects_map = {
     model: new Models.Default("AM_Program", "am_program", {
       id: { type: String, required: true, unique: true, index: true },
       name: { type: String, required: true },
-      data: { type: Object },
-      root_scope: { type: Object }
+      rules: { type: [Object], required: true },
+      forms: { type: [String], required: true }
     }),
     model_load_fn: "load_all",
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_programs_map",
+    object_class: "Default",
+    manager: null
+  },
+  am_system: {
+    model: new Models.Default("AM_System", "am_system", {
+      id: { type: String, required: true, unique: true, index: true },
+      name: { type: String, required: true },
+      programs: { type: [String], required: true }
+    }),
+    model_load_fn: "load_all",
+    model_save_fn: "save",
+    collection_uid: "id",
+    data: "am_systems_map",
     object_class: "Default",
     manager: null
   },
@@ -122,19 +135,6 @@ const db_objects_map = {
     model_save_fn: "save",
     collection_uid: "id",
     data: "am_scripts_map",
-    object_class: "Default",
-    manager: null
-  },
-  am_system: {
-    model: new Models.Default("AM_System", "am_system", {
-      id: { type: String, required: true, unique: true, index: true },
-      name: { type: String, required: true },
-      programs: { type: [String] }
-    }),
-    model_load_fn: "load_all",
-    model_save_fn: "save",
-    collection_uid: "id",
-    data: "am_systems_map",
     object_class: "Default",
     manager: null
   }

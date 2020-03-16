@@ -3,9 +3,95 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
+const { Validator } = require(path.join(
+  global.node_modules_path,
+  "am_framework"
+)).ScriptingSystem;
 const ObjectID = require(path.join(global.node_modules_path, "bson-objectid"));
 
 const Objects = require("../../objects");
+
+const RULES = {
+  form: {
+    id: { type: "string", required: true, empty: false },
+    name: { type: "string", required: true, empty: false },
+    rules: {
+      type: "array",
+      required: true,
+      object_type: "object",
+      object_rules: {
+        type: { type: "string", required: true, empty: false },
+        triggers: {
+          type: "array",
+          required: true,
+          object_type: "object",
+          object_empty: false,
+          object_rules: {}
+        },
+        actions: {
+          type: "array",
+          required: true,
+          object_type: "object",
+          object_empty: false,
+          object_rules: {}
+        }
+      }
+    },
+    scripts: {
+      type: "array",
+      required: true,
+      object_type: "string",
+      object_empty: false
+    }
+  },
+  program: {
+    id: { type: "string", required: true, empty: false },
+    name: { type: "string", required: true, empty: false },
+    rules: {
+      type: "array",
+      required: true,
+      object_type: "object",
+      object_rules: {
+        type: { type: "string", required: true, empty: false },
+        triggers: {
+          type: "array",
+          required: true,
+          object_type: "object",
+          object_empty: false,
+          object_rules: {}
+        },
+        actions: {
+          type: "array",
+          required: true,
+          object_type: "object",
+          object_empty: false,
+          object_rules: {}
+        }
+      }
+    },
+    forms: {
+      type: "array",
+      required: true,
+      object_type: "string",
+      object_empty: false
+    }
+  },
+  system: {
+    id: { type: "string", required: true, empty: false },
+    name: { type: "string", required: true, empty: false },
+    programs: {
+      type: "array",
+      required: true,
+      object_type: "string",
+      object_empty: false
+    }
+  }
+};
+const validator_map = {
+  form: new Validator(RULES.form),
+  program: new Validator(RULES.program),
+  system: new Validator(RULES.system)
+};
 
 /*
 NOTE!
@@ -125,36 +211,45 @@ module.exports = {
     const { action_id } = received_data;
     const module_data = managers.admin_server.module_world.data;
 
-    const forms = [];
+    const list = [];
 
-    for (const form of Object.values(module_data.am_forms_map))
-      forms.push(form._data);
+    for (const value of Object.values(module_data.am_forms_map))
+      list.push(value._data);
 
     managers.admin_server.send(connection.get_id(), "data_am_form", {
       action_id,
-      forms
+      list,
+      rules: RULES.form
     });
   },
-  get_am_data: (connection, received_data, managers) => {
+  data_am_program: (connection, received_data, managers) => {
+    const { action_id } = received_data;
     const module_data = managers.admin_server.module_world.data;
-    const forms_list = [];
-    const programs_list = [];
-    const scripts_list = [];
-    const systems_list = [];
 
-    for (const id of Object.keys(module_data.am_forms_map)) forms_list.push(id);
-    for (const id of Object.keys(module_data.am_programs_map))
-      programs_list.push(id);
-    for (const id of Object.keys(module_data.am_scripts_map))
-      scripts_list.push(id);
-    for (const id of Object.keys(module_data.am_systems_map))
-      systems_list.push(id);
+    const list = [];
 
-    managers.admin_server.send(connection.get_id(), "get_am_data", {
-      forms_list,
-      programs_list,
-      scripts_list,
-      systems_list
+    for (const value of Object.values(module_data.am_programs_map))
+      list.push(value._data);
+
+    managers.admin_server.send(connection.get_id(), "data_am_program", {
+      action_id,
+      list,
+      rules: RULES.program
+    });
+  },
+  data_am_system: (connection, received_data, managers) => {
+    const { action_id } = received_data;
+    const module_data = managers.admin_server.module_world.data;
+
+    const list = [];
+
+    for (const value of Object.values(module_data.am_systems_map))
+      list.push(value._data);
+
+    managers.admin_server.send(connection.get_id(), "data_am_system", {
+      action_id,
+      list,
+      rules: RULES.system
     });
   },
   update_am_form: (connection, received_data, managers) => {
@@ -179,9 +274,15 @@ module.exports = {
       delete map[id];
       message = `Removed id[${id}]`;
     } else {
-      // "id: map[id].get_id()" to be sure id wont be override
-      map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
-      message = `Updated id[${id}]`;
+      try {
+        validator_map.form.validate(object);
+
+        // "id: map[id].get_id()" to be sure id wont be override
+        map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
+        message = `Updated id[${id}]`;
+      } catch (e) {
+        message = e.message;
+      }
     }
 
     managers.admin_server.send(connection.get_id(), "update_am_form", {
@@ -189,38 +290,77 @@ module.exports = {
       message
     });
   },
-  update_am_data: (connection, received_data, managers) => {
-    const { action_id, type, id, object } = received_data;
+  update_am_program: (connection, received_data, managers) => {
+    const { action_id, id, object } = received_data;
     const module_data = managers.admin_server.module_world.data;
+    const map = module_data.am_programs_map;
 
     let message = "Unknown";
 
-    const maps = {
-      form: module_data.am_forms_map,
-      program: module_data.am_programs_map,
-      script: module_data.am_scripts_map,
-      system: module_data.am_systems_map
-    };
-
-    let map = maps[type];
-
-    if (!(type in maps)) {
-      message = "Wrong type";
-    } else if (id === "") {
-      message = "Wrong id";
+    if (id === "") {
+      const id = ObjectID().toHexString();
+      map[id] = new Objects.Default({
+        name: "new_" + id,
+        id,
+        rules: [],
+        forms: []
+      });
+      message = `Added id[${id}]`;
     } else if (!(id in map)) {
-      map[id] = new Objects.Default({ ...object, id });
-      message = `Added type[${type}] id[${id}]`;
+      message = `Wrong id[${id}]`;
     } else if (object == null) {
       delete map[id];
-      message = `Removed type[${type}] id[${id}]`;
+      message = `Removed id[${id}]`;
     } else {
-      // "id: map[id].get_id()" to be sure id wont be override
-      map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
-      message = `Updated type[${type}] id[${id}]`;
+      try {
+        validator_map.program.validate(object);
+
+        // "id: map[id].get_id()" to be sure id wont be override
+        map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
+        message = `Updated id[${id}]`;
+      } catch (e) {
+        message = e;
+      }
     }
 
-    managers.admin_server.send(connection.get_id(), "update_am_data", {
+    managers.admin_server.send(connection.get_id(), "update_am_program", {
+      action_id,
+      message
+    });
+  },
+  update_am_system: (connection, received_data, managers) => {
+    const { action_id, id, object } = received_data;
+    const module_data = managers.admin_server.module_world.data;
+    const map = module_data.am_systems_map;
+
+    let message = "Unknown";
+
+    if (id === "") {
+      const id = ObjectID().toHexString();
+      map[id] = new Objects.Default({
+        name: "new_" + id,
+        id,
+        programs: []
+      });
+      message = `Added id[${id}]`;
+    } else if (!(id in map)) {
+      message = `Wrong id[${id}]`;
+    } else if (object == null) {
+      delete map[id];
+      message = `Removed id[${id}]`;
+    } else {
+      try {
+        validator_map.system.validate(object);
+
+        // "id: map[id].get_id()" to be sure id wont be override
+        map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
+        message = `Updated id[${id}]`;
+      } catch (e) {
+        message = e;
+      }
+    }
+
+    managers.admin_server.send(connection.get_id(), "update_am_system", {
       action_id,
       message
     });

@@ -127,9 +127,7 @@ const db_objects_map = {
   am_script: {
     model: new Models.Default("AM_Script", "am_script", {
       id: { type: String, required: true, unique: true, index: true },
-      name: { type: String, required: true },
-      data: { type: Object },
-      root_scope: { type: Object }
+      source: { type: String, required: true }
     }),
     model_load_fn: "load_all",
     model_save_fn: "save",

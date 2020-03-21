@@ -3,7 +3,7 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
-const { Validator } = require(path.join(
+const { Validator, AML } = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).ScriptingSystem;
@@ -252,6 +252,21 @@ module.exports = {
       rules: RULES.system
     });
   },
+  data_am_script: (connection, received_data, managers) => {
+    const { action_id } = received_data;
+    const module_data = managers.admin_server.module_world.data;
+
+    const list = [];
+
+    for (const value of Object.values(module_data.am_scripts_map))
+      list.push(value._data);
+
+    managers.admin_server.send(connection.get_id(), "data_am_script", {
+      action_id,
+      list,
+      rules: RULES.system
+    });
+  },
   update_am_form: (connection, received_data, managers) => {
     const { action_id, id, object } = received_data;
     const module_data = managers.admin_server.module_world.data;
@@ -281,6 +296,7 @@ module.exports = {
         map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
         message = `Updated id[${id}]`;
       } catch (e) {
+        logger.error(e);
         message = e.message;
       }
     }
@@ -319,7 +335,8 @@ module.exports = {
         map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
         message = `Updated id[${id}]`;
       } catch (e) {
-        message = e;
+        logger.error(e);
+        message = e.message;
       }
     }
 
@@ -356,11 +373,53 @@ module.exports = {
         map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
         message = `Updated id[${id}]`;
       } catch (e) {
-        message = e;
+        logger.error(e);
+        message = e.message;
       }
     }
 
     managers.admin_server.send(connection.get_id(), "update_am_system", {
+      action_id,
+      message
+    });
+  },
+  update_am_script: (connection, received_data, managers) => {
+    const { action_id, id, object } = received_data;
+    const module_data = managers.admin_server.module_world.data;
+    const map = module_data.am_scripts_map;
+
+    let message = "Unknown";
+
+    if (id === "") {
+      const id = ObjectID().toHexString();
+      map[id] = new Objects.Default({
+        id,
+        source: `id ${id}\r\nname new_${id}\r\n data\r\n`
+      });
+      message = `Added id[${id}]`;
+    } else if (!(id in map)) {
+      message = `Wrong id[${id}]`;
+    } else if (object == null) {
+      delete map[id];
+      message = `Removed id[${id}]`;
+    } else {
+      try {
+        AML.parse(object);
+
+        // "id: map[id].get_id()" to be sure id wont be override
+        map[id]._data = {
+          ...map[id]._data,
+          source: object,
+          id: map[id].get_id()
+        };
+        message = `Updated id[${id}]`;
+      } catch (e) {
+        logger.error(e);
+        message = e.message;
+      }
+    }
+
+    managers.admin_server.send(connection.get_id(), "update_am_script", {
       action_id,
       message
     });

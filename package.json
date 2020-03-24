@@ -13,11 +13,13 @@
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
+    "acorn": ">=7.1.1",
+    "chai": "^4.2.0",
     "eslint": "^6.3.0",
     "eslint-config-google": "^0.13.0",
-    "chai": "^4.2.0",
+    "minimist": "^1.2.5",
     "mocha": "^6.2.0",
-    "nodemon": "^1.19.2",
+    "nodemon": "^2.0.2",
     "supertest": "^4.0.2"
   },
   "directories": {},

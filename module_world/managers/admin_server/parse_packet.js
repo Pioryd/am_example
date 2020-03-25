@@ -123,9 +123,8 @@ module.exports = {
     if (
       login == null ||
       password == null ||
-      config.module_world.admin_server.login.toLowerCase() !==
-        login.toLowerCase() ||
-      config.module_world.admin_server.password !== password.toLowerCase()
+      config.admin_server.login.toLowerCase() !== login.toLowerCase() ||
+      config.admin_server.password !== password.toLowerCase()
     ) {
       handle_error(
         connection,

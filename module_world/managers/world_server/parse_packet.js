@@ -27,8 +27,8 @@ function handle_error(connection, received_data, managers, message) {
 
 module.exports = {
   accept_connection: (connection, received_data, managers) => {
-    const login = received_data.login;
-    const password = received_data.password;
+    const { login, password, gate_number } = received_data;
+
     const error = managers.characters.log_in(
       connection.get_id(),
       login,

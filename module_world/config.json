@@ -1,0 +1,29 @@
+{
+  "required": ["database", "world_server", "admin_server"],
+  "properties": {
+    "database": {
+      "type": "object",
+      "required": ["url", "name"],
+      "properties": {
+        "url": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "world_server": {
+      "type": "object",
+      "required": ["port"],
+      "properties": {
+        "port": { "type": "number" }
+      }
+    },
+    "admin_server": {
+      "type": "object",
+      "required": ["login", "password", "port"],
+      "properties": {
+        "login": { "type": "string" },
+        "password": { "type": "string" },
+        "port": { "type": "number" }
+      }
+    }
+  }
+}

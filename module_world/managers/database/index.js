@@ -28,8 +28,8 @@ class DatabaseManager {
       models[key] = value.model;
 
     this.database = new Database({
-      url: this.config.module_world.database.url,
-      name: this.config.module_world.database.name,
+      url: this.config.database.url,
+      name: this.config.database.name,
       models
     });
   }

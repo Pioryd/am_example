@@ -2,7 +2,7 @@
   "app": {
     "modules": {
       "map": {
-        "module_animal": ""
+        "module_mam": ""
       },
       "paths_auto_find": [],
       "disabled": []
@@ -11,7 +11,7 @@
     "close_app_delay": 5000,
     "auto_run_scripts": ["net_msg_off"]
   },
-  "module_animal": {
+  "module_mam": {
     "world_client": {
       "url": "http://localhost:3100",
       "login": "AM_3",

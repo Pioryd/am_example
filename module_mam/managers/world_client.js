@@ -2,16 +2,16 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_animal", file_name: __filename });
+)).create_logger({ module_name: "module_mam", file_name: __filename });
 const { Client } = require(path.join(global.node_modules_path, "am_framework"));
 /*
 Responsible for:
 */
 class WorldClient {
-  constructor(module_animal) {
-    this.module_animal = module_animal;
+  constructor(module_mam) {
+    this.module_mam = module_mam;
 
-    const { url } = this.module_animal.config.world_client;
+    const { url } = this.module_mam.config.world_client;
     this.client = new Client({
       url,
       options: { packet_timeout: 0, send_delay: 1000 }
@@ -19,7 +19,7 @@ class WorldClient {
   }
 
   initialize() {
-    const { login, password } = this.module_animal.config.world_client;
+    const { login, password } = this.module_mam.config.world_client;
     this.client.events.connected = () => {
       this._send("accept_connection", { login, password });
     };
@@ -57,26 +57,26 @@ class WorldClient {
         this.send_data_world({});
       },
       data_character: data => {
-        this.module_animal.data.character_data = { ...data };
+        this.module_mam.data.character_data = { ...data };
         this.send_data_character({});
       },
       data_land: data => {
-        this.module_animal.data.land_data = { ...data };
+        this.module_mam.data.land_data = { ...data };
         this.send_data_land({});
       },
       data_world: data => {
-        this.module_animal.data.world_data = { ...data };
+        this.module_mam.data.world_data = { ...data };
         this.send_data_world({});
       },
       action_message: data => {
-        this.module_animal.data.action_message_packets = [
-          ...this.module_animal.data.action_message_packets,
+        this.module_mam.data.action_message_packets = [
+          ...this.module_mam.data.action_message_packets,
           { ...data }
         ];
       },
       virtual_world: data => {
-        this.module_animal.data.virtual_world_packets = [
-          ...this.module_animal.data.virtual_world_packets,
+        this.module_mam.data.virtual_world_packets = [
+          ...this.module_mam.data.virtual_world_packets,
           { ...data }
         ];
       }

@@ -2,7 +2,7 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_animal", file_name: __filename });
+)).create_logger({ module_name: "module_mam", file_name: __filename });
 const EventEmitter = require("events");
 
 const Manager = require("./managers");

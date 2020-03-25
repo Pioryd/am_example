@@ -1,5 +1,5 @@
 const logger = require("am_framework").create_logger({
-  module_name: "module_animal",
+  module_name: "module_mam",
   file_name: __filename
 });
 const { Application } = require("am_framework");

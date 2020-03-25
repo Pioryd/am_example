@@ -5,7 +5,7 @@ module.exports = {
   character: {
     change_land: (root, script_id, query_id, timeout, return_value, args) => {
       const { land_id } = args;
-      const { world_client } = root.ext.module_animal.managers;
+      const { world_client } = root.ext.module_mam.managers;
       world_client.send_data_character_change_land({
         land_id
       });
@@ -18,7 +18,7 @@ module.exports = {
       return_value,
       args
     ) {
-      const { world_client } = root.ext.module_animal.managers;
+      const { world_client } = root.ext.module_mam.managers;
       world_client.send_leave_virtual_world();
     },
     use_object: (root, script_id, query_id, timeout, return_value, args) => {
@@ -28,7 +28,7 @@ module.exports = {
         action_id: 0,
         dynamic_args: {}
       };
-      const { world_client } = root.ext.module_animal.managers;
+      const { world_client } = root.ext.module_mam.managers;
       world_client.send_process_script_action(script_action_doors);
     }
   },
@@ -41,8 +41,8 @@ module.exports = {
   virtual_world: {
     make_choice: (root, script_id, query_id, timeout, return_value, args) => {
       const { enemy_choice } = args;
-      const { data } = root.ext.module_animal;
-      const { world_client } = root.ext.module_animal.managers;
+      const { data } = root.ext.module_mam;
+      const { world_client } = root.ext.module_mam.managers;
 
       // Game in virtual world
       if (data.virtual_world_data == null) {

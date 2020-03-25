@@ -2,7 +2,7 @@ const path = require("path");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_animal", file_name: __filename });
+)).create_logger({ module_name: "module_mam", file_name: __filename });
 const { ScriptingSystem, Stopwatch } = require(path.join(
   global.node_modules_path,
   "am_framework"
@@ -14,8 +14,8 @@ const tmp_data_forms = require("../tmp_data/forms");
 const tmp_data_system = require("../tmp_data/system");
 
 class AM {
-  constructor(module_animal) {
-    this.module_animal = module_animal;
+  constructor(module_mam) {
+    this.module_mam = module_mam;
 
     this.stopwatches_map = {
       check_data: new Stopwatch(1 * 1000)
@@ -30,9 +30,9 @@ class AM {
     this.scripting_system_root.install_system(tmp_data_system);
     this.scripting_system_root.install_forms(tmp_data_forms);
     this.scripting_system_root.install_api(tmp_data_api);
-    this.scripting_system_root.install_data(this.module_animal.data);
+    this.scripting_system_root.install_data(this.module_mam.data);
     this.scripting_system_root.install_ext({
-      module_animal: this.module_animal
+      module_mam: this.module_mam
     });
   }
 
@@ -51,7 +51,7 @@ class AM {
 
   emit_data() {
     // Set land_id
-    const { character_data, land_data } = this.module_animal.data;
+    const { character_data, land_data } = this.module_mam.data;
     if ("map" in land_data) {
       for (const point of land_data.map) {
         if (point.characters_list.includes(character_data.id)) {
@@ -78,7 +78,7 @@ class AM {
       const { packet_id, data } = packet;
 
       if (packet_id === "data") {
-        this.module_animal.data.virtual_world_data = data;
+        this.module_mam.data.virtual_world_data = data;
       } else if (packet_id === "message") {
         logger.log("Virtual world message: ", data);
       } else {
@@ -86,7 +86,7 @@ class AM {
       }
     };
 
-    const { virtual_world_packets } = this.module_animal.data;
+    const { virtual_world_packets } = this.module_mam.data;
 
     const locked_length = virtual_world_packets.length;
     for (let i = 0; i < locked_length; i++)

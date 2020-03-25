@@ -4,7 +4,6 @@ const logger = require(path.join(
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
 const EventEmitter = require("events");
-
 const Manager = require("./managers");
 
 /* 
@@ -19,6 +18,7 @@ class ModuleWorld extends EventEmitter {
     this.event_emitter = event_emitter;
     this.application = event_emitter;
     this.config = config;
+
     this.data = {
       lands_map: {},
       characters_map: {},
@@ -41,8 +41,7 @@ class ModuleWorld extends EventEmitter {
       main_world: new Manager.MainWorld(this),
       world_server: new Manager.WorldServer(this),
       admin_server: new Manager.AdminServer(this),
-      virtual_worlds: new Manager.VirtualWorlds(this),
-      am: new Manager.AM(this)
+      virtual_worlds: new Manager.VirtualWorlds(this)
     };
 
     this.ready = false;
@@ -60,7 +59,6 @@ class ModuleWorld extends EventEmitter {
       this.managers.characters.initialize();
       this.managers.main_world.initialize();
       this.managers.virtual_worlds.initialize();
-      this.managers.am.initialize();
     } catch (e) {
       logger.error(e, e.stack);
     }
@@ -123,7 +121,6 @@ class ModuleWorld extends EventEmitter {
       _this.managers.characters.terminate();
       _this.managers.database.terminate();
       _this.managers.virtual_worlds.terminate();
-      _this.managers.am.terminate();
     } catch (e) {
       logger.error(e, e.stack);
     }
@@ -139,7 +136,6 @@ class ModuleWorld extends EventEmitter {
     _this.managers.characters.poll();
     _this.managers.main_world.poll();
     _this.managers.virtual_worlds.poll();
-    _this.managers.am.poll();
   }
 }
 

@@ -142,43 +142,44 @@ module.exports = {
     });
     return true;
   },
+  module_info: (connection, received_data, managers) => {
+    const json = { "Module name": "World", "Connected count": "?" };
+    managers.admin_server.send(connection.get_id(), "module_info", { json });
+  },
   module_data: (connection, received_data, managers) => {
-    const lands_map = {};
-    const characters_map = {};
-    const environment_objects_map = {};
-    const virtual_worlds_map = {};
+    const json = {
+      lands_map: {},
+      characters_map: {},
+      environment_objects_map: {},
+      virtual_worlds_map: {}
+    };
 
     for (const land of Object.values(
       managers.admin_server.module_world.data.lands_map
     )) {
-      lands_map[land.get_id()] = land._data;
+      json.lands_map[land.get_id()] = land._data;
     }
 
     for (const character of Object.values(
       managers.admin_server.module_world.data.characters_map
     )) {
-      characters_map[character.get_id()] = character._data;
+      json.characters_map[character.get_id()] = character._data;
     }
 
     for (const environment_object of Object.values(
       managers.admin_server.module_world.data.environment_objects_map
     )) {
-      environment_objects_map[environment_object.get_id()] =
+      json.environment_objects_map[environment_object.get_id()] =
         environment_object._data;
     }
 
     for (const virtual_world of Object.values(
       managers.admin_server.module_world.data.virtual_worlds_map
     )) {
-      virtual_worlds_map[virtual_world.get_id()] = virtual_world._data;
+      json.virtual_worlds_map[virtual_world.get_id()] = virtual_world._data;
     }
 
-    managers.admin_server.send(connection.get_id(), "module_data", {
-      lands_map,
-      characters_map,
-      environment_objects_map,
-      virtual_worlds_map
-    });
+    managers.admin_server.send(connection.get_id(), "module_data", { json });
   },
   process_script: (connection, received_data, managers) => {
     const { script } = received_data;

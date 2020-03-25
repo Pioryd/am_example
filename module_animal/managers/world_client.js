@@ -11,7 +11,7 @@ class WorldClient {
   constructor(module_animal) {
     this.module_animal = module_animal;
 
-    const { url } = this.module_animal.config.module_animal.world_client;
+    const { url } = this.module_animal.config.world_client;
     this.client = new Client({
       url,
       options: { packet_timeout: 0, send_delay: 1000 }
@@ -19,10 +19,7 @@ class WorldClient {
   }
 
   initialize() {
-    const {
-      login,
-      password
-    } = this.module_animal.config.module_animal.world_client;
+    const { login, password } = this.module_animal.config.world_client;
     this.client.events.connected = () => {
       this._send("accept_connection", { login, password });
     };

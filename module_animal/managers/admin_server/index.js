@@ -17,7 +17,7 @@ class AdminServerManager {
     this.config = this.module_animal.config;
 
     this.server = new Server({
-      port: this.config.module_animal.admin_server.port,
+      port: this.config.admin_server.port,
       options: { packet_timeout: 0 }
     });
   }

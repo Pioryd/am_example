@@ -32,9 +32,8 @@ function accept_connection(connection, received_data, managers) {
 
   const config = managers.admin_server.config;
   if (
-    config.module_animal.admin_server.login.toLowerCase() !==
-      login.toLowerCase() ||
-    config.module_animal.admin_server.password !== password.toLowerCase()
+    config.admin_server.login.toLowerCase() !== login.toLowerCase() ||
+    config.admin_server.password !== password.toLowerCase()
   ) {
     handle_error(
       connection,

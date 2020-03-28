@@ -244,7 +244,7 @@ module.exports = {
       text: text
     });
   },
-  process_script_action: (connection, received_data, managers) => {
+  script_action: (connection, received_data, managers) => {
     const character_id = connection.user_data.character_id;
 
     managers.main_world.process_action(

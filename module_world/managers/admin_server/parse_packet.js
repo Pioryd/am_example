@@ -3,7 +3,7 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
-const { Validator, AML } = require(path.join(
+const { Instruction, AML } = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).ScriptingSystem;
@@ -88,9 +88,9 @@ const RULES = {
   }
 };
 const validator_map = {
-  form: new Validator(RULES.form),
-  program: new Validator(RULES.program),
-  system: new Validator(RULES.system)
+  form: new Instruction.Validator(RULES.form),
+  program: new Instruction.Validator(RULES.program),
+  system: new Instruction.Validator(RULES.system)
 };
 
 /*

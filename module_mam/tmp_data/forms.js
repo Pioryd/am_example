@@ -51,16 +51,16 @@ module.exports = {
           }
         ],
         actions: [
-          { script_run: { value: "first_aid_id" } },
+          { script_run: { value: "make_choice_id" } },
           {
             script_set_data: {
-              script: "first_aid_id",
+              script: "make_choice_id",
               data: "enemy_choice"
             }
           }
         ]
       }
     ],
-    scripts: ["first_aid_id"]
+    scripts: ["make_choice_id"]
   }
 };

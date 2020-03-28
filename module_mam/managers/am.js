@@ -88,6 +88,7 @@ class AM {
     }
     // Set inside_virtual_world
     character_data.inside_virtual_world =
+      character_data.virtual_world_id != null &&
       character_data.virtual_world_id !== "";
 
     // Set choice

@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
@@ -11,7 +12,15 @@ const { ScriptingSystem, Stopwatch } = require(path.join(
 // Draft -> Database
 const tmp_data_api = require("../tmp_data/api");
 const tmp_data_forms = require("../tmp_data/forms");
+const tmp_data_programs = require("../tmp_data/programs");
 const tmp_data_system = require("../tmp_data/system");
+
+const scripts_path_full_name = path.join(
+  __dirname,
+  "..",
+  "tmp_data",
+  "scripts"
+);
 
 class AM {
   constructor(module_mam) {
@@ -27,10 +36,27 @@ class AM {
   initialize() {
     this.scripting_system_root._debug_enabled = true;
 
-    this.scripting_system_root.install_system(tmp_data_system);
-    this.scripting_system_root.install_forms(tmp_data_forms);
-    this.scripting_system_root.install_api(tmp_data_api);
+    const scripts_source = {};
+    for (const script_file of fs.readdirSync(scripts_path_full_name)) {
+      const parsed = ScriptingSystem.AML.parse(
+        fs.readFileSync(
+          path.join(scripts_path_full_name, script_file),
+          "utf8",
+          err => {
+            if (err) throw err;
+          }
+        )
+      );
+
+      scripts_source[parsed.id] = parsed;
+    }
+
     this.scripting_system_root.install_data(this.module_mam.data);
+    this.scripting_system_root.install_api(tmp_data_api);
+    this.scripting_system_root.install_scripts(scripts_source);
+    this.scripting_system_root.install_forms(tmp_data_forms);
+    this.scripting_system_root.install_programs(tmp_data_programs);
+    this.scripting_system_root.install_system(tmp_data_system["Animal_ID"]);
     this.scripting_system_root.install_ext({
       module_mam: this.module_mam
     });

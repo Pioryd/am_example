@@ -1,0 +1,6 @@
+id first_aid_id
+name first_aid
+data
+
+if root.data.character_data.virtual_world_id !== ''
+  api character.leave_virtual_world

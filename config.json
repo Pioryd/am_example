@@ -18,7 +18,7 @@
       "password": "123"
     },
     "admin_server": {
-      "login": "admin",
+      "login": "MAM",
       "password": "123",
       "port": 3103
     }

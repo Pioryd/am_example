@@ -1,6 +1,6 @@
 id plan_id
 name plan
-data rest_form_name: "Rest",  portal_doors_id: "5e419cbb6204d91bf8bfb29e"
+data rest_form_name: "Rest",  portal_doors_id: "5e657b1b222e0a3c381a55df"
 
 if root.data.character_data.land_id !== root.data.character_data.default_land_id
   api character.change_land land_id:root.data.character_data.default_land_id

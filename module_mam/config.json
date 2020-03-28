@@ -1,11 +1,11 @@
 {
-  "required": ["database", "world_server", "admin_server"],
+  "required": ["world_client", "admin_server"],
   "properties": {
     "world_client": {
       "type": "object",
-      "required": ["port"],
+      "required": ["url", "login", "password"],
       "properties": {
-        "url": { "type": "number" },
+        "url": { "type": "string" },
         "login": { "type": "string" },
         "password": { "type": "string" }
       }

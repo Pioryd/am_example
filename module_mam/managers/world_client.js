@@ -51,7 +51,7 @@ class WorldClient {
   // parse methods
   _add_parse_packet_dict() {
     this.client.add_parse_packet_dict({
-      login: data => {
+      accept_connection: data => {
         this.send_data_character({});
         this.send_data_land({});
         this.send_data_world({});
@@ -144,7 +144,7 @@ class WorldClient {
   }
 
   send_process_script_action({ object_id, action_id, dynamic_args }) {
-    this._send("process_script_action", {
+    this._send("script_action", {
       object_id,
       action_id,
       dynamic_args

@@ -17,6 +17,8 @@
       "name": "am_world"
     },
     "world_server": {
+      "login": "World",
+      "password": "123",
       "port": 3100
     },
     "admin_server": {

@@ -83,27 +83,12 @@ class VirtualWorlds {
   }
 
   process_character_packet_received_from_virtual_world(received_data) {
-    const character_id = received_data.character_id;
-    const packet_id = received_data.packet_id;
-    const data = received_data.packet_data;
+    const { character_id, packet_id, data } = received_data;
 
-    const characters_manager = this.module_world.managers.characters;
-    const connection_id = characters_manager.get_connection_id(character_id);
-
-    if (connection_id == null) {
-      logger.error(
-        "Unable to parse CHARACTER packet from virtual world. Character[" +
-          character_id +
-          "]"
-      );
-      return;
-    }
-
-    this.module_world.managers.world_server.send(
-      connection_id,
-      "virtual_world",
-      { packet_id, data }
-    );
+    this.module_world.managers.mam.send(character_id, "virtual_world", {
+      packet_id,
+      data
+    });
   }
 
   process_world_packet_received_from_virtual_world(received_data) {

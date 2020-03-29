@@ -20,53 +20,53 @@ function handle_error(connection, received_data, managers, message) {
 
   managers.world_server.send(connection.get_id(), "error", {
     connection_id: connection.get_id(),
-    received_data: received_data,
+    received_data,
     error: message != null ? message : ""
   });
 }
 
 module.exports = {
   accept_connection: (connection, received_data, managers) => {
-    const { login, password, gate_number } = received_data;
+    const { login, password, characters } = received_data;
 
-    const error = managers.characters.log_in(
-      connection.get_id(),
-      login,
-      password
-    );
-
-    if (error != null) {
+    const config = managers.world_server.config;
+    if (
+      login == null ||
+      password == null ||
+      config.world_server.login.toLowerCase() !== login.toLowerCase() ||
+      config.world_server.password !== password.toLowerCase()
+    ) {
       handle_error(
         connection,
         received_data,
         managers,
-        "Unable to character_authenticate. Error: " + error
+        `Unable to accept connection. Login[${login}] Password[${password}]`
       );
       return false;
     }
 
-    const character = managers.characters._get_character_by_name(login);
-    if (character == null) {
-      handle_error(connection, received_data, managers, "Character not found.");
-      return;
-    }
+    const characters_info = managers.mam.register(
+      characters,
+      connection.get_id()
+    );
 
-    connection.user_data.character_id = character.get_id();
     connection.on_close = connection => {
-      managers.characters.log_off(character.get_id());
+      managers.mam.unregister(connection.get_id());
     };
 
     managers.world_server.send(connection.get_id(), "accept_connection", {
-      user_name: login
+      user_name: login,
+      characters_info
     });
     return true;
   },
   data_character: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id } = received_data;
 
     const character = managers.characters._get_character_by_id(character_id);
 
     managers.world_server.send(connection.get_id(), "data_character", {
+      character_id,
       id: character.get_id(),
       name: character.get_name(),
       password: character.get_password(),
@@ -82,9 +82,9 @@ module.exports = {
     });
   },
   data_land: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id } = received_data;
 
-    const packet_data = {};
+    const packet_data = { character_id };
 
     const land = managers.characters.get_land(character_id);
     if (land != null) {
@@ -95,7 +95,7 @@ module.exports = {
     managers.world_server.send(connection.get_id(), "data_land", packet_data);
   },
   data_world: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id } = received_data;
 
     const lands_map = {};
     const characters_map = {};
@@ -152,6 +152,7 @@ module.exports = {
     }
 
     managers.world_server.send(connection.get_id(), "data_world", {
+      character_id,
       lands_map,
       characters_map,
       environment_objects_map,
@@ -159,71 +160,66 @@ module.exports = {
     });
   },
   character_change_position: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, position_x } = received_data;
 
-    managers.characters.change_position(character_id, received_data.position_x);
+    managers.characters.change_position(character_id, position_x);
 
     data_world(connection, received_data, managers);
   },
   character_change_land: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, land_id } = received_data;
 
-    managers.characters.change_land(character_id, received_data.land_id);
+    managers.characters.change_land(character_id, land_id);
 
     data_world(connection, received_data, managers);
   },
   character_add_friend: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, name } = received_data;
 
-    managers.characters.add_friend_if_exist(character_id, received_data.name);
+    managers.characters.add_friend_if_exist(character_id, name);
 
     data_character(connection, received_data, managers);
   },
   character_remove_friend: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, name } = received_data;
 
-    managers.characters.remove_friend_if_exist(
-      character_id,
-      received_data.name
-    );
+    managers.characters.remove_friend_if_exist(character_id, name);
 
     data_character(connection, received_data, managers);
   },
   character_change_state: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, name } = received_data;
 
     const character = managers.characters._get_character_by_id(character_id);
-    character._change_state(received_data.name);
+    character._change_state(name);
 
     data_character(connection, received_data, managers);
   },
   character_change_action: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, name } = received_data;
 
     const character = managers.characters._get_character_by_id(character_id);
-    character._change_action(received_data.name);
+    character._change_action(name);
 
     data_character(connection, received_data, managers);
   },
   character_change_activity: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, name } = received_data;
 
     const character = managers.characters._get_character_by_id(character_id);
-    character._change_activity(received_data.name);
+    character._change_activity(name);
 
     data_character(connection, received_data, managers);
   },
   action_message: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, name, text } = received_data;
 
     const character = managers.characters._get_character_by_id(character_id);
 
     const from_character_name = character.get_name();
     const to_character_connection_id = managers.characters.get_connection_id(
-      managers.characters.get_id_by_name(received_data.name)
+      managers.characters.get_id_by_name(name)
     );
-
-    const text = received_data.text;
 
     if (
       text == null ||
@@ -240,18 +236,18 @@ module.exports = {
     }
 
     managers.world_server.send(connection.get_id(), "action_message", {
+      character_id,
       name: from_character_name,
       text: text
     });
   },
   script_action: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id, object_id, action_id, dynamic_args } = received_data;
 
-    managers.main_world.process_action(
-      received_data.object_id,
-      received_data.action_id,
-      { character_id, ...received_data.dynamic_args }
-    );
+    managers.main_world.process_action(object_id, action_id, {
+      character_id,
+      ...dynamic_args
+    });
   },
   enter_virtual_world: (connection, received_data, managers) => {
     logger.error(
@@ -265,7 +261,7 @@ module.exports = {
     // managers.characters.enter_virtual_world(character_id, virtual_world_id);
   },
   leave_virtual_world: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id } = received_data;
 
     managers.characters.leave_virtual_world(character_id);
   },

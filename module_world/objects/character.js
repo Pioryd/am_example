@@ -13,8 +13,6 @@ Data format:
 class Character {
   constructor(data) {
     this._data = data;
-
-    this._connection_id = undefined;
   }
 
   get_id() {
@@ -65,10 +63,6 @@ class Character {
     return [...this._data.friends_list];
   }
 
-  get_connection_id() {
-    return this._connection_id;
-  }
-
   _change_state(state) {
     this._data.state = state;
   }
@@ -94,10 +88,6 @@ class Character {
 
   _change_virtual_world_id(virtual_world_id) {
     this._data.virtual_world_id = virtual_world_id;
-  }
-
-  _set_connection_id(connection_id) {
-    this._connection_id = connection_id;
   }
 
   _add_friend(name) {

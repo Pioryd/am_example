@@ -9,12 +9,6 @@ class Characters {
 
   poll() {}
 
-  get_connection_id(id) {
-    const character = this._get_character_by_id(id);
-    if (character == null) return;
-    return character.get_connection_id();
-  }
-
   get_id_by_name(character_name) {
     const character = this._get_character_by_name(character_name);
     if (character != null) return character.get_id();
@@ -112,35 +106,6 @@ class Characters {
     character._change_virtual_world_id("");
 
     this.change_land(id, character.get_default_land_id());
-  }
-
-  log_off(id) {
-    const character = this._get_character_by_id(id);
-    if (character == null) return;
-
-    character._set_connection_id(null);
-  }
-
-  log_in(connection_id, login, password) {
-    if (connection_id == null || login == null || password == null) return;
-
-    for (const character of Object.values(
-      this.module_world.data.characters_map
-    )) {
-      if (
-        character.get_name().toLowerCase() === login.toLowerCase() &&
-        character.get_password().toLowerCase() === password.toLowerCase()
-      ) {
-        if (character.get_connection_id() != null)
-          return (
-            "Another socket is logged in: " + character.get_connection_id()
-          );
-
-        character._set_connection_id(connection_id);
-        return;
-      }
-    }
-    return "Wrong authentication data";
   }
 
   _get_character_by_name(name) {

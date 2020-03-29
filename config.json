@@ -12,9 +12,13 @@
     "auto_run_scripts": ["net_msg_off"]
   },
   "module_mam": {
+    "characters": {
+      "included": ["5e657b1b222e0a3c381a55de"],
+      "excluded": []
+    },
     "world_client": {
       "url": "http://localhost:3100",
-      "login": "AM_3",
+      "login": "World",
       "password": "123"
     },
     "admin_server": {

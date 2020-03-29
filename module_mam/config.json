@@ -1,6 +1,14 @@
 {
-  "required": ["world_client", "admin_server"],
+  "required": ["characters", "world_client", "admin_server"],
   "properties": {
+    "characters": {
+      "type": "object",
+      "required": ["included"],
+      "properties": {
+        "included": { "type": "array" },
+        "excluded": { "type": "array" }
+      }
+    },
     "world_client": {
       "type": "object",
       "required": ["url", "login", "password"],

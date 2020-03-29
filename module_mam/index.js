@@ -14,16 +14,17 @@ class ModuleAnimal extends EventEmitter {
     this.application = event_emitter;
     this.config = config;
     this.data = {
-      character_data: {},
-      land_data: {},
-      world_data: {
-        lands_map: {},
-        characters_map: {},
-        environment_objects_map: {},
-        virtual_worlds_map: {}
-      },
-      action_message_packets: [],
-      virtual_world_packets: [],
+      characters_info: {},
+      // character_data: {},
+      // land_data: {},
+      // world_data: {
+      //   lands_map: {},
+      //   characters_map: {},
+      //   environment_objects_map: {},
+      //   virtual_worlds_map: {}
+      // },
+      // action_message_packets: [],
+      // virtual_world_packets: [],
       // Remember to update models if rebuild settings structure
       settings: {
         generated: false,

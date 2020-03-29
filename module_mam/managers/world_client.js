@@ -20,8 +20,9 @@ class WorldClient {
 
   initialize() {
     const { login, password } = this.module_mam.config.world_client;
+    const { characters } = this.module_mam.config;
     this.client.events.connected = () => {
-      this._send("accept_connection", { login, password });
+      this.send("accept_connection", { login, password, characters });
     };
     this._add_parse_packet_dict();
 
@@ -44,7 +45,7 @@ class WorldClient {
     this.client.disconnect();
   }
 
-  _send(packet_id, data) {
+  send(packet_id, data) {
     this.client.send(packet_id, data);
   }
 
@@ -52,102 +53,55 @@ class WorldClient {
   _add_parse_packet_dict() {
     this.client.add_parse_packet_dict({
       accept_connection: data => {
-        this.send_data_character({});
-        this.send_data_land({});
-        this.send_data_world({});
+        for (const character_id of Object.keys(
+          this.module_mam.data.characters_info
+        )) {
+          this.send("data_character", { character_id });
+          this.send("data_land", { character_id });
+          this.send("data_world", { character_id });
+        }
       },
       data_character: data => {
-        this.module_mam.data.character_data = { ...data };
-        this.send_data_character({});
+        const { character_id } = data;
+        this.module_mam.data.characters_info[character_id].character_data = {
+          ...data
+        };
+        this.send("data_character", { character_id });
       },
       data_land: data => {
-        this.module_mam.data.land_data = { ...data };
-        this.send_data_land({});
+        const { character_id } = data;
+        this.module_mam.data.characters_info[character_id].land_data = {
+          ...data
+        };
+        this.send("data_land", { character_id });
       },
       data_world: data => {
-        this.module_mam.data.world_data = { ...data };
-        this.send_data_world({});
+        const { character_id } = data;
+        this.module_mam.data.characters_info[character_id].world_data = {
+          ...data
+        };
+        this.send("data_world", { character_id });
       },
       action_message: data => {
-        this.module_mam.data.action_message_packets = [
-          ...this.module_mam.data.action_message_packets,
+        const { character_id } = data;
+        this.module_mam.data.characters_info[
+          character_id
+        ].action_message_packets = [
+          ...this.module_mam.data.characters_info[character_id]
+            .action_message_packets,
           { ...data }
         ];
       },
       virtual_world: data => {
-        this.module_mam.data.virtual_world_packets = [
-          ...this.module_mam.data.virtual_world_packets,
+        const { character_id } = data;
+        this.module_mam.data.characters_info[
+          character_id
+        ].virtual_world_packets = [
+          ...this.module_mam.data.characters_info[character_id]
+            .virtual_world_packets,
           { ...data }
         ];
       }
-    });
-  }
-
-  // send methods
-  send_data_character() {
-    this._send("data_character");
-  }
-
-  send_data_land() {
-    this._send("data_land");
-  }
-
-  send_data_world() {
-    this._send("data_world");
-  }
-
-  send_data_character_change_position({ position_x }) {
-    this._send("data_character_change_position", {
-      position_x
-    });
-  }
-
-  send_data_character_change_land({ land_id }) {
-    this._send("data_character_change_land", { land_id });
-  }
-
-  send_data_character_add_friend({ name }) {
-    this._send("data_character_add_friend", { name });
-  }
-
-  send_data_character_remove_friend({ name }) {
-    this._send("data_character_remove_friend", { name });
-  }
-
-  send_data_character_change_state({ name }) {
-    this._send("data_character_change_state", { name });
-  }
-
-  send_data_character_change_action({ name }) {
-    this._send("data_character_change_action", { name });
-  }
-
-  send_data_character_change_activity({ name }) {
-    this._send("data_character_change_activity", { name });
-  }
-
-  send_action_message({ name, text }) {
-    this._send("action_message", { name, text });
-  }
-
-  // Currently is not used by server
-  send_enter_virtual_world({ id }) {
-    this._send("enter_virtual_world", { id });
-  }
-
-  send_leave_virtual_world() {
-    this._send("leave_virtual_world", {});
-  }
-
-  send_virtual_world({ packet_id, packet_data }) {
-    this._send("virtual_world", { packet_id, packet_data });
-  }
-
-  send_process_script_action({ object_id, action_id, dynamic_args }) {
-    this._send("script_action", {
-      object_id,
-      action_id,
-      dynamic_args
     });
   }
 }

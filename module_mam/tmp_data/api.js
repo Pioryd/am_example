@@ -6,7 +6,8 @@ module.exports = {
     change_land: (root, script_id, query_id, timeout, return_value, args) => {
       const { land_id } = args;
       const { world_client } = root.ext.module_mam.managers;
-      world_client.send_data_character_change_land({
+      world_client.send("character_change_land", {
+        character_id: root.ext.character_id,
         land_id
       });
     },
@@ -19,17 +20,24 @@ module.exports = {
       args
     ) {
       const { world_client } = root.ext.module_mam.managers;
-      world_client.send_leave_virtual_world();
+      world_client.send("leave_virtual_world", {
+        character_id: root.ext.character_id
+      });
     },
-    use_object: (root, script_id, query_id, timeout, return_value, args) => {
-      const { id } = args;
-      const script_action_doors = {
-        object_id: id,
+    use_doors: (root, script_id, query_id, timeout, return_value, args) => {
+      const { world_client } = root.ext.module_mam.managers;
+
+      const doors_id = root.data.land_data.doors_id;
+
+      if (doors_id !== "5e657b1b222e0a3c381a55df")
+        throw new Error(`Wrong doors id[${doors_id}]`);
+
+      world_client.send("script_action", {
+        character_id: root.ext.character_id,
+        object_id: doors_id,
         action_id: 0,
         dynamic_args: {}
-      };
-      const { world_client } = root.ext.module_mam.managers;
-      world_client.send_process_script_action(script_action_doors);
+      });
     }
   },
   system: {
@@ -46,7 +54,8 @@ module.exports = {
 
       // Game in virtual world
       if (data.virtual_world_data == null) {
-        world_client.send_virtual_world({
+        world_client.send("virtual_world", {
+          character_id: root.ext.character_id,
           packet_id: "data",
           packet_data: {}
         });
@@ -56,11 +65,13 @@ module.exports = {
       const choices = ["rock", "paper", "scissors"];
       const chosen_choice = choices[Util.get_random_int(0, 2)];
 
-      world_client.send_virtual_world({
+      world_client.send("virtual_world", {
+        character_id: root.ext.character_id,
         packet_id: "message",
         packet_data: { text: chosen_choice }
       });
-      world_client.send_virtual_world({
+      world_client.send("virtual_world", {
+        character_id: root.ext.character_id,
         packet_id: "data",
         packet_data: {}
       });

@@ -16,7 +16,7 @@ class MAM {
     const characters_ids_list = [];
     const characters_manager = this.module_world.managers.characters;
 
-    if ("included" in mam_characters) {
+    if ("included" in mam_characters && mam_characters.included.length > 0) {
       for (const id of mam_characters.included) {
         if (characters_manager._get_character_by_id(id) == null)
           throw new Error(`Character[${id}] not found`);
@@ -29,16 +29,19 @@ class MAM {
 
         characters_ids_list.push(id);
       }
-    } else if ("excluded" in mam_characters) {
-      for (const id of Object.entries(this.module_world.data.characters_map)) {
+    } else if (
+      "excluded" in mam_characters &&
+      mam_characters.excluded.length > 0
+    ) {
+      for (const id of Object.keys(this.module_world.data.characters_map)) {
         if (
-          !(id in mam_characters.excluded) &&
+          !mam_characters.excluded.includes(id) &&
           this._get_mam_key_by_character_id(id) == null
         )
           characters_ids_list.push(id);
       }
     } else {
-      for (const id of Object.entries(this.module_world.data.characters_map)) {
+      for (const id of Object.keys(this.module_world.data.characters_map)) {
         if (this._get_mam_key_by_character_id(id) == null)
           characters_ids_list.push(id);
       }

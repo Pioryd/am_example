@@ -60,6 +60,12 @@ class VirtualWorlds {
     const characters_manager = this.module_world.managers.characters;
     const character = characters_manager._get_character_by_id(character_id);
 
+    if (character == null)
+      throw new Error(
+        `Unable send packet to Virtual World.` +
+          ` Wrong character id[${character_id}].`
+      );
+
     const virtual_world_id = character.get_virtual_world_id();
     const packet_id = received_data.packet_id;
     const packet_data = received_data.packet_data;

@@ -53,6 +53,11 @@ class WorldClient {
   _add_parse_packet_dict() {
     this.client.add_parse_packet_dict({
       accept_connection: data => {
+        const { characters_info } = data;
+        this.module_mam.data.characters_info = characters_info;
+
+        this.module_mam.managers.am.reload();
+
         for (const character_id of Object.keys(
           this.module_mam.data.characters_info
         )) {

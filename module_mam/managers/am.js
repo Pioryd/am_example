@@ -29,19 +29,12 @@ class AM {
       check_data: new Stopwatch(1 * 1000)
     };
     this.containers_map = {};
-    for (const id of this.module_mam.config.characters.included) {
-      const root = new ScriptingSystem.Root();
-      this.containers_map[id] = root;
-      root.ext.character_id = id;
-    }
+
+    // remove after add db support
+    this.scripts_source = {};
   }
 
   initialize() {
-    for (const scripting_system_root of Object.values(this.containers_map)) {
-      scripting_system_root._debug_enabled = true;
-    }
-
-    const scripts_source = {};
     for (const script_file of fs.readdirSync(scripts_path_full_name)) {
       const parsed = ScriptingSystem.AML.parse(
         fs.readFileSync(
@@ -53,9 +46,41 @@ class AM {
         )
       );
 
-      scripts_source[parsed.id] = parsed;
+      this.scripts_source[parsed.id] = parsed;
+    }
+  }
+
+  terminate() {
+    for (const scripting_system_root of Object.values(this.containers_map)) {
+      scripting_system_root.terminate();
+    }
+    this.containers_map = {};
+  }
+
+  poll() {
+    if (this.stopwatches_map.check_data.is_elapsed()) {
+      this.emit_data();
+      for (const scripting_system_root of Object.values(this.containers_map)) {
+        scripting_system_root.process();
+      }
+      this.parse_virtual_world_packets();
+      this.stopwatches_map.check_data.reset();
+    }
+  }
+
+  reload() {
+    this.terminate();
+
+    // Create roots
+    const { characters_info } = this.module_mam.data;
+    for (const character_info of Object.values(characters_info)) {
+      const { id, force_new } = character_info;
+      const root = new ScriptingSystem.Root();
+      this.containers_map[id] = root;
+      root.ext.character_id = id;
     }
 
+    // Setup roots
     for (const [id, scripting_system_root] of Object.entries(
       this.containers_map
     )) {
@@ -75,30 +100,14 @@ class AM {
         this.module_mam.data.characters_info[id]
       );
       scripting_system_root.install_api(tmp_data_api);
-      scripting_system_root.install_scripts(scripts_source);
+      scripting_system_root.install_scripts(this.scripts_source);
       scripting_system_root.install_forms(tmp_data_forms);
       scripting_system_root.install_programs(tmp_data_programs);
       scripting_system_root.install_system(tmp_data_system["Animal_ID"]);
       scripting_system_root.install_ext({
         module_mam: this.module_mam
       });
-    }
-  }
-
-  terminate() {
-    for (const scripting_system_root of Object.values(this.containers_map)) {
-      scripting_system_root.terminate();
-    }
-  }
-
-  poll() {
-    if (this.stopwatches_map.check_data.is_elapsed()) {
-      this.emit_data();
-      for (const scripting_system_root of Object.values(this.containers_map)) {
-        scripting_system_root.process();
-      }
-      this.parse_virtual_world_packets();
-      this.stopwatches_map.check_data.reset();
+      scripting_system_root._debug_enabled = true;
     }
   }
 

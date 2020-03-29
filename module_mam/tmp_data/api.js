@@ -29,9 +29,6 @@ module.exports = {
 
       const doors_id = root.data.land_data.doors_id;
 
-      if (doors_id !== "5e657b1b222e0a3c381a55df")
-        throw new Error(`Wrong doors id[${doors_id}]`);
-
       world_client.send("script_action", {
         character_id: root.ext.character_id,
         object_id: doors_id,

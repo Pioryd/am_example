@@ -13,8 +13,12 @@
   },
   "module_mam": {
     "characters": {
-      "included": ["5e657b1b222e0a3c381a55de"],
-      "excluded": []
+      "included": [],
+      "excluded": [
+        "5e657b1b222e0a3c381a55e7",
+        "5e657b1b222e0a3c381a55ba",
+        "5e657b1b222e0a3c381a55c3"
+      ]
     },
     "world_client": {
       "url": "http://localhost:3100",

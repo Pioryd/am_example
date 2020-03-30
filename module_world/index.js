@@ -42,7 +42,41 @@ class ModuleWorld extends EventEmitter {
       world_server: new Manager.WorldServer(this),
       admin_server: new Manager.AdminServer(this),
       virtual_worlds: new Manager.VirtualWorlds(this),
-      mam: new Manager.MAM(this)
+      mam: new Manager.MAM(this),
+      am_data: new Manager.AM_Data(this)
+    };
+    // The order is important for logic
+    this.__order = {
+      initialize: [
+        "database",
+        "world_server",
+        "admin_server",
+        "characters",
+        "main_world",
+        "virtual_worlds",
+        "mam",
+        "am_data"
+      ],
+      terminate: [
+        "world_server",
+        "admin_server",
+        "main_world",
+        "characters",
+        "database",
+        "virtual_worlds",
+        "mam",
+        "am_data"
+      ],
+      poll: [
+        "database",
+        "world_server",
+        "admin_server",
+        "characters",
+        "main_world",
+        "virtual_worlds",
+        "mam",
+        "am_data"
+      ]
     };
 
     this.ready = false;
@@ -53,14 +87,8 @@ class ModuleWorld extends EventEmitter {
   on_initialize() {
     this.terminate = false;
     try {
-      // The order is important for logic
-      this.managers.database.initialize();
-      this.managers.world_server.initialize();
-      this.managers.admin_server.initialize();
-      this.managers.characters.initialize();
-      this.managers.main_world.initialize();
-      this.managers.virtual_worlds.initialize();
-      this.managers.mam.initialize();
+      for (const manager_name of this.__order.initialize)
+        this.managers[manager_name].initialize();
     } catch (e) {
       logger.error(e, e.stack);
     }
@@ -116,14 +144,8 @@ class ModuleWorld extends EventEmitter {
       logger.info("Close module...");
       _this.event_emitter.removeAllListeners();
 
-      // The order is important for logic
-      _this.managers.world_server.terminate();
-      _this.managers.admin_server.terminate();
-      _this.managers.main_world.terminate();
-      _this.managers.characters.terminate();
-      _this.managers.database.terminate();
-      _this.managers.virtual_worlds.terminate();
-      _this.managers.mam.terminate();
+      for (const manager_name of this.__order.terminate)
+        this.managers[manager_name].terminate();
     } catch (e) {
       logger.error(e, e.stack);
     }
@@ -132,14 +154,8 @@ class ModuleWorld extends EventEmitter {
   }
 
   _poll(_this) {
-    // The order is important for logic
-    _this.managers.database.poll();
-    _this.managers.world_server.poll();
-    _this.managers.admin_server.poll();
-    _this.managers.characters.poll();
-    _this.managers.main_world.poll();
-    _this.managers.virtual_worlds.poll();
-    _this.managers.mam.poll();
+    for (const manager_name of this.__order.poll)
+      this.managers[manager_name].poll();
   }
 }
 

@@ -17,6 +17,7 @@ const db_objects_map = {
       password: { type: String },
       outfit: { type: String, required: true },
       default_land_id: { type: String, required: true },
+      default_system_id: { type: String, required: true },
       virtual_world_id: { type: String, required: true },
       state: { type: String },
       action: { type: String },

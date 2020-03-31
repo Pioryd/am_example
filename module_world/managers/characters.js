@@ -27,6 +27,13 @@ class Characters {
       if (land.get_character_position(character.get_id()) != null) return land;
   }
 
+  get_default_system_id(id) {
+    const character = this._get_character_by_id(id);
+    if (character == null) return;
+
+    return character.get_default_system_id();
+  }
+
   change_position(id, position) {
     const character = this._get_character_by_id(id);
     if (!character) return;

@@ -1,5 +1,5 @@
 {
-  "required": ["database", "world_server", "admin_server"],
+  "required": ["database", "world_server", "admin_server", "am_data_rules"],
   "properties": {
     "database": {
       "type": "object",
@@ -24,6 +24,9 @@
         "password": { "type": "string" },
         "port": { "type": "number" }
       }
+    },
+    "am_data_rules": {
+      "type": "object"
     }
   }
 }

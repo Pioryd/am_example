@@ -3,101 +3,25 @@ const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).create_logger({ module_name: "module_world", file_name: __filename });
-const { Instruction, AML } = require(path.join(
+const { AML } = require(path.join(
   global.node_modules_path,
   "am_framework"
 )).ScriptingSystem;
 const ObjectID = require(path.join(global.node_modules_path, "bson-objectid"));
-
+const Ajv = require(path.join(global.node_modules_path, "ajv"));
 const Objects = require("../../objects");
-
-const RULES = {
-  form: {
-    id: { type: "string", required: true, empty: false },
-    name: { type: "string", required: true, empty: false },
-    rules: {
-      type: "array",
-      required: true,
-      object_type: "object",
-      object_rules: {
-        type: { type: "string", required: true, empty: false },
-        triggers: {
-          type: "array",
-          required: true,
-          object_type: "object",
-          object_empty: false,
-          object_rules: {}
-        },
-        actions: {
-          type: "array",
-          required: true,
-          object_type: "object",
-          object_empty: false,
-          object_rules: {}
-        }
-      }
-    },
-    scripts: {
-      type: "array",
-      required: true,
-      object_type: "string",
-      object_empty: false
-    }
-  },
-  program: {
-    id: { type: "string", required: true, empty: false },
-    name: { type: "string", required: true, empty: false },
-    rules: {
-      type: "array",
-      required: true,
-      object_type: "object",
-      object_rules: {
-        type: { type: "string", required: true, empty: false },
-        triggers: {
-          type: "array",
-          required: true,
-          object_type: "object",
-          object_empty: false,
-          object_rules: {}
-        },
-        actions: {
-          type: "array",
-          required: true,
-          object_type: "object",
-          object_empty: false,
-          object_rules: {}
-        }
-      }
-    },
-    forms: {
-      type: "array",
-      required: true,
-      object_type: "string",
-      object_empty: false
-    }
-  },
-  system: {
-    id: { type: "string", required: true, empty: false },
-    name: { type: "string", required: true, empty: false },
-    programs: {
-      type: "array",
-      required: true,
-      object_type: "string",
-      object_empty: false
-    }
-  }
-};
-const validator_map = {
-  form: new Instruction.Validator(RULES.form),
-  program: new Instruction.Validator(RULES.program),
-  system: new Instruction.Validator(RULES.system)
-};
 
 /*
 NOTE!
 Classes instances like: [Character], [Land], etc use only as read only. 
 To change any data of them use [managers] methods.
 */
+function validate_json(rule, object) {
+  const ajv = new Ajv({ allErrors: true });
+  const validate = ajv.compile(rule);
+  const valid = validate(object);
+  if (!valid) throw new Error("AJV: " + ajv.errorsText(validate.errors));
+}
 function handle_error(connection, received_data, managers, message) {
   if (message != null) logger.error("Error:", message);
   logger.error(
@@ -219,7 +143,7 @@ module.exports = {
     managers.admin_server.send(connection.get_id(), "data_am_form", {
       action_id,
       list,
-      rules: RULES.form
+      rules: managers.admin_server.module_world.config.am_data_rules.form
     });
   },
   data_am_program: (connection, received_data, managers) => {
@@ -234,7 +158,7 @@ module.exports = {
     managers.admin_server.send(connection.get_id(), "data_am_program", {
       action_id,
       list,
-      rules: RULES.program
+      rules: managers.admin_server.module_world.config.am_data_rules.program
     });
   },
   data_am_system: (connection, received_data, managers) => {
@@ -249,7 +173,7 @@ module.exports = {
     managers.admin_server.send(connection.get_id(), "data_am_system", {
       action_id,
       list,
-      rules: RULES.system
+      rules: managers.admin_server.module_world.config.am_data_rules.system
     });
   },
   data_am_script: (connection, received_data, managers) => {
@@ -264,7 +188,7 @@ module.exports = {
     managers.admin_server.send(connection.get_id(), "data_am_script", {
       action_id,
       list,
-      rules: RULES.system
+      rules: managers.admin_server.module_world.config.am_data_rules.system
     });
   },
   update_am_form: (connection, received_data, managers) => {
@@ -290,7 +214,10 @@ module.exports = {
       message = `Removed id[${id}]`;
     } else {
       try {
-        validator_map.form.validate(object);
+        validate_json(
+          managers.admin_server.module_world.config.am_data_rules.form,
+          object
+        );
 
         // "id: map[id].get_id()" to be sure id wont be override
         map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
@@ -329,7 +256,10 @@ module.exports = {
       message = `Removed id[${id}]`;
     } else {
       try {
-        validator_map.program.validate(object);
+        validate_json(
+          managers.admin_server.module_world.config.am_data_rules.program,
+          object
+        );
 
         // "id: map[id].get_id()" to be sure id wont be override
         map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };
@@ -367,7 +297,10 @@ module.exports = {
       message = `Removed id[${id}]`;
     } else {
       try {
-        validator_map.system.validate(object);
+        validate_json(
+          managers.admin_server.module_world.config.am_data_rules.system,
+          object
+        );
 
         // "id: map[id].get_id()" to be sure id wont be override
         map[id]._data = { ...map[id]._data, ...object, id: map[id].get_id() };

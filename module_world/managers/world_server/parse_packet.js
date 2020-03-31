@@ -49,13 +49,15 @@ module.exports = {
       characters,
       connection.get_id()
     );
+    const am_data = managers.am_data.get_primary(Object.keys(characters_info));
 
     connection.on_close = connection => {
       managers.mam.unregister(connection.get_id());
     };
 
     managers.world_server.send(connection.get_id(), "accept_connection", {
-      characters_info
+      characters_info,
+      am_data
     });
     return true;
   },
@@ -71,6 +73,7 @@ module.exports = {
       password: character.get_password(),
       outfit: character.get_outfit(),
       default_land_id: character.get_default_land_id(),
+      default_system_id: character.get_default_system_id(),
       virtual_world_id: character.get_virtual_world_id(),
       state: character.get_state(),
       action: character.get_action(),

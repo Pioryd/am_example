@@ -9,7 +9,9 @@
     },
     "node_modules_rel_path": "node_modules",
     "close_app_delay": 5000,
-    "auto_run_scripts": ["net_msg_on"]
+    "auto_run_scripts": [
+      "net_msg_on"
+    ]
   },
   "module_world": {
     "database": {
@@ -25,6 +27,112 @@
       "login": "World",
       "password": "123",
       "port": 3101
+    },
+    "am_data_rules": {
+      "form": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "triggers": {
+                  "type": "array"
+                },
+                "actions": {
+                  "type": "array"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "scripts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "rules",
+          "scripts"
+        ],
+        "additionalProperties": false
+      },
+      "program": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "triggers": {
+                  "type": "array"
+                },
+                "actions": {
+                  "type": "array"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "forms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "rules",
+          "forms"
+        ],
+        "additionalProperties": false
+      },
+      "system": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "programs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "programs"
+        ],
+        "additionalProperties": false
+      }
     }
   }
 }

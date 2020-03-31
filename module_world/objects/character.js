@@ -35,6 +35,10 @@ class Character {
     return this._data.default_land_id;
   }
 
+  get_default_system_id() {
+    return this._data.default_system_id;
+  }
+
   get_virtual_world_id() {
     return this._data.virtual_world_id;
   }

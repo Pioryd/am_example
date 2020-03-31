@@ -5,6 +5,7 @@ const WorldServer = require("./world_server");
 const AdminServer = require("./admin_server");
 const VirtualWorlds = require("./virtual_worlds");
 const MAM = require("./mam");
+const AM_Data = require("./am_data");
 
 module.exports = {
   Characters,
@@ -13,5 +14,6 @@ module.exports = {
   WorldServer,
   AdminServer,
   VirtualWorlds,
-  MAM
+  MAM,
+  AM_Data
 };

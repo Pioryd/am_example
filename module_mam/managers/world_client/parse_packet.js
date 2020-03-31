@@ -22,9 +22,10 @@ function handle_error(connection, received_data, managers, message) {
 
 module.exports = {
   accept_connection: (data, managers) => {
-    const { characters_info } = data;
+    const { characters_info, am_data } = data;
     managers.world_client.module_mam.data.characters_info = characters_info;
 
+    managers.am.am_data = am_data;
     managers.am.reload();
 
     for (const character_id of Object.keys(

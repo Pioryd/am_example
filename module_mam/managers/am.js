@@ -1,5 +1,4 @@
 const path = require("path");
-const fs = require("fs");
 const logger = require(path.join(
   global.node_modules_path,
   "am_framework"
@@ -8,12 +7,8 @@ const { ScriptingSystem, Stopwatch } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
-
 // Draft -> Database
 const tmp_data_api = require("../tmp_data/api");
-const tmp_data_forms = require("../tmp_data/forms");
-const tmp_data_programs = require("../tmp_data/programs");
-const tmp_data_system = require("../tmp_data/system");
 
 const scripts_path_full_name = path.join(
   __dirname,
@@ -30,25 +25,10 @@ class AM {
     };
     this.containers_map = {};
 
-    // remove after add db support
-    this.scripts_source = {};
+    this.am_data = {};
   }
 
-  initialize() {
-    for (const script_file of fs.readdirSync(scripts_path_full_name)) {
-      const parsed = ScriptingSystem.AML.parse(
-        fs.readFileSync(
-          path.join(scripts_path_full_name, script_file),
-          "utf8",
-          err => {
-            if (err) throw err;
-          }
-        )
-      );
-
-      this.scripts_source[parsed.id] = parsed;
-    }
-  }
+  initialize() {}
 
   terminate() {
     for (const scripting_system_root of Object.values(this.containers_map)) {
@@ -99,11 +79,14 @@ class AM {
       scripting_system_root.install_data(
         this.module_mam.data.characters_info[id]
       );
+
       scripting_system_root.install_api(tmp_data_api);
-      scripting_system_root.install_scripts(this.scripts_source);
-      scripting_system_root.install_forms(tmp_data_forms);
-      scripting_system_root.install_programs(tmp_data_programs);
-      scripting_system_root.install_system(tmp_data_system["Animal_ID"]);
+      scripting_system_root.install_scripts(this.am_data.scripts);
+      scripting_system_root.install_forms(this.am_data.forms);
+      scripting_system_root.install_programs(this.am_data.programs);
+      scripting_system_root.install_system(
+        this.am_data.systems[Object.keys(this.am_data.systems)[0]]
+      );
       scripting_system_root.install_ext({
         module_mam: this.module_mam
       });

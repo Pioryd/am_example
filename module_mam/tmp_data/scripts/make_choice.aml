@@ -1,6 +1,0 @@
-id make_choice_id
-name make_choice
-data enemy_choice:""
-
-api virtual_world.make_choice enemy_choice:script.data.enemy_choice
-sleep 500

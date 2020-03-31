@@ -26,7 +26,6 @@ module.exports = {
     managers.world_client.module_mam.data.characters_info = characters_info;
 
     managers.am.am_data = am_data;
-    managers.am.reload();
 
     for (const character_id of Object.keys(
       managers.world_client.module_mam.data.characters_info

@@ -10,13 +10,6 @@ const { ScriptingSystem, Stopwatch } = require(path.join(
 // Draft -> Database
 const tmp_data_api = require("../tmp_data/api");
 
-const scripts_path_full_name = path.join(
-  __dirname,
-  "..",
-  "tmp_data",
-  "scripts"
-);
-
 class AM {
   constructor(module_mam) {
     this.module_mam = module_mam;
@@ -25,7 +18,12 @@ class AM {
     };
     this.containers_map = {};
 
+    this.api_list = {};
     this.am_data = {};
+
+    this._ready = false;
+
+    this.api_list = tmp_data_api;
   }
 
   initialize() {}
@@ -38,17 +36,21 @@ class AM {
   }
 
   poll() {
-    if (this.stopwatches_map.check_data.is_elapsed()) {
-      this.emit_data();
-      for (const scripting_system_root of Object.values(this.containers_map)) {
-        scripting_system_root.process();
-      }
-      this.parse_virtual_world_packets();
-      this.stopwatches_map.check_data.reset();
+    if (!this.stopwatches_map.check_data.is_elapsed()) return;
+    if (!this._ready) {
+      this._check_ready();
+      return;
     }
+
+    this.emit_data();
+    for (const scripting_system_root of Object.values(this.containers_map)) {
+      scripting_system_root.process();
+    }
+    this.parse_virtual_world_packets();
+    this.stopwatches_map.check_data.reset();
   }
 
-  reload() {
+  _reload() {
     this.terminate();
 
     // Create roots
@@ -80,7 +82,7 @@ class AM {
         this.module_mam.data.characters_info[id]
       );
 
-      scripting_system_root.install_api(tmp_data_api);
+      scripting_system_root.api_list = this.api_list;
       scripting_system_root.install_scripts(this.am_data.scripts);
       scripting_system_root.install_forms(this.am_data.forms);
       scripting_system_root.install_programs(this.am_data.programs);
@@ -163,6 +165,18 @@ class AM {
       const locked_length = virtual_world_packets.length;
       for (let i = 0; i < locked_length; i++)
         parse_packet(virtual_world_packets.shift());
+    }
+  }
+
+  _check_ready() {
+    if (
+      Object.keys(this.am_data).length > 0 &&
+      Object.keys(this.am_data.systems).length > 0 &&
+      Object.keys(this.api_list).length > 0
+    ) {
+      console.log("ready");
+      this._ready = true;
+      this._reload();
     }
   }
 }

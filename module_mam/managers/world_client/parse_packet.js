@@ -73,13 +73,16 @@ module.exports = {
     ];
   },
   virtual_world: (data, managers) => {
-    const { character_id } = data;
-    managers.world_client.module_mam.data.characters_info[
-      character_id
-    ].virtual_world_packets = [
-      ...managers.world_client.module_mam.data.characters_info[character_id]
-        .virtual_world_packets,
-      { ...data }
-    ];
+    const { packet_data } = data;
+    const { character_id } = packet_data;
+    const character_info =
+      managers.world_client.module_mam.data.characters_info[character_id];
+
+    if (Array.isArray(character_info.virtual_world_packets))
+      character_info.virtual_world_packets = [
+        ...character_info.virtual_world_packets,
+        { ...packet_data }
+      ];
+    else character_info.virtual_world_packets = [{ ...packet_data }];
   }
 };

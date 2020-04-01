@@ -143,17 +143,16 @@ class AM {
   }
   parse_virtual_world_packets() {
     const parse_packet = packet => {
-      const { packet_id, data } = packet;
-      const { character_id } = data;
+      const { character_id, packet_id, packet_data } = packet;
 
       if (packet_id === "data") {
         this.module_mam.data.characters_info[
           character_id
-        ].virtual_world_data = data;
+        ].virtual_world_data = packet_data;
       } else if (packet_id === "message") {
-        logger.log("Virtual world message: ", data);
+        logger.log("Virtual world message: ", packet_data);
       } else {
-        logger.error("Unknown virtual world packet: " + { packet });
+        logger.error(`Unknown virtual world packet[${packet_id}]: ${packet}`);
       }
     };
 
@@ -161,6 +160,7 @@ class AM {
       this.module_mam.data.characters_info
     )) {
       const { virtual_world_packets } = character_info;
+      if (virtual_world_packets == null) break;
 
       const locked_length = virtual_world_packets.length;
       for (let i = 0; i < locked_length; i++)
@@ -174,7 +174,6 @@ class AM {
       Object.keys(this.am_data.systems).length > 0 &&
       Object.keys(this.api_list).length > 0
     ) {
-      console.log("ready");
       this._ready = true;
       this._reload();
     }

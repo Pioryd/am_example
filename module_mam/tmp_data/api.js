@@ -50,7 +50,9 @@ module.exports = {
       const { world_client } = root.ext.module_mam.managers;
 
       // Game in virtual world
-      if (data.virtual_world_data == null) {
+      if (
+        data.characters_info[root.ext.character_id].virtual_world_data == null
+      ) {
         world_client.send("virtual_world", {
           character_id: root.ext.character_id,
           packet_id: "data",

@@ -1,9 +1,10 @@
 const path = require("path");
-const { ModuleBase } = require(path.join(
+const { ModuleBase, Managers } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
 const Manager = require("./managers");
+const Objects = require("./objects");
 
 class ModuleWorld extends ModuleBase {
   constructor({ event_emitter, config }) {
@@ -34,7 +35,7 @@ class ModuleWorld extends ModuleBase {
         database: new Manager.Database(this),
         main_world: new Manager.MainWorld(this),
         world_server: new Manager.WorldServer(this),
-        admin_server: new Manager.AdminServer(this),
+        admin_server: new Managers.AdminServer(this, Objects.Default),
         virtual_worlds: new Manager.VirtualWorlds(this),
         mam: new Manager.MAM(this),
         am_data: new Manager.AM_Data(this)

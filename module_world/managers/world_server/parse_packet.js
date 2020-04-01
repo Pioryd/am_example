@@ -268,7 +268,7 @@ module.exports = {
     managers.characters.leave_virtual_world(character_id);
   },
   virtual_world: (connection, received_data, managers) => {
-    const character_id = connection.user_data.character_id;
+    const { character_id } = received_data;
 
     managers.virtual_worlds.process_packet_received_from_character(
       character_id,

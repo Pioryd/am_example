@@ -52,7 +52,7 @@ class MAM {
       characters_info[id] = { id, force_new: false };
     }
 
-    this.mam_data[connection_id] = [characters_ids_list];
+    this.mam_data[connection_id] = characters_ids_list;
     return characters_info;
   }
 
@@ -65,14 +65,14 @@ class MAM {
 
     if (connection_id == null)
       throw new Error(
-        `Unable to send packet. Character[${connection_id}]` +
+        `Unable to send packet. Character[${character_id}]` +
           ` is not connected to MAM`
       );
 
     this.module_world.managers.world_server.send(
       connection_id,
       "virtual_world",
-      { packet_id, data }
+      { packet_id, packet_data: { character_id, ...packet_data } }
     );
   }
 

@@ -67,8 +67,7 @@ class VirtualWorlds {
       );
 
     const virtual_world_id = character.get_virtual_world_id();
-    const packet_id = received_data.packet_id;
-    const packet_data = received_data.packet_data;
+    const { packet_id, packet_data } = received_data;
     for (const [id, virtual_world] of Object.entries(
       this.module_world.data.virtual_worlds_map
     )) {
@@ -89,11 +88,11 @@ class VirtualWorlds {
   }
 
   process_character_packet_received_from_virtual_world(received_data) {
-    const { character_id, packet_id, data } = received_data;
+    const { character_id, packet_id, packet_data } = received_data;
 
     this.module_world.managers.mam.send(character_id, "virtual_world", {
       packet_id,
-      data
+      packet_data
     });
   }
 

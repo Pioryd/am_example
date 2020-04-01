@@ -185,7 +185,7 @@ class MainWorld {
         // Character is 0 with own human outfit
         outfit: id === 0 ? 0 : Util.get_random_int(1, 3),
         default_land_id: land.get_id(),
-        default_system_id: "default_system_ID",
+        default_system_id: "5e6fc6c870d8fc264068c143",
         virtual_world_id: "",
         state: "",
         action: "",

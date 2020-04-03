@@ -9,26 +9,50 @@
     },
     "node_modules_rel_path": "node_modules",
     "close_app_delay": 5000,
-    "auto_run_scripts": ["net_msg_off"]
+    "auto_run_scripts": [
+      {
+        "name": "net_msg",
+        "args": [
+          "module_mam",
+          "world_client",
+          "false"
+        ]
+      },
+      {
+        "name": "net_msg",
+        "args": [
+          "module_mam",
+          "admin_server",
+          "false"
+        ]
+      }
+    ]
   },
   "module_mam": {
     "characters": {
-      "included": [],
-      "excluded": [
-        "5e657b1b222e0a3c381a55e7",
-        "5e657b1b222e0a3c381a55ba",
-        "5e657b1b222e0a3c381a55c3"
-      ]
+      "included": [
+        "5e657b1b222e0a3c381a55e7"
+      ],
+      "excluded": []
     },
     "world_client": {
-      "url": "http://localhost:3100",
       "login": "World",
-      "password": "123"
+      "password": "123",
+      "options": {
+        "url": "http://localhost:3100",
+        "packet_timeout": 0,
+        "send_delay": 1000
+      },
+      "socket_io_options": {}
     },
     "admin_server": {
       "login": "MAM",
       "password": "123",
-      "port": 3103
+      "options": {
+        "port": 3103,
+        "packet_timeout": 0
+      },
+      "socket_io_options": {}
     }
   }
 }

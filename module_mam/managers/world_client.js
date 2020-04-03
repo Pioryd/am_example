@@ -1,26 +1,15 @@
 const path = require("path");
-const logger = require(path.join(
+const { Managers, create_logger } = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_mam", file_name: __filename });
+));
 
-function handle_error(connection, received_data, managers, message) {
-  if (message != null) logger.error("Error:", message);
-  logger.error(
-    "Connection ID:",
-    connection.get_id(),
-    "Received_data:",
-    received_data
-  );
+const logger = create_logger({
+  module_name: "module_mam",
+  file_name: __filename
+});
 
-  managers.admin_server.send(connection.get_id(), "error", {
-    connection_id: connection.get_id(),
-    received_data: received_data,
-    error: message != null ? message : ""
-  });
-}
-
-module.exports = {
+const ParsePacket = {
   accept_connection: (data, managers) => {
     const { characters_info, am_data } = data;
     managers.world_client.module_mam.data.characters_info = characters_info;
@@ -86,3 +75,20 @@ module.exports = {
     else character_info.virtual_world_packets = [{ ...packet_data }];
   }
 };
+
+class WorldClient extends Managers.Client {
+  constructor({ root_module, config }) {
+    super({
+      root_module,
+      config,
+      parse_packet: ParsePacket,
+      on_connected: () => {
+        const { login, password } = config;
+        const { characters } = root_module.config;
+        this.send("accept_connection", { login, password, characters });
+      }
+    });
+  }
+}
+
+module.exports = WorldClient;

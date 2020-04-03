@@ -11,20 +11,22 @@
     },
     "world_client": {
       "type": "object",
-      "required": ["url", "login", "password"],
+      "required": ["login", "password", "options", "socket_io_options"],
       "properties": {
-        "url": { "type": "string" },
         "login": { "type": "string" },
-        "password": { "type": "string" }
+        "password": { "type": "string" },
+        "options": { "type": "object" },
+        "socket_io_options": { "type": "object" }
       }
     },
     "admin_server": {
       "type": "object",
-      "required": ["login", "password", "port"],
+      "required": ["login", "password", "options", "socket_io_options"],
       "properties": {
         "login": { "type": "string" },
         "password": { "type": "string" },
-        "port": { "type": "number" }
+        "options": { "type": "object" },
+        "socket_io_options": { "type": "object" }
       }
     }
   }

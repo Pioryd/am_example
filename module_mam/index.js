@@ -1,5 +1,5 @@
 const path = require("path");
-const { ModuleBase } = require(path.join(
+const { ModuleBase, Managers } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
@@ -24,7 +24,10 @@ class ModuleMAM extends ModuleBase {
     this.setup_managers({
       managers: {
         am: new Manager.AM(this),
-        admin_server: new Manager.AdminServer(this),
+        admin_server: new Managers.AdminServer({
+          root_module: this,
+          config: this.config.admin_server
+        }),
         world_client: new Manager.WorldClient(this)
       },
       order: {

@@ -1,12 +1,14 @@
 const path = require("path");
-const logger = require(path.join(
-  global.node_modules_path,
-  "am_framework"
-)).create_logger({ module_name: "module_mam", file_name: __filename });
-const { ScriptingSystem, Stopwatch } = require(path.join(
+const { ScriptingSystem, Stopwatch, create_logger } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
+
+const logger = create_logger({
+  module_name: "module_mam",
+  file_name: __filename
+});
+
 // Draft -> Database
 const tmp_data_api = require("../tmp_data/api");
 

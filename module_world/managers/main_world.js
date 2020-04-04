@@ -1,9 +1,5 @@
 const path = require("path");
-const logger = require(path.join(
-  global.node_modules_path,
-  "am_framework"
-)).create_logger({ module_name: "module_world", file_name: __filename });
-const { Util, Stopwatch } = require(path.join(
+const { Util, Stopwatch, create_logger } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
@@ -11,13 +7,18 @@ const ObjectID = require(path.join(global.node_modules_path, "bson-objectid"));
 
 const Objects = require("../objects");
 
+const logger = create_logger({
+  module_name: "module_world",
+  file_name: __filename
+});
+
 /*
 Responsible for:
   - world logic between object
 */
 class MainWorld {
-  constructor(module_world) {
-    this.module_world = module_world;
+  constructor(root_module) {
+    this.root_module = root_module;
 
     this.stopwatches_map = {
       energy: new Stopwatch(1 * 1000),
@@ -29,7 +30,7 @@ class MainWorld {
         const { virtual_world_id } = static_args;
         const { character_id } = dynamic_args;
 
-        this.module_world.managers.characters.enter_virtual_world(
+        this.root_module.managers.characters.enter_virtual_world(
           character_id,
           virtual_world_id
         );
@@ -45,10 +46,10 @@ class MainWorld {
     if (this.stopwatches_map.energy.is_elapsed()) {
       const decrease_energy = () => {
         for (const [id, character] of Object.entries(
-          this.module_world.data.characters_map
+          this.root_module.data.characters_map
         )) {
           if (character.get_virtual_world_id() === "") {
-            this.module_world.managers.characters.change_energy(
+            this.root_module.managers.characters.change_energy(
               id,
               character.get_energy() - 5
             );
@@ -57,10 +58,10 @@ class MainWorld {
       };
       const increase_energy = () => {
         for (const [id, character] of Object.entries(
-          this.module_world.data.characters_map
+          this.root_module.data.characters_map
         )) {
           if (character.get_virtual_world_id() != "") {
-            this.module_world.managers.characters.change_energy(
+            this.root_module.managers.characters.change_energy(
               id,
               character.get_energy() + 10
             );
@@ -76,10 +77,10 @@ class MainWorld {
     if (this.stopwatches_map.stress.is_elapsed()) {
       const decrease_stress = () => {
         for (const [id, character] of Object.entries(
-          this.module_world.data.characters_map
+          this.root_module.data.characters_map
         )) {
           if (character.get_virtual_world_id() === "") {
-            this.module_world.managers.characters.change_stress(
+            this.root_module.managers.characters.change_stress(
               id,
               character.get_stress() - 5
             );
@@ -88,10 +89,10 @@ class MainWorld {
       };
       const increase_stress = () => {
         for (const [id, character] of Object.entries(
-          this.module_world.data.characters_map
+          this.root_module.data.characters_map
         )) {
           if (character.get_virtual_world_id() != "") {
-            this.module_world.managers.characters.change_stress(
+            this.root_module.managers.characters.change_stress(
               id,
               character.get_stress() + 5
             );
@@ -106,16 +107,16 @@ class MainWorld {
   }
 
   process_action(object_id, action_id, dynamic_args) {
-    if (!(object_id in this.module_world.data.environment_objects_map)) return;
+    if (!(object_id in this.root_module.data.environment_objects_map)) return;
 
-    const environment_object = this.module_world.data.environment_objects_map[
+    const environment_object = this.root_module.data.environment_objects_map[
       object_id
     ];
 
     environment_object.process_action_script(
       action_id,
       dynamic_args,
-      this.module_world.managers
+      this.root_module.managers
     );
   }
 
@@ -155,10 +156,10 @@ class MainWorld {
         url: "http://localhost:4001",
         characters_list: []
       },
-      this.module_world.managers.virtual_worlds
+      this.root_module.managers.virtual_worlds
     );
 
-    this.module_world.data.virtual_worlds_map[
+    this.root_module.data.virtual_worlds_map[
       virtual_world.get_id()
     ] = virtual_world;
 
@@ -170,12 +171,12 @@ class MainWorld {
           name: "land_" + id,
           map: []
         },
-        this.module_world
+        this.root_module
       );
       const land_size = Util.get_random_int(7, 12);
       for (let i = 0; i < land_size; i++)
         land._data.map.push({ characters_list: [], objects_list: [] });
-      this.module_world.data.lands_map[land.get_id()] = land;
+      this.root_module.data.lands_map[land.get_id()] = land;
 
       // Create character
       const character = new Objects.Character({
@@ -194,7 +195,7 @@ class MainWorld {
         stress: 0,
         friends_list: []
       });
-      this.module_world.data.characters_map[character.get_id()] = character;
+      this.root_module.data.characters_map[character.get_id()] = character;
 
       // Place character at land
       const character_position = Util.get_random_int(0, land_size - 1);
@@ -216,7 +217,7 @@ class MainWorld {
           }
         ]
       });
-      this.module_world.data.environment_objects_map[
+      this.root_module.data.environment_objects_map[
         environment_object.get_id()
       ] = environment_object;
 
@@ -251,7 +252,7 @@ class MainWorld {
           name: object_type.replace("_", " "),
           action_scripts_list: []
         });
-        this.module_world.data.environment_objects_map[
+        this.root_module.data.environment_objects_map[
           environment_object.get_id()
         ] = environment_object;
 
@@ -260,9 +261,9 @@ class MainWorld {
     }
 
     // Set global settings
-    this.module_world.data.settings.generated = true;
-    this.module_world.data.settings.admin_login = "admin";
-    this.module_world.data.admin_password = "123";
+    this.root_module.data.settings.generated = true;
+    this.root_module.data.settings.admin_login = "admin";
+    this.root_module.data.admin_password = "123";
   }
 }
 

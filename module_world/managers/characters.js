@@ -1,6 +1,6 @@
 class Characters {
-  constructor(module_world) {
-    this.module_world = module_world;
+  constructor(root_module) {
+    this.root_module = root_module;
   }
 
   initialize() {}
@@ -23,7 +23,7 @@ class Characters {
     const character = this._get_character_by_id(id);
     if (character == null) return;
 
-    for (const land of Object.values(this.module_world.data.lands_map))
+    for (const land of Object.values(this.root_module.data.lands_map))
       if (land.get_character_position(character.get_id()) != null) return land;
   }
 
@@ -38,21 +38,21 @@ class Characters {
     const character = this._get_character_by_id(id);
     if (!character) return;
 
-    for (const land of Object.values(this.module_world.data.lands_map))
+    for (const land of Object.values(this.root_module.data.lands_map))
       land.change_position(character.get_id(), position);
   }
 
   change_land(id, land_id) {
-    if (!(land_id in this.module_world.data.lands_map)) return;
+    if (!(land_id in this.root_module.data.lands_map)) return;
 
     const character = this._get_character_by_id(id);
     if (!character) return;
 
-    for (const land of Object.values(this.module_world.data.lands_map))
+    for (const land of Object.values(this.root_module.data.lands_map))
       if (land.get_character_position(character.get_id()) != null)
         land.remove_character(character.get_id());
 
-    const new_land = this.module_world.data.lands_map[land_id];
+    const new_land = this.root_module.data.lands_map[land_id];
     new_land.insert_character(character.get_id());
   }
 
@@ -93,12 +93,12 @@ class Characters {
     if (character == null) return;
 
     // Leave land
-    for (const land of Object.values(this.module_world.data.lands_map))
+    for (const land of Object.values(this.root_module.data.lands_map))
       land.remove_character(id);
 
     character._change_virtual_world_id(virtual_world_id);
 
-    this.module_world.managers.virtual_worlds.insert_character(
+    this.root_module.managers.virtual_worlds.insert_character(
       id,
       virtual_world_id
     );
@@ -108,7 +108,7 @@ class Characters {
     const character = this._get_character_by_id(id);
     if (character == null) return;
 
-    this.module_world.managers.virtual_worlds.remove_character(id);
+    this.root_module.managers.virtual_worlds.remove_character(id);
 
     character._change_virtual_world_id("");
 
@@ -117,7 +117,7 @@ class Characters {
 
   _get_character_by_name(name) {
     for (const character of Object.values(
-      this.module_world.data.characters_map
+      this.root_module.data.characters_map
     )) {
       if (character.get_name() === name) {
         return character;
@@ -126,8 +126,8 @@ class Characters {
   }
 
   _get_character_by_id(id) {
-    if (id in this.module_world.data.characters_map)
-      return this.module_world.data.characters_map[id];
+    if (id in this.root_module.data.characters_map)
+      return this.root_module.data.characters_map[id];
   }
 }
 

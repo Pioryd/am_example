@@ -1,31 +1,15 @@
 const path = require("path");
-const logger = require(path.join(
+const { Managers, create_logger } = require(path.join(
   global.node_modules_path,
   "am_framework"
-)).create_logger({ module_name: "module_world", file_name: __filename });
+));
 
-/*
-NOTE!
-Classes instances like: [Character], [Land], etc use only as read only. 
-To change any data of them use [managers] methods.
-*/
-function handle_error(connection, received_data, managers, message) {
-  if (message != null) logger.error("Error:", message);
-  logger.error(
-    "Connection ID:",
-    connection.get_id(),
-    "Received_data:",
-    received_data
-  );
+const logger = create_logger({
+  module_name: "module_world",
+  file_name: __filename
+});
 
-  managers.world_server.send(connection.get_id(), "error", {
-    connection_id: connection.get_id(),
-    received_data,
-    error: message != null ? message : ""
-  });
-}
-
-module.exports = {
+const ParsePacket = {
   accept_connection: (connection, received_data, managers) => {
     const { login, password, characters } = received_data;
 
@@ -36,7 +20,7 @@ module.exports = {
       config.world_server.login.toLowerCase() !== login.toLowerCase() ||
       config.world_server.password !== password.toLowerCase()
     ) {
-      handle_error(
+      managers.world_server.handle_error(
         connection,
         received_data,
         managers,
@@ -105,13 +89,13 @@ module.exports = {
     const virtual_worlds_map = {};
 
     for (const land of Object.values(
-      managers.world_server.module_world.data.lands_map
+      managers.world_server.root_module.data.lands_map
     )) {
       lands_map[land.get_id()] = { name: land._data.name };
     }
 
     for (const character of Object.values(
-      managers.world_server.module_world.data.characters_map
+      managers.world_server.root_module.data.characters_map
     )) {
       characters_map[character.get_id()] = {
         name: character._data.name,
@@ -125,7 +109,7 @@ module.exports = {
     }
 
     for (const environment_object of Object.values(
-      managers.world_server.module_world.data.environment_objects_map
+      managers.world_server.root_module.data.environment_objects_map
     )) {
       const object_data = {
         type: environment_object._data.type,
@@ -143,7 +127,7 @@ module.exports = {
     }
 
     for (const virtual_world of Object.values(
-      managers.world_server.module_world.data.virtual_worlds_map
+      managers.world_server.root_module.data.virtual_worlds_map
     )) {
       const object_data = {
         name: virtual_world._data.name,
@@ -228,7 +212,7 @@ module.exports = {
       from_character_name == null ||
       to_character_connection_id == null
     ) {
-      handle_error(
+      managers.world_server.handle_error(
         connection,
         received_data,
         managers,
@@ -276,3 +260,11 @@ module.exports = {
     );
   }
 };
+
+class WorldServer extends Managers.Server {
+  constructor({ root_module, config }) {
+    super({ root_module, config, parse_packet: ParsePacket });
+  }
+}
+
+module.exports = WorldServer;

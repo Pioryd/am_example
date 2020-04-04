@@ -1,6 +1,6 @@
 class MAM {
-  constructor(module_world) {
-    this.module_world = module_world;
+  constructor(root_module) {
+    this.root_module = root_module;
 
     this.mam_data = {};
   }
@@ -14,7 +14,7 @@ class MAM {
   register(mam_characters, connection_id) {
     const characters_info = {};
     const characters_ids_list = [];
-    const characters_manager = this.module_world.managers.characters;
+    const characters_manager = this.root_module.managers.characters;
 
     if ("included" in mam_characters && mam_characters.included.length > 0) {
       for (const id of mam_characters.included) {
@@ -33,7 +33,7 @@ class MAM {
       "excluded" in mam_characters &&
       mam_characters.excluded.length > 0
     ) {
-      for (const id of Object.keys(this.module_world.data.characters_map)) {
+      for (const id of Object.keys(this.root_module.data.characters_map)) {
         if (
           !mam_characters.excluded.includes(id) &&
           this._get_mam_key_by_character_id(id) == null
@@ -41,7 +41,7 @@ class MAM {
           characters_ids_list.push(id);
       }
     } else {
-      for (const id of Object.keys(this.module_world.data.characters_map)) {
+      for (const id of Object.keys(this.root_module.data.characters_map)) {
         if (this._get_mam_key_by_character_id(id) == null)
           characters_ids_list.push(id);
       }
@@ -69,7 +69,7 @@ class MAM {
           ` is not connected to MAM`
       );
 
-    this.module_world.managers.world_server.send(
+    this.root_module.managers.world_server.send(
       connection_id,
       "virtual_world",
       { packet_id, packet_data: { character_id, ...packet_data } }

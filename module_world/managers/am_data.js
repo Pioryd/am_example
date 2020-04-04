@@ -5,8 +5,8 @@ const { ScriptingSystem } = require(path.join(
 ));
 
 class AM_Data {
-  constructor(module_world) {
-    this.module_world = module_world;
+  constructor(root_module) {
+    this.root_module = root_module;
   }
 
   initialize() {}
@@ -16,7 +16,7 @@ class AM_Data {
   poll() {}
 
   get_primary(characters_ids) {
-    const { managers } = this.module_world;
+    const { managers } = this.root_module;
     const am_data = { systems: {}, programs: {}, forms: {}, scripts: {} };
 
     for (const id of characters_ids) {
@@ -40,7 +40,7 @@ class AM_Data {
   }
 
   get_full_system_data(id) {
-    const { data } = this.module_world;
+    const { data } = this.root_module;
     const am_data = { systems: {}, programs: {}, forms: {}, scripts: {} };
     const system = data.am_systems_map[id]._data;
 

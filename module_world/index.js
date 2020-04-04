@@ -32,10 +32,20 @@ class ModuleWorld extends ModuleBase {
     this.setup_managers({
       managers: {
         characters: new Manager.Characters(this),
-        database: new Manager.Database(this),
+        database: new Manager.Database({
+          root_module: this,
+          config: this.config.database
+        }),
         main_world: new Manager.MainWorld(this),
-        world_server: new Manager.WorldServer(this),
-        admin_server: new Managers.AdminServer(this, Objects.Default),
+        world_server: new Manager.WorldServer({
+          root_module: this,
+          config: this.config.world_server
+        }),
+        admin_server: new Managers.AdminServer({
+          root_module: this,
+          config: this.config.admin_server,
+          DefaultObjectClass: Objects.Default
+        }),
         virtual_worlds: new Manager.VirtualWorlds(this),
         mam: new Manager.MAM(this),
         am_data: new Manager.AM_Data(this)

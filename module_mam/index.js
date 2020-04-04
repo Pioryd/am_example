@@ -28,7 +28,10 @@ class ModuleMAM extends ModuleBase {
           root_module: this,
           config: this.config.admin_server
         }),
-        world_client: new Manager.WorldClient(this)
+        world_client: new Manager.WorldClient({
+          root_module: this,
+          config: this.config.world_client
+        })
       },
       order: {
         initialize: ["am", "admin_server", "world_client"],

@@ -17,8 +17,8 @@ const ParsePacket = {
     if (
       login == null ||
       password == null ||
-      config.world_server.login.toLowerCase() !== login.toLowerCase() ||
-      config.world_server.password !== password.toLowerCase()
+      config.login.toLowerCase() !== login.toLowerCase() ||
+      config.password !== password.toLowerCase()
     ) {
       managers.world_server.handle_error(
         connection,

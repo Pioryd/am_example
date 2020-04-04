@@ -5,8 +5,7 @@ class VirtualWorld {
   constructor(data, manager_virtual_worlds) {
     this._data = data;
     this.client = new Client({
-      url: this._data.url,
-      options: { packet_timeout: 0 }
+      options: { url: this._data.url, packet_timeout: 0 }
     });
 
     this.client.events.connected = () => {

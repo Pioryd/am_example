@@ -12,12 +12,12 @@ const logger = create_logger({
 const ParsePacket = {
   accept_connection: (data, managers) => {
     const { characters_info, am_data } = data;
-    managers.world_client.module_mam.data.characters_info = characters_info;
+    managers.world_client.root_module.data.characters_info = characters_info;
 
     managers.am.am_data = am_data;
 
     for (const character_id of Object.keys(
-      managers.world_client.module_mam.data.characters_info
+      managers.world_client.root_module.data.characters_info
     )) {
       managers.world_client.send("data_character", { character_id });
       managers.world_client.send("data_land", { character_id });
@@ -26,7 +26,7 @@ const ParsePacket = {
   },
   data_character: (data, managers) => {
     const { character_id } = data;
-    managers.world_client.module_mam.data.characters_info[
+    managers.world_client.root_module.data.characters_info[
       character_id
     ].character_data = {
       ...data
@@ -35,7 +35,7 @@ const ParsePacket = {
   },
   data_land: (data, managers) => {
     const { character_id } = data;
-    managers.world_client.module_mam.data.characters_info[
+    managers.world_client.root_module.data.characters_info[
       character_id
     ].land_data = {
       ...data
@@ -44,7 +44,7 @@ const ParsePacket = {
   },
   data_world: (data, managers) => {
     const { character_id } = data;
-    managers.world_client.module_mam.data.characters_info[
+    managers.world_client.root_module.data.characters_info[
       character_id
     ].world_data = {
       ...data
@@ -53,10 +53,10 @@ const ParsePacket = {
   },
   action_message: (data, managers) => {
     const { character_id } = data;
-    managers.world_client.module_mam.data.characters_info[
+    managers.world_client.root_module.data.characters_info[
       character_id
     ].action_message_packets = [
-      ...managers.world_client.module_mam.data.characters_info[character_id]
+      ...managers.world_client.root_module.data.characters_info[character_id]
         .action_message_packets,
       { ...data }
     ];
@@ -65,7 +65,7 @@ const ParsePacket = {
     const { packet_data } = data;
     const { character_id } = packet_data;
     const character_info =
-      managers.world_client.module_mam.data.characters_info[character_id];
+      managers.world_client.root_module.data.characters_info[character_id];
 
     if (Array.isArray(character_info.virtual_world_packets))
       character_info.virtual_world_packets = [

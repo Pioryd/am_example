@@ -13,8 +13,8 @@ const logger = create_logger({
 const tmp_data_api = require("../tmp_data/api");
 
 class AM {
-  constructor(module_mam) {
-    this.module_mam = module_mam;
+  constructor(root_module) {
+    this.root_module = root_module;
     this.stopwatches_map = {
       check_data: new Stopwatch(1 * 1000)
     };
@@ -56,7 +56,7 @@ class AM {
     this.terminate();
 
     // Create roots
-    const { characters_info } = this.module_mam.data;
+    const { characters_info } = this.root_module.data;
     for (const character_info of Object.values(characters_info)) {
       const { id, force_new } = character_info;
       const root = new ScriptingSystem.Root();
@@ -68,7 +68,7 @@ class AM {
     for (const [id, scripting_system_root] of Object.entries(
       this.containers_map
     )) {
-      this.module_mam.data.characters_info[id] = {
+      this.root_module.data.characters_info[id] = {
         character_data: {},
         land_data: {},
         world_data: {
@@ -81,7 +81,7 @@ class AM {
         virtual_world_packets: []
       };
       scripting_system_root.install_data(
-        this.module_mam.data.characters_info[id]
+        this.root_module.data.characters_info[id]
       );
 
       scripting_system_root.api_list = this.api_list;
@@ -92,7 +92,7 @@ class AM {
         this.am_data.systems[Object.keys(this.am_data.systems)[0]]
       );
       scripting_system_root.install_ext({
-        module_mam: this.module_mam
+        root_module: this.root_module
       });
       scripting_system_root._debug_enabled = true;
     }
@@ -100,7 +100,7 @@ class AM {
 
   emit_data() {
     // Set land_id
-    const { characters_info } = this.module_mam.data;
+    const { characters_info } = this.root_module.data;
 
     for (const [id, character_info] of Object.entries(characters_info)) {
       const { character_data, land_data, world_data } = character_info;
@@ -148,7 +148,7 @@ class AM {
       const { character_id, packet_id, packet_data } = packet;
 
       if (packet_id === "data") {
-        this.module_mam.data.characters_info[
+        this.root_module.data.characters_info[
           character_id
         ].virtual_world_data = packet_data;
       } else if (packet_id === "message") {
@@ -159,7 +159,7 @@ class AM {
     };
 
     for (const character_info of Object.values(
-      this.module_mam.data.characters_info
+      this.root_module.data.characters_info
     )) {
       const { virtual_world_packets } = character_info;
       if (virtual_world_packets == null) break;

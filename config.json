@@ -25,6 +25,15 @@
       "url": "mongodb://127.0.0.1:27017",
       "name": "am_world"
     },
+    "virtual_world": {
+      "login": "VW",
+      "password": "123",
+      "options": {
+        "url": "http://localhost:4001",
+        "packet_timeout": 0
+      },
+      "socket_io_options": {}
+    },
     "world_server": {
       "login": "World",
       "password": "123",

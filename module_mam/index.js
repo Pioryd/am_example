@@ -31,12 +31,16 @@ class ModuleMAM extends ModuleBase {
         world_client: new Manager.WorldClient({
           root_module: this,
           config: this.config.world_client
+        }),
+        api_client: new Manager.ApiClient({
+          root_module: this,
+          config: this.config.api_client
         })
       },
       order: {
-        initialize: ["am", "admin_server", "world_client"],
-        terminate: ["admin_server", "am", "world_client"],
-        poll: ["admin_server", "world_client", "am"]
+        initialize: ["am", "admin_server", "world_client", "api_client"],
+        terminate: ["admin_server", "am", "world_client", "api_client"],
+        poll: ["admin_server", "world_client", "api_client", "am"]
       }
     });
   }

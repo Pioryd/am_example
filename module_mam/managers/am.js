@@ -9,9 +9,6 @@ const logger = create_logger({
   file_name: __filename
 });
 
-// Draft -> Database
-const tmp_data_api = require("../tmp_data/api");
-
 class AM {
   constructor(root_module) {
     this.root_module = root_module;
@@ -20,12 +17,10 @@ class AM {
     };
     this.containers_map = {};
 
-    this.api_list = {};
+    this.api_map = {};
     this.am_data = {};
 
     this._ready = false;
-
-    this.api_list = tmp_data_api;
   }
 
   initialize() {}
@@ -84,7 +79,7 @@ class AM {
         this.root_module.data.characters_info[id]
       );
 
-      scripting_system_root.api_list = this.api_list;
+      scripting_system_root.api_map = this.api_map;
       scripting_system_root.install_scripts(this.am_data.scripts);
       scripting_system_root.install_forms(this.am_data.forms);
       scripting_system_root.install_programs(this.am_data.programs);
@@ -174,7 +169,7 @@ class AM {
     if (
       Object.keys(this.am_data).length > 0 &&
       Object.keys(this.am_data.systems).length > 0 &&
-      Object.keys(this.api_list).length > 0
+      Object.keys(this.api_map).length > 0
     ) {
       this._ready = true;
       this._reload();

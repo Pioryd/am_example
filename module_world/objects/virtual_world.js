@@ -4,12 +4,19 @@ const { Client } = require(path.join(global.node_modules_path, "am_framework"));
 class VirtualWorld {
   constructor(data, manager_virtual_worlds) {
     this._data = data;
+
+    this.config = manager_virtual_worlds.root_module.config.virtual_world;
+
     this.client = new Client({
-      options: { url: this._data.url, packet_timeout: 0 }
+      options: this.config.options,
+      socket_io_options: this.config.socket_io_options
     });
 
     this.client.events.connected = () => {
-      this.send("accept_connection", {});
+      this.send("accept_connection", {
+        login: this.config.login,
+        password: this.config.password
+      });
     };
 
     this.client.add_parse_packet_dict({

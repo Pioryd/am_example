@@ -17,11 +17,26 @@ const ParsePacket = {
       key,
       value
     ) {
-      if (typeof value === "string") return Util.string_to_function(value);
+      if (typeof value === "string")
+        if (key === "remote_fn")
+          return ({ fn_full_name, script_id, query_id, timeout, args }) =>
+            managers.api_client.send("process_api", {
+              fn_full_name,
+              script_id,
+              query_id,
+              timeout,
+              args
+            });
+        else if (key === "local_fn") return Util.string_to_function_ex(value);
+        else throw new Error(`Wrong key[${key}]`);
       return value;
     });
+  },
+  process_api: (data, managers) => {
+    const { script_id, query_id, value } = data;
 
-    console.log(managers.am.api_map);
+    for (const root of Object.values(managers.am.containers_map))
+      root.return_data.insert({ script_id, query_id, value });
   }
 };
 

@@ -1,13 +1,13 @@
 {
   "required": [
-    "database",
+    "database_world",
     "virtual_world",
     "world_server",
     "admin_server",
     "am_data_rules"
   ],
   "properties": {
-    "database": {
+    "database_world": {
       "type": "object",
       "required": ["url", "name"],
       "properties": {

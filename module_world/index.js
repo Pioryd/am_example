@@ -32,9 +32,9 @@ class ModuleWorld extends ModuleBase {
     this.setup_managers({
       managers: {
         characters: new Manager.Characters(this),
-        database: new Manager.Database({
+        database_world: new Manager.DatabaseWorld({
           root_module: this,
-          config: this.config.database
+          config: this.config.database_world
         }),
         main_world: new Manager.MainWorld(this),
         world_server: new Manager.WorldServer({
@@ -52,7 +52,7 @@ class ModuleWorld extends ModuleBase {
       },
       order: {
         initialize: [
-          "database",
+          "database_world",
           "world_server",
           "admin_server",
           "characters",
@@ -66,13 +66,13 @@ class ModuleWorld extends ModuleBase {
           "admin_server",
           "main_world",
           "characters",
-          "database",
+          "database_world",
           "virtual_worlds",
           "mam",
           "am_data"
         ],
         poll: [
-          "database",
+          "database_world",
           "world_server",
           "admin_server",
           "characters",

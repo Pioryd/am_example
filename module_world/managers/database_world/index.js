@@ -7,7 +7,7 @@ const { Managers } = require(path.join(
 const { db_objects_map } = require("./db_objects_map");
 const Objects = require("../../objects");
 
-class DatabaseManager extends Managers.Database {
+class DatabaseWorldManager extends Managers.DatabaseStatic {
   constructor({ root_module, config }) {
     super({
       root_module,
@@ -22,4 +22,4 @@ class DatabaseManager extends Managers.Database {
   }
 }
 
-module.exports = DatabaseManager;
+module.exports = DatabaseWorldManager;

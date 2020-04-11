@@ -57,7 +57,7 @@
       "socket_io_options": {}
     },
     "am_data_rules": {
-      "form": {
+      "am_form": {
         "properties": {
           "id": {
             "type": "string"
@@ -93,7 +93,7 @@
         "required": ["id", "name", "rules", "scripts"],
         "additionalProperties": false
       },
-      "program": {
+      "am_program": {
         "properties": {
           "id": {
             "type": "string"
@@ -129,7 +129,7 @@
         "required": ["id", "name", "rules", "forms"],
         "additionalProperties": false
       },
-      "system": {
+      "am_system": {
         "properties": {
           "id": {
             "type": "string"

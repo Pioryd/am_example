@@ -1,6 +1,7 @@
 {
   "required": [
     "database_world",
+    "database_scripts",
     "virtual_world",
     "world_server",
     "admin_server",
@@ -8,6 +9,14 @@
   ],
   "properties": {
     "database_world": {
+      "type": "object",
+      "required": ["url", "name"],
+      "properties": {
+        "url": { "type": "string" },
+        "name": { "type": "string" }
+      }
+    },
+    "database_scripts": {
       "type": "object",
       "required": ["url", "name"],
       "properties": {

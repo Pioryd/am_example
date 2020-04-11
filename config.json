@@ -25,6 +25,10 @@
       "url": "mongodb://127.0.0.1:27017",
       "name": "am_world"
     },
+    "database_scripts": {
+      "url": "mongodb://127.0.0.1:27017",
+      "name": "admin_scripts"
+    },
     "virtual_world": {
       "login": "VW",
       "password": "123",

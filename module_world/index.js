@@ -36,6 +36,10 @@ class ModuleWorld extends ModuleBase {
           root_module: this,
           config: this.config.database_world
         }),
+        database_scripts: new Managers.DatabaseScripts({
+          root_module: this,
+          config: this.config.database_scripts
+        }),
         main_world: new Manager.MainWorld(this),
         world_server: new Manager.WorldServer({
           root_module: this,
@@ -53,6 +57,7 @@ class ModuleWorld extends ModuleBase {
       order: {
         initialize: [
           "database_world",
+          "database_scripts",
           "world_server",
           "admin_server",
           "characters",
@@ -67,12 +72,14 @@ class ModuleWorld extends ModuleBase {
           "main_world",
           "characters",
           "database_world",
+          "database_scripts",
           "virtual_worlds",
           "mam",
           "am_data"
         ],
         poll: [
           "database_world",
+          "database_scripts",
           "world_server",
           "admin_server",
           "characters",

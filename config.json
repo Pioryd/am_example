@@ -9,16 +9,18 @@
     },
     "node_modules_rel_path": "node_modules",
     "close_app_delay": 5000,
-    "auto_run_scripts": [
-      {
-        "name": "net_msg",
-        "args": ["module_world", "world_server", "false"]
-      },
-      {
-        "name": "net_msg",
-        "args": ["module_world", "admin_server", "false"]
-      }
-    ]
+    "auto_run_scripts": {
+      "module_world": [
+        {
+          "name": "net_msg",
+          "args": ["module_world", "world_server", "false"]
+        },
+        {
+          "name": "net_msg",
+          "args": ["module_world", "admin_server", "false"]
+        }
+      ]
+    }
   },
   "module_world": {
     "database_world": {

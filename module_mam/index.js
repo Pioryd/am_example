@@ -23,6 +23,10 @@ class ModuleMAM extends ModuleBase {
 
     this.setup_managers({
       managers: {
+        database_scripts: new Managers.DatabaseScripts({
+          root_module: this,
+          config: this.config.database_scripts
+        }),
         am: new Manager.AM(this),
         admin_server: new Managers.AdminServer({
           root_module: this,
@@ -38,9 +42,27 @@ class ModuleMAM extends ModuleBase {
         })
       },
       order: {
-        initialize: ["am", "admin_server", "world_client", "api_client"],
-        terminate: ["admin_server", "am", "world_client", "api_client"],
-        poll: ["admin_server", "world_client", "api_client", "am"]
+        initialize: [
+          "database_scripts",
+          "am",
+          "admin_server",
+          "world_client",
+          "api_client"
+        ],
+        terminate: [
+          "admin_server",
+          "am",
+          "world_client",
+          "api_client",
+          "database_scripts"
+        ],
+        poll: [
+          "database_scripts",
+          "admin_server",
+          "world_client",
+          "api_client",
+          "am"
+        ]
       }
     });
   }

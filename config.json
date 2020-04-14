@@ -9,21 +9,27 @@
     },
     "node_modules_rel_path": "node_modules",
     "close_app_delay": 5000,
-    "auto_run_scripts": [
-      {
-        "name": "net_msg",
-        "args": ["module_mam", "world_client", "false"]
-      },
-      {
-        "name": "net_msg",
-        "args": ["module_mam", "admin_server", "false"]
-      }
-    ]
+    "auto_run_scripts": {
+      "module_mam": [
+        {
+          "name": "net_msg",
+          "args": ["module_mam", "world_client", "false"]
+        },
+        {
+          "name": "net_msg",
+          "args": ["module_mam", "admin_server", "false"]
+        }
+      ]
+    }
   },
   "module_mam": {
     "characters": {
       "included": ["5e657b1b222e0a3c381a55e7"],
       "excluded": []
+    },
+    "database_scripts": {
+      "url": "mongodb://127.0.0.1:27017",
+      "name": "admin_scripts"
     },
     "api_client": {
       "login": "Api",

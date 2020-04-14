@@ -1,5 +1,10 @@
 {
-  "required": ["characters", "world_client", "admin_server"],
+  "required": [
+    "characters",
+    "database_scripts",
+    "world_client",
+    "admin_server"
+  ],
   "properties": {
     "characters": {
       "type": "object",
@@ -7,6 +12,14 @@
       "properties": {
         "included": { "type": "array" },
         "excluded": { "type": "array" }
+      }
+    },
+    "database_scripts": {
+      "type": "object",
+      "required": ["url", "name"],
+      "properties": {
+        "url": { "type": "string" },
+        "name": { "type": "string" }
       }
     },
     "api_client": {

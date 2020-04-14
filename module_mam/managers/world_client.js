@@ -9,7 +9,7 @@ const logger = create_logger({
   file_name: __filename
 });
 
-const ParsePacket = {
+const parse_packets = {
   accept_connection: (data, managers) => {
     const { characters_info, am_data } = data;
     managers.world_client.root_module.data.characters_info = characters_info;
@@ -73,6 +73,12 @@ const ParsePacket = {
         { ...packet_data }
       ];
     else character_info.virtual_world_packets = [{ ...packet_data }];
+  }
+};
+const ParsePacket = {
+  root: (data, managers) => {
+    const { packet_id, packet_data } = data;
+    parse_packets[packet_id](packet_data, managers);
   }
 };
 

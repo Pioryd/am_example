@@ -203,7 +203,7 @@ const ParsePacket = {
     const character = managers.characters._get_character_by_id(character_id);
 
     const from_character_name = character.get_name();
-    const to_character_connection_id = managers.characters.get_connection_id(
+    const to_character_connection_id = managers.mam._get_mam_key_by_character_id(
       managers.characters.get_id_by_name(name)
     );
 
@@ -221,7 +221,7 @@ const ParsePacket = {
       return;
     }
 
-    managers.world_server.send(connection.get_id(), "action_message", {
+    managers.world_server.send(to_character_connection_id, "action_message", {
       character_id,
       name: from_character_name,
       text: text

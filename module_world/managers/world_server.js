@@ -9,7 +9,7 @@ const logger = create_logger({
   file_name: __filename
 });
 
-const ParsePacket = {
+const parse_packet = {
   accept_connection: function(connection, received_data, managers) {
     const { login, password, characters } = received_data;
 
@@ -263,7 +263,11 @@ const ParsePacket = {
 
 class WorldServer extends Managers.Server {
   constructor({ root_module, config }) {
-    super({ root_module, config, parse_packet: ParsePacket });
+    super({ root_module, config, parse_packet });
+  }
+
+  send(connection_id, packet_id, packet_data) {
+    super.send(connection_id, "root", { packet_id, packet_data });
   }
 }
 

@@ -9,6 +9,105 @@ const logger = create_logger({
   file_name: __filename
 });
 
+const API_MAP = {
+  character: {
+    change_land: ({ root_module, character_id, timeout, args }) => {
+      const { land_id } = args;
+      root_module.managers.characters.change_land(character_id, land_id);
+    },
+    leave_virtual_world: ({ root_module, character_id, timeout, args }) => {
+      root_module.managers.characters.leave_virtual_world(character_id);
+    },
+    use_doors: ({ root_module, character_id, timeout, args }) => {
+      // TODO find doors id
+      let doors_id = null;
+      const is_door = (id) => {
+        if (!(id in root_module.data.environment_objects_map)) return false;
+        return (
+          root_module.data.environment_objects_map[id]._data.type === "portal"
+        );
+      };
+      const land = root_module.managers.characters.get_land(character_id);
+      if (land == null) logger.error("Land is null");
+      for (const point of land._data.map) {
+        for (const object_id of point.objects_list) {
+          if (is_door(object_id)) {
+            doors_id = object_id;
+            break;
+          }
+        }
+      }
+
+      if (doors_id == null) logger.error(`Unable to find doors`);
+
+      const object_id = doors_id;
+      const action_id = 0;
+      const dynamic_args = {};
+
+      root_module.managers.main_world.process_action(object_id, action_id, {
+        character_id,
+        ...dynamic_args
+      });
+    }
+  },
+  system: {
+    // form_run: ({ root, timeout, args }) => {
+    //   const { name } = args;
+    //   root.system._current_program._run_form(name);
+    // }
+  },
+  virtual_world: {
+    // draw_choice:  ({ root, timeout, args }) => {
+    //     remote_fn: ({root , timeout, args }) => {
+    //     const min = 0;
+    //     const max = 2;
+    //     const number = Math.floor(Math.random() * (max - min + 1)) + min;
+    //     return number;
+    // },
+    make_choice: ({ root_module, character_id, timeout, args }) => {
+      const { choice } = args;
+      const { data } = root_module;
+
+      if (choice == null) return;
+
+      // // Game in virtual world
+      // if (
+      //   data.characters_info[root.ext.character_id].virtual_world_data == null
+      // ) {
+      //   managers.virtual_worlds.process_packet_received_from_character(
+      //     character_id,
+      //     {
+      //       character_id,
+      //       packet_id: "data",
+      //       packet_data: {}
+      //     }
+      //   );
+      //   return;
+      // }
+
+      const choices = ["rock", "paper", "scissors"];
+      const chosen_choice = choices[choice];
+
+      root_module.managers.virtual_worlds.process_packet_received_from_character(
+        character_id,
+        {
+          character_id,
+          packet_id: "message",
+          packet_data: { text: chosen_choice }
+        }
+      );
+      root_module.managers.virtual_worlds.process_packet_received_from_character(
+        character_id,
+        {
+          character_id,
+          packet_id: "data",
+          packet_data: {}
+        }
+      );
+    }
+  }
+};
+
 const parse_packet = {
   accept_connection: function (connection, received_data, managers) {
     const { login, password, characters } = received_data;
@@ -44,6 +143,27 @@ const parse_packet = {
       am_data
     });
     return true;
+  },
+  process_api: function (connection, received_data, managers) {
+    const { character_id, api_name, timeout, args } = received_data;
+    try {
+      let api = null;
+      eval(`api = API_MAP.${api_name}`);
+      api({
+        root_module: managers.world_server.root_module,
+        character_id,
+        timeout,
+        args
+      });
+    } catch (e) {
+      logger.error(
+        `Unable to process api. Error: ${e.message}. Data ${JSON.stringify(
+          { character_id, api_name, timeout, args },
+          null,
+          2
+        )}`
+      );
+    }
   },
   data_character: function (connection, received_data, managers) {
     const { character_id } = received_data;

@@ -9,6 +9,97 @@ const logger = create_logger({
   file_name: __filename
 });
 
+const API_MAP = {
+  character: {
+    change_land: {
+      local_fn: ({ root, timeout, args }) => {
+        const { land_id, character_id } = args;
+        const { world_client } = root.ext.root_module.managers;
+        world_client.send("character_change_land", {
+          character_id: root.ext.character_id,
+          land_id
+        });
+      }
+    },
+    leave_virtual_world: {
+      local_fn: function ({ root, timeout, args }) {
+        const { world_client } = root.ext.root_module.managers;
+        world_client.send("leave_virtual_world", {
+          character_id: root.ext.character_id
+        });
+      }
+    },
+    use_doors: {
+      local_fn: ({ root, timeout, args }) => {
+        const { world_client } = root.ext.root_module.managers;
+
+        const doors_id = root.data.land_data.doors_id;
+
+        world_client.send("script_action", {
+          character_id: root.ext.character_id,
+          object_id: doors_id,
+          action_id: 0,
+          dynamic_args: {}
+        });
+      }
+    }
+  },
+  system: {
+    form_run: {
+      local_fn: ({ root, timeout, args }) => {
+        const { name } = args;
+        root.system._current_program._run_form(name);
+      }
+    }
+  },
+  virtual_world: {
+    // draw_choice: {
+    //   local_fn: ({ root, timeout, args }) => {
+    //     remote_fn: ({root , timeout, args }) => {
+    //     const min = 0;
+    //     const max = 2;
+    //     const number = Math.floor(Math.random() * (max - min + 1)) + min;
+    //     return number;
+    //   }
+    // },
+    make_choice: {
+      local_fn: ({ root, timeout, args }) => {
+        const { choice } = args;
+        const { data } = root.ext.root_module;
+        const { world_client } = root.ext.root_module.managers;
+
+        if (choice == null) return;
+
+        // Game in virtual world
+        if (
+          data.characters_info[root.ext.character_id].virtual_world_data == null
+        ) {
+          world_client.send("virtual_world", {
+            character_id: root.ext.character_id,
+            packet_id: "data",
+            packet_data: {}
+          });
+          return;
+        }
+
+        const choices = ["rock", "paper", "scissors"];
+        const chosen_choice = choices[choice];
+
+        world_client.send("virtual_world", {
+          character_id: root.ext.character_id,
+          packet_id: "message",
+          packet_data: { text: chosen_choice }
+        });
+        world_client.send("virtual_world", {
+          character_id: root.ext.character_id,
+          packet_id: "data",
+          packet_data: {}
+        });
+      }
+    }
+  }
+};
+
 class AM {
   constructor(root_module) {
     this.root_module = root_module;
@@ -17,7 +108,7 @@ class AM {
     };
     this.containers_map = {};
 
-    this.api_map = {};
+    this.api_map = API_MAP; // {};
     this.am_data = {};
 
     this._ready = false;
@@ -108,7 +199,7 @@ class AM {
           }
         }
         // Find door id
-        const is_door = id => {
+        const is_door = (id) => {
           if (!(id in world_data.environment_objects_map)) return false;
           return world_data.environment_objects_map[id].type === "portal";
         };
@@ -139,7 +230,7 @@ class AM {
     }
   }
   parse_virtual_world_packets() {
-    const parse_packet = packet => {
+    const parse_packet = (packet) => {
       const { character_id, packet_id, packet_data } = packet;
 
       if (packet_id === "data") {

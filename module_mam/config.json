@@ -22,16 +22,6 @@
         "name": { "type": "string" }
       }
     },
-    "api_client": {
-      "type": "object",
-      "required": ["login", "password", "options", "socket_io_options"],
-      "properties": {
-        "login": { "type": "string" },
-        "password": { "type": "string" },
-        "options": { "type": "object" },
-        "socket_io_options": { "type": "object" }
-      }
-    },
     "world_client": {
       "type": "object",
       "required": ["login", "password", "options", "socket_io_options"],

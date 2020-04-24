@@ -19,53 +19,25 @@ const parse_packets = {
     for (const character_id of Object.keys(
       managers.world_client.root_module.data.characters_info
     )) {
-      managers.world_client.send("data_character", { character_id });
-      managers.world_client.send("data_land", { character_id });
-      managers.world_client.send("data_world", { character_id });
+      managers.world_client.send("data_mirror", { character_id });
     }
+  },
+  data_mirror: (data, managers) => {
+    const { character_id, mirror } = data;
+
+    // To not override [character_info] object
+    for (const [key, value] of Object.entries(mirror))
+      managers.world_client.root_module.data.characters_info[character_id][
+        key
+      ] = value;
+
+    managers.world_client.send("data_mirror", { character_id });
   },
   process_api: (data, managers) => {
     const { script_id, query_id, value } = data;
 
     for (const root of Object.values(managers.am.containers_map))
       root.return_data.insert({ script_id, query_id, value });
-  },
-  data_character: (data, managers) => {
-    const { character_id } = data;
-    managers.world_client.root_module.data.characters_info[
-      character_id
-    ].character_data = {
-      ...data
-    };
-    managers.world_client.send("data_character", { character_id });
-  },
-  data_land: (data, managers) => {
-    const { character_id } = data;
-    managers.world_client.root_module.data.characters_info[
-      character_id
-    ].land_data = {
-      ...data
-    };
-    managers.world_client.send("data_land", { character_id });
-  },
-  data_world: (data, managers) => {
-    const { character_id } = data;
-    managers.world_client.root_module.data.characters_info[
-      character_id
-    ].world_data = {
-      ...data
-    };
-    managers.world_client.send("data_world", { character_id });
-  },
-  action_message: (data, managers) => {
-    const { character_id } = data;
-    managers.world_client.root_module.data.characters_info[
-      character_id
-    ].action_message_packets = [
-      ...managers.world_client.root_module.data.characters_info[character_id]
-        .action_message_packets,
-      { ...data }
-    ];
   },
   virtual_world: (data, managers) => {
     const { packet_data } = data;

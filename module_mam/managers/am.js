@@ -63,9 +63,9 @@ class AM {
       this.containers_map
     )) {
       this.root_module.data.characters_info[id] = {
-        character_data: {},
-        land_data: {},
-        world_data: {
+        data_character: {},
+        data_land: {},
+        data_world: {
           lands_map: {},
           characters_map: {},
           environment_objects_map: {},
@@ -106,24 +106,33 @@ class AM {
     const { characters_info } = this.root_module.data;
 
     for (const [id, character_info] of Object.entries(characters_info)) {
-      const { character_data, land_data, world_data } = character_info;
-      if ("map" in land_data) {
+      const { data_character, data_land, data_world } = character_info;
+      if (data_character == null || data_land == null || data_world == null) {
+        logger.error(
+          data_character == null,
+          data_land == null,
+          data_world == null
+        );
+        return;
+      }
+
+      if ("map" in data_land) {
         // set character land id
-        for (const point of land_data.map) {
-          if (point.characters_list.includes(character_data.id)) {
-            character_data.land_id = land_data.id;
+        for (const point of data_land.map) {
+          if (point.characters_list.includes(data_character.id)) {
+            data_character.land_id = data_land.id;
             break;
           }
         }
         // Find door id
         const is_door = (id) => {
-          if (!(id in world_data.environment_objects_map)) return false;
-          return world_data.environment_objects_map[id].type === "portal";
+          if (!(id in data_world.environment_objects_map)) return false;
+          return data_world.environment_objects_map[id].type === "portal";
         };
-        for (const point of land_data.map) {
+        for (const point of data_land.map) {
           for (const object_id of point.objects_list) {
             if (is_door(object_id)) {
-              land_data.doors_id = object_id;
+              data_land.doors_id = object_id;
               break;
             }
           }
@@ -131,14 +140,14 @@ class AM {
       }
 
       // Set inside_virtual_world
-      character_data.inside_virtual_world =
-        character_data.virtual_world_id != null &&
-        character_data.virtual_world_id !== "";
+      data_character.inside_virtual_world =
+        data_character.virtual_world_id != null &&
+        data_character.virtual_world_id !== "";
 
       // Set choice
-      character_data.choice = "";
+      data_character.choice = "";
 
-      for (const [val_name, val_value] of Object.entries(character_data)) {
+      for (const [val_name, val_value] of Object.entries(data_character)) {
         if (!(id in this.containers_map))
           throw new Error(`Character[${id}] does not belong to any container`);
         const scripting_system_root = this.containers_map[id];
@@ -153,7 +162,7 @@ class AM {
       if (packet_id === "data") {
         this.root_module.data.characters_info[
           character_id
-        ].virtual_world_data = packet_data;
+        ].virtual_data_world = packet_data;
       } else if (packet_id === "message") {
         logger.log("Virtual world message: ", packet_data);
       } else {

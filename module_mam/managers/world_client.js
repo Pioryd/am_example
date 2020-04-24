@@ -24,6 +24,12 @@ const parse_packets = {
       managers.world_client.send("data_world", { character_id });
     }
   },
+  process_api: (data, managers) => {
+    const { script_id, query_id, value } = data;
+
+    for (const root of Object.values(managers.am.containers_map))
+      root.return_data.insert({ script_id, query_id, value });
+  },
   data_character: (data, managers) => {
     const { character_id } = data;
     managers.world_client.root_module.data.characters_info[

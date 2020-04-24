@@ -9,6 +9,8 @@ const logger = create_logger({
   file_name: __filename
 });
 
+const QUEUE_LIMIT = 10;
+
 const API_MAP = {
   character: {
     change_land: ({ root_module, character_id, timeout, args }) => {
@@ -45,6 +47,14 @@ const API_MAP = {
       const dynamic_args = {};
 
       root_module.managers.main_world.process_action(object_id, action_id, {
+        character_id,
+        ...dynamic_args
+      });
+    },
+    script_action: ({ root_module, character_id, timeout, args }) => {
+      const { object_id, action_id, dynamic_args } = args;
+
+      managers.main_world.process_action(object_id, action_id, {
         character_id,
         ...dynamic_args
       });
@@ -105,6 +115,11 @@ const API_MAP = {
         }
       );
     }
+  },
+  enter_virtual_world: ({ root_module, character_id, timeout, args }) => {
+    // TODO get virtual world by character_id
+    // dodać specjalna tablice
+    managers.characters.enter_virtual_world(character_id, virtual_world_id);
   }
 };
 
@@ -144,33 +159,13 @@ const parse_packet = {
     });
     return true;
   },
-  process_api: function (connection, received_data, managers) {
-    const { character_id, api_name, timeout, args } = received_data;
-    try {
-      let api = null;
-      eval(`api = API_MAP.${api_name}`);
-      api({
-        root_module: managers.world_server.root_module,
-        character_id,
-        timeout,
-        args
-      });
-    } catch (e) {
-      logger.error(
-        `Unable to process api. Error: ${e.message}. Data ${JSON.stringify(
-          { character_id, api_name, timeout, args },
-          null,
-          2
-        )}`
-      );
-    }
-  },
-  data_character: function (connection, received_data, managers) {
+  data_mirror: function (connection, received_data, managers) {
     const { character_id } = received_data;
+    const mirror = {};
 
+    // data_character
     const character = managers.characters._get_character_by_id(character_id);
-
-    managers.world_server.send(connection.get_id(), "data_character", {
+    mirror.data_character = {
       character_id,
       id: character.get_id(),
       name: character.get_name(),
@@ -185,24 +180,19 @@ const parse_packet = {
       energy: character.get_energy(),
       stress: character.get_stress(),
       friends_list: character.get_friends_list()
-    });
-  },
-  data_land: function (connection, received_data, managers) {
-    const { character_id } = received_data;
+    };
 
-    const packet_data = { character_id };
-
+    // data_land
     const land = managers.characters.get_land(character_id);
+    mirror.data_land = {};
     if (land != null) {
-      packet_data.id = land._data.id;
-      packet_data.map = land._data.map;
+      mirror.data_land = {
+        id: land._data.id,
+        map: land._data.map
+      };
     }
 
-    managers.world_server.send(connection.get_id(), "data_land", packet_data);
-  },
-  data_world: function (connection, received_data, managers) {
-    const { character_id } = received_data;
-
+    // data_world
     const lands_map = {};
     const characters_map = {};
     const environment_objects_map = {};
@@ -257,65 +247,76 @@ const parse_packet = {
       virtual_worlds_map[virtual_world.get_id()] = object_data;
     }
 
-    managers.world_server.send(connection.get_id(), "data_world", {
-      character_id,
+    mirror.data_world = {
       lands_map,
       characters_map,
       environment_objects_map,
       virtual_worlds_map
+    };
+
+    managers.world_server.send(connection.get_id(), "data_mirror", {
+      character_id,
+      mirror
     });
+  },
+  process_api: function (connection, received_data, managers) {
+    const { character_id, api_name, timeout, args } = received_data;
+    try {
+      let api = null;
+      eval(`api = API_MAP.${api_name}`);
+      api({
+        root_module: managers.world_server.root_module,
+        character_id,
+        timeout,
+        args
+      });
+    } catch (e) {
+      logger.error(
+        `Unable to process api. Error: ${e.message}. Data ${JSON.stringify(
+          { character_id, api_name, timeout, args },
+          null,
+          2
+        )}`
+      );
+    }
   },
   character_change_position: function (connection, received_data, managers) {
     const { character_id, position_x } = received_data;
 
     managers.characters.change_position(character_id, position_x);
-
-    this.data_world(connection, received_data, managers);
   },
   character_change_land: function (connection, received_data, managers) {
     const { character_id, land_id } = received_data;
 
     managers.characters.change_land(character_id, land_id);
-
-    this.data_world(connection, received_data, managers);
   },
   character_add_friend: function (connection, received_data, managers) {
     const { character_id, name } = received_data;
 
     managers.characters.add_friend_if_exist(character_id, name);
-
-    this.data_character(connection, received_data, managers);
   },
   character_remove_friend: function (connection, received_data, managers) {
     const { character_id, name } = received_data;
 
     managers.characters.remove_friend_if_exist(character_id, name);
-
-    this.data_character(connection, received_data, managers);
   },
   character_change_state: function (connection, received_data, managers) {
     const { character_id, name } = received_data;
 
     const character = managers.characters._get_character_by_id(character_id);
     character._change_state(name);
-
-    this.data_character(connection, received_data, managers);
   },
   character_change_action: function (connection, received_data, managers) {
     const { character_id, name } = received_data;
 
     const character = managers.characters._get_character_by_id(character_id);
     character._change_action(name);
-
-    this.data_character(connection, received_data, managers);
   },
   character_change_activity: function (connection, received_data, managers) {
     const { character_id, name } = received_data;
 
     const character = managers.characters._get_character_by_id(character_id);
     character._change_activity(name);
-
-    this.data_character(connection, received_data, managers);
   },
   action_message: function (connection, received_data, managers) {
     const { character_id, name, text } = received_data;
@@ -341,35 +342,17 @@ const parse_packet = {
       return;
     }
 
-    managers.world_server.send(to_character_connection_id, "action_message", {
-      character_id,
-      name: from_character_name,
-      text: text
+    if (!(character_id in managers.root_module.data.action_messages_map))
+      managers.root_module.data.action_messages_map[character_id] = [];
+
+    const action_messages =
+      managers.root_module.data.action_messages_map[character_id];
+
+    action_messages.push({
+      id: new Date(),
+      action: { name: from_character_name, text: text }
     });
-  },
-  script_action: function (connection, received_data, managers) {
-    const { character_id, object_id, action_id, dynamic_args } = received_data;
-
-    managers.main_world.process_action(object_id, action_id, {
-      character_id,
-      ...dynamic_args
-    });
-  },
-  enter_virtual_world: function (connection, received_data, managers) {
-    logger.error(
-      "Currently is not used",
-      "(Server logic allow only enter by object - action message)"
-    );
-    // const character_id = connection.user_data.character_id;
-
-    // const virtual_world_id = received_data.id;
-
-    // managers.characters.enter_virtual_world(character_id, virtual_world_id);
-  },
-  leave_virtual_world: function (connection, received_data, managers) {
-    const { character_id } = received_data;
-
-    managers.characters.leave_virtual_world(character_id);
+    while (action_messages.length > QUEUE_LIMIT) action_messages.pop();
   },
   virtual_world: function (connection, received_data, managers) {
     const { character_id } = received_data;

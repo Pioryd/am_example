@@ -9,16 +9,6 @@ const logger = create_logger({
   file_name: __filename
 });
 
-const QUEUE_LIMIT = 10;
-const API_MAP = {
-  character: {
-    change_area: ({ root_module, character_id, timeout, args }) => {
-      const { land_id } = args;
-      root_module.managers.characters.change_land(character_id, land_id);
-    }
-  }
-};
-
 const parse_packet = {
   accept_connection: function (connection, received_data, managers) {
     const { login, password, characters } = received_data;
@@ -57,7 +47,6 @@ const parse_packet = {
   },
   data_mirror: function (connection, received_data, managers) {
     const { character_id } = received_data;
-    const mirror = {};
 
     // data_character
     const character = managers.characters._get_character_by_id(character_id);
@@ -154,24 +143,8 @@ const parse_packet = {
   },
   process_api: function (connection, received_data, managers) {
     const { character_id, api_name, timeout, args } = received_data;
-    try {
-      let api = null;
-      eval(`api = API_MAP.${api_name}`);
-      api({
-        root_module: managers.world_server.root_module,
-        character_id,
-        timeout,
-        args
-      });
-    } catch (e) {
-      logger.error(
-        `Unable to process api. Error: ${e.message}. Data ${JSON.stringify(
-          { character_id, api_name, timeout, args },
-          null,
-          2
-        )}`
-      );
-    }
+
+    managers.api_loader({ character_id, api_name, timeout, args });
   }
 };
 

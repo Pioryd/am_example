@@ -40,6 +40,7 @@
           "load_from": "",
           "force_new": true
         },
+        "api_loader": {},
         "mam_register": {},
         "world_server": {
           "login": "World",
@@ -54,6 +55,7 @@
       "managers_order": {
         "initialize": [
           "world_creator",
+          "api_loader",
           "mam_register",
           "admin_scripts",
           "admin_server",
@@ -65,12 +67,14 @@
           "admin_server",
           "world_server",
           "world_creator",
+          "api_loader",
           "mam_register",
           "backup"
         ],
         "poll": [
           "admin_scripts",
           "admin_server",
+          "api_loader",
           "mam_register",
           "world_server",
           "world_creator",

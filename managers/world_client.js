@@ -38,19 +38,6 @@ const parse_packets = {
 
     for (const root of Object.values(managers.am.containers_map))
       root.return_data.insert({ script_id, query_id, value });
-  },
-  virtual_world: (data, managers) => {
-    const { packet_data } = data;
-    const { character_id } = packet_data;
-    const character_info =
-      managers.world_client.root_module.data.characters_info[character_id];
-
-    if (Array.isArray(character_info.virtual_world_packets))
-      character_info.virtual_world_packets = [
-        ...character_info.virtual_world_packets,
-        { ...packet_data }
-      ];
-    else character_info.virtual_world_packets = [{ ...packet_data }];
   }
 };
 const ParsePacket = {
@@ -60,7 +47,7 @@ const ParsePacket = {
   }
 };
 
-class WorldClient extends Managers.Client {
+class WorldClient extends Managers.client {
   constructor({ root_module, config }) {
     super({
       root_module,

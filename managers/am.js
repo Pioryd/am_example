@@ -80,6 +80,7 @@ class AM {
 
       scripting_system_root.install_api(
         ({ root, fn_full_name, script_id, query_id, timeout, args }) => {
+          console.log("send api " + fn_full_name);
           this.root_module.managers.world_client.send("process_api", {
             character_id: root.ext.character_id,
             api_name: fn_full_name,
@@ -122,19 +123,6 @@ class AM {
           if (point.characters_list.includes(data_character.id)) {
             data_character.land_id = data_land.id;
             break;
-          }
-        }
-        // Find door id
-        const is_door = (id) => {
-          if (!(id in data_world.environment_objects_map)) return false;
-          return data_world.environment_objects_map[id].type === "portal";
-        };
-        for (const point of data_land.map) {
-          for (const object_id of point.objects_list) {
-            if (is_door(object_id)) {
-              data_land.doors_id = object_id;
-              break;
-            }
           }
         }
       }

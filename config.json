@@ -1,54 +1,80 @@
 {
-  "app": {
-    "modules": {
-      "map": {
-        "module_mam": ""
-      },
-      "paths_auto_find": [],
-      "disabled": []
-    },
-    "node_modules_rel_path": "node_modules",
-    "close_app_delay": 5000,
-    "auto_run_scripts": {
-      "module_mam": [
-        {
-          "name": "net_msg",
-          "args": ["module_mam", "world_client", "false"]
+  "managers_rel_name": "managers",
+  "node_modules_rel_path": "node_modules",
+  "close_app_delay": 5000,
+  "modules": {
+    "module_mam": {
+      "managers_map": {
+        "admin_server": {
+          "login": "MAM",
+          "password": "123",
+          "options": {
+            "port": 3106,
+            "packet_timeout": 0
+          },
+          "socket_io_options": {}
         },
-        {
-          "name": "net_msg",
-          "args": ["module_mam", "admin_server", "false"]
+        "backup": {
+          "url": "mongodb://127.0.0.1:27017",
+          "name": "mam_backup",
+          "interval": 3,
+          "archive_limit": 3,
+          "list": []
+        },
+        "admin_scripts": {
+          "url": "mongodb://127.0.0.1:27017",
+          "name": "admin_scripts",
+          "scripts_rel_name": "scripts",
+          "auto_run_scripts": [
+            {
+              "id": "net_msg",
+              "args": ["module_mam", "admin_server", "false"]
+            },
+            {
+              "id": "net_msg",
+              "args": ["module_mam", "world_client", "false"]
+            }
+          ]
+        },
+        "am": {},
+        "am_data": {},
+        "world_client": {
+          "login": "World",
+          "password": "123",
+          "options": {
+            "url": "http://localhost:3100",
+            "packet_timeout": 0,
+            "send_delay": 1000
+          },
+          "socket_io_options": {}
         }
-      ]
-    }
-  },
-  "module_mam": {
-    "characters": {
-      "included": ["5e657b1b222e0a3c381a55e7"],
-      "excluded": []
-    },
-    "database_scripts": {
-      "url": "mongodb://127.0.0.1:27017",
-      "name": "admin_scripts"
-    },
-    "world_client": {
-      "login": "World",
-      "password": "123",
-      "options": {
-        "url": "http://localhost:3100",
-        "packet_timeout": 0,
-        "send_delay": 1000
       },
-      "socket_io_options": {}
-    },
-    "admin_server": {
-      "login": "MAM",
-      "password": "123",
-      "options": {
-        "port": 3103,
-        "packet_timeout": 0
-      },
-      "socket_io_options": {}
+      "managers_order": {
+        "initialize": [
+          "am",
+          "am_data",
+          "admin_scripts",
+          "admin_server",
+          "world_client",
+          "backup"
+        ],
+        "terminate": [
+          "admin_scripts",
+          "admin_server",
+          "world_client",
+          "am",
+          "am_data",
+          "backup"
+        ],
+        "poll": [
+          "admin_scripts",
+          "admin_server",
+          "am",
+          "world_client",
+          "am_data",
+          "backup"
+        ]
+      }
     }
   }
 }

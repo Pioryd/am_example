@@ -1,4 +1,4 @@
-class MAM {
+class MAM_Register {
   constructor(root_module) {
     this.root_module = root_module;
 
@@ -60,20 +60,8 @@ class MAM {
     delete this.mam_data[connection_id];
   }
 
-  send(character_id, packet_id, packet_data) {
-    const connection_id = this._get_mam_key_by_character_id(character_id);
-
-    if (connection_id == null)
-      throw new Error(
-        `Unable to send packet. Character[${character_id}]` +
-          ` is not connected to MAM`
-      );
-
-    this.root_module.managers.world_server.send(
-      connection_id,
-      "virtual_world",
-      { packet_id, packet_data: { character_id, ...packet_data } }
-    );
+  get_connection(character_id) {
+    return this._get_mam_key_by_character_id(character_id);
   }
 
   _get_mam_key_by_character_id(id) {
@@ -85,4 +73,4 @@ class MAM {
   }
 }
 
-module.exports = MAM;
+module.exports = MAM_Register;

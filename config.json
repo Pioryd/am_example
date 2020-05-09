@@ -1,153 +1,81 @@
 {
-  "app": {
-    "modules": {
-      "map": {
-        "module_world": ""
-      },
-      "paths_auto_find": [],
-      "disabled": []
-    },
-    "node_modules_rel_path": "node_modules",
-    "close_app_delay": 5000,
-    "auto_run_scripts": {
-      "module_world": [
-        {
-          "name": "net_msg",
-          "args": ["module_world", "world_server", "false"]
+  "managers_rel_name": "managers",
+  "node_modules_rel_path": "node_modules",
+  "close_app_delay": 5000,
+  "modules": {
+    "module_world": {
+      "managers_map": {
+        "admin_server": {
+          "login": "World",
+          "password": "123",
+          "options": {
+            "port": 3101,
+            "packet_timeout": 0
+          },
+          "socket_io_options": {}
         },
-        {
-          "name": "net_msg",
-          "args": ["module_world", "admin_server", "false"]
+        "backup": {
+          "url": "mongodb://127.0.0.1:27017",
+          "name": "am_world_schema_1",
+          "interval": 3,
+          "archive_limit": 3,
+          "list": []
+        },
+        "admin_scripts": {
+          "url": "mongodb://127.0.0.1:27017",
+          "name": "admin_scripts",
+          "scripts_rel_name": "scripts",
+          "auto_run_scripts": [
+            {
+              "id": "net_msg",
+              "args": ["module_world", "admin_server", "false"]
+            },
+            {
+              "id": "net_msg",
+              "args": ["module_world", "world_server", "false"]
+            }
+          ]
+        },
+        "world_creator": {
+          "load_from": "",
+          "force_new": true
+        },
+        "mam_register": {},
+        "world_server": {
+          "login": "World",
+          "password": "123",
+          "options": {
+            "port": 3103,
+            "packet_timeout": 0
+          },
+          "socket_io_options": {}
         }
-      ]
-    }
-  },
-  "module_world": {
-    "database_world": {
-      "url": "mongodb://127.0.0.1:27017",
-      "name": "am_world"
-    },
-    "database_scripts": {
-      "url": "mongodb://127.0.0.1:27017",
-      "name": "admin_scripts"
-    },
-    "virtual_world": {
-      "login": "VW",
-      "password": "123",
-      "options": {
-        "url": "http://localhost:4001",
-        "packet_timeout": 0
       },
-      "socket_io_options": {}
-    },
-    "world_server": {
-      "login": "World",
-      "password": "123",
-      "options": {
-        "port": 3100,
-        "packet_timeout": 0
-      },
-      "socket_io_options": {}
-    },
-    "admin_server": {
-      "login": "World",
-      "password": "123",
-      "options": {
-        "port": 3101,
-        "packet_timeout": 0
-      },
-      "socket_io_options": {}
-    },
-    "am_data_rules": {
-      "am_form": {
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "rules": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string"
-                },
-                "triggers": {
-                  "type": "array"
-                },
-                "actions": {
-                  "type": "array"
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "scripts": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": ["id", "name", "rules", "scripts"],
-        "additionalProperties": false
-      },
-      "am_program": {
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "rules": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string"
-                },
-                "triggers": {
-                  "type": "array"
-                },
-                "actions": {
-                  "type": "array"
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "forms": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": ["id", "name", "rules", "forms"],
-        "additionalProperties": false
-      },
-      "am_system": {
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "programs": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": ["id", "name", "programs"],
-        "additionalProperties": false
+      "managers_order": {
+        "initialize": [
+          "world_creator",
+          "mam_register",
+          "admin_scripts",
+          "admin_server",
+          "world_server",
+          "backup"
+        ],
+        "terminate": [
+          "admin_scripts",
+          "admin_server",
+          "world_server",
+          "world_creator",
+          "mam_register",
+          "backup"
+        ],
+        "poll": [
+          "admin_scripts",
+          "admin_server",
+          "mam_register",
+          "world_server",
+          "world_creator",
+          "backup"
+        ]
       }
     }
   }

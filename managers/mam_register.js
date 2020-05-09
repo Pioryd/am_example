@@ -2,7 +2,7 @@ class MAM_Register {
   constructor(root_module) {
     this.root_module = root_module;
 
-    this.mam_data = {};
+    this.mam_data_map = {};
   }
 
   initialize() {}
@@ -13,7 +13,7 @@ class MAM_Register {
 
   register(mam_characters, connection_id) {
     const characters_info = {};
-    const characters_ids_list = [];
+    const characters_list = [];
     const characters_manager = this.root_module.managers.characters;
 
     if ("included" in mam_characters && mam_characters.included.length > 0) {
@@ -27,7 +27,7 @@ class MAM_Register {
             `Character[${id}] is connected to another MAM[${mam_key}]`
           );
 
-        characters_ids_list.push(id);
+        characters_list.push(id);
       }
     } else if (
       "excluded" in mam_characters &&
@@ -38,26 +38,26 @@ class MAM_Register {
           !mam_characters.excluded.includes(id) &&
           this._get_mam_key_by_character_id(id) == null
         )
-          characters_ids_list.push(id);
+          characters_list.push(id);
       }
     } else {
       for (const id of Object.keys(this.root_module.data.characters_map)) {
         if (this._get_mam_key_by_character_id(id) == null)
-          characters_ids_list.push(id);
+          characters_list.push(id);
       }
     }
 
     // setup characters_info
-    for (const id of characters_ids_list) {
+    for (const id of characters_list) {
       characters_info[id] = { id, force_new: false };
     }
 
-    this.mam_data[connection_id] = characters_ids_list;
+    this.mam_data_map[connection_id] = { characters_list };
     return characters_info;
   }
 
   unregister(connection_id) {
-    delete this.mam_data[connection_id];
+    delete this.mam_data_map[connection_id];
   }
 
   get_connection(character_id) {
@@ -65,10 +65,8 @@ class MAM_Register {
   }
 
   _get_mam_key_by_character_id(id) {
-    for (const [connection_id, characters_ids_list] of Object.entries(
-      this.mam_data
-    )) {
-      if (characters_ids_list.includes(id)) return connection_id;
+    for (const [connection_id, mam_data] of Object.entries(this.mam_data_map)) {
+      if (mam_data.characters_list.includes(id)) return connection_id;
     }
   }
 }

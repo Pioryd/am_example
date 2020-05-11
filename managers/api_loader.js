@@ -1,10 +1,21 @@
-const _ = require("lodash");
+const fs = require("fs");
 const path = require("path");
+
+const _ = require(path.join(global.node_modules_path, "lodash"));
+const { Util, create_logger } = require(path.join(
+  global.node_modules_path,
+  "am_framework"
+));
+
+const logger = create_logger({
+  module_name: "module_world",
+  file_name: __filename
+});
 
 const DEFAULT_CONFIG = { api_folder: "api" };
 
 class ApiLoader {
-  constructor(root_module, config) {
+  constructor({ root_module, config }) {
     this.root_module = root_module;
     this.config = _.merge(DEFAULT_CONFIG, config);
 
@@ -13,6 +24,19 @@ class ApiLoader {
 
   initialize() {
     this.load();
+
+    this.process({
+      object_id: 1,
+      api: "world.test_1",
+      timeout: 11,
+      args: { a: 1, b: 2 }
+    });
+    this.process({
+      object_id: 2,
+      api: "world.b.test_2",
+      timeout: 22,
+      args: { x: 11, z: 22 }
+    });
   }
 
   terminate() {}
@@ -21,30 +45,38 @@ class ApiLoader {
 
   load() {
     const api_folder_full_name = path.join(
-      this.config.api_folder,
-      this.root_module.application.root_full_name
+      this.root_module.application.root_full_name,
+      this.config.api_folder
     );
-
+    console.log(api_folder_full_name);
     if (api_folder_full_name != null && fs.existsSync(api_folder_full_name)) {
-      for (const file of Util.get_files(api_folder_full_name))
-        this.api_map[file] = require(path.join(api_folder_full_name, file));
+      for (const file of Util.get_files(api_folder_full_name)) {
+        const file_name_without_extension = file
+          .split(".")
+          .slice(0, -1)
+          .join(".");
+        this.api_map[file_name_without_extension] = require(path.join(
+          api_folder_full_name,
+          file
+        ));
+      }
     }
   }
 
-  execute({ character_id, api_name, timeout, args }) {
+  process({ object_id, api, timeout, args }) {
     try {
-      let api = null;
-      eval(`api = this.api_map.${api_name}`);
-      api({
+      let api_to_process = null;
+      eval(`api_to_process = this.api_map.${api}`);
+      api_to_process({
         root_module: this.root_module,
-        character_id,
+        object_id,
         timeout,
         args
       });
     } catch (e) {
       logger.error(
         `Unable to process api. Error: ${e.message}. Data ${JSON.stringify(
-          { character_id, api_name, timeout, args },
+          { object_id, api, timeout, args },
           null,
           2
         )}`

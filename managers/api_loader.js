@@ -24,19 +24,6 @@ class ApiLoader {
 
   initialize() {
     this.load();
-
-    this.process({
-      object_id: 1,
-      api: "world.test_1",
-      timeout: 11,
-      args: { a: 1, b: 2 }
-    });
-    this.process({
-      object_id: 2,
-      api: "world.b.test_2",
-      timeout: 22,
-      args: { x: 11, z: 22 }
-    });
   }
 
   terminate() {}
@@ -48,7 +35,7 @@ class ApiLoader {
       this.root_module.application.root_full_name,
       this.config.api_folder
     );
-    console.log(api_folder_full_name);
+
     if (api_folder_full_name != null && fs.existsSync(api_folder_full_name)) {
       for (const file of Util.get_files(api_folder_full_name)) {
         const file_name_without_extension = file

@@ -11,9 +11,9 @@ const logger = create_logger({
 
 const parse_packet = {
   accept_connection: function (connection, received_data, managers) {
-    const { login, password, characters } = received_data;
+    const { login, password, mam_data } = received_data;
+    const { config } = managers.world_server;
 
-    const config = managers.world_server.config;
     if (
       login == null ||
       password == null ||
@@ -29,18 +29,19 @@ const parse_packet = {
       return false;
     }
 
-    const characters_info = managers.mam_register.register(
-      characters,
+    const { objects_list } = managers.mam_register.register(
+      mam_data,
       connection.get_id()
-    );
+    ).mam;
 
     connection.on_close = (connection) => {
       managers.mam_register.unregister(connection.get_id());
     };
 
     managers.world_server.send(connection.get_id(), "accept_connection", {
-      characters_info
+      objects_list
     });
+
     return true;
   },
   data_mirror: function (connection, received_data, managers) {

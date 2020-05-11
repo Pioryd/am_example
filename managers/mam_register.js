@@ -1,8 +1,9 @@
 class MAM_Register {
-  constructor(root_module) {
+  constructor({ root_module, config }) {
     this.root_module = root_module;
+    this.config = config;
 
-    this.mam_data_map = {};
+    this.mam_map = {};
   }
 
   initialize() {}
@@ -11,63 +12,75 @@ class MAM_Register {
 
   poll() {}
 
-  register(mam_characters, connection_id) {
-    const characters_info = {};
-    const characters_list = [];
-    const characters_manager = this.root_module.managers.characters;
-
-    if ("included" in mam_characters && mam_characters.included.length > 0) {
-      for (const id of mam_characters.included) {
-        if (characters_manager._get_character_by_id(id) == null)
-          throw new Error(`Character[${id}] not found`);
-
-        const mam_key = this._get_mam_key_by_character_id(id);
-        if (mam_key != null)
+  register(mam_data, connection_id) {
+    const throw_if = {
+      not_found: (object) => {
+        if (object == null) throw new Error(`Object[${id}] not found`);
+      },
+      cannot_be_am: (object) => {
+        if (!object.properties.includes("am"))
+          throw new Error(`Object[${object.id}] cannot be AM`);
+      },
+      is_taken: (object) => {
+        const mam_id = this._get_mam_id_by_object_id(object.id);
+        if (mam_id != null)
           throw new Error(
-            `Character[${id}] is connected to another MAM[${mam_key}]`
+            `Object[${object.id}] is connected to another MAM[${mam_id}]`
           );
-
-        characters_list.push(id);
       }
-    } else if (
-      "excluded" in mam_characters &&
-      mam_characters.excluded.length > 0
-    ) {
-      for (const id of Object.keys(this.root_module.data.characters_map)) {
-        if (
-          !mam_characters.excluded.includes(id) &&
-          this._get_mam_key_by_character_id(id) == null
-        )
-          characters_list.push(id);
+    };
+
+    if (connection_id in this.mam_map)
+      throw new Error(`Mam with id[${connection_id}] is already registered.`);
+
+    const mam = { objects_list: [] };
+    if ("included" in mam_data && mam_data.included.length > 0) {
+      for (const id of mam_data.included) {
+        const object = this.root_module.data.objects[id];
+        throw_if.not_found(object);
+        throw_if.cannot_be_am(object);
+        throw_if.is_taken(object);
+        mam.objects_list.push(id);
+      }
+    } else if ("excluded" in mam_data && mam_data.excluded.length > 0) {
+      for (const [id, object] of Object.entries(
+        this.root_module.data.objects
+      )) {
+        if (mam_data.excluded.includes(id)) continue;
+        try {
+          throw_if.cannot_be_am(object);
+          throw_if.is_taken(object);
+          mam.objects_list.push(id);
+        } catch (e) {}
       }
     } else {
-      for (const id of Object.keys(this.root_module.data.characters_map)) {
-        if (this._get_mam_key_by_character_id(id) == null)
-          characters_list.push(id);
+      for (const [id, object] of Object.entries(
+        this.root_module.data.objects
+      )) {
+        try {
+          throw_if.cannot_be_am(object);
+          throw_if.is_taken(object);
+          mam.objects_list.push(id);
+        } catch (e) {}
       }
     }
 
-    // setup characters_info
-    for (const id of characters_list) {
-      characters_info[id] = { id, force_new: false };
-    }
+    this.mam_map[connection_id] = mam;
 
-    this.mam_data_map[connection_id] = { characters_list };
-    return characters_info;
+    return mam;
   }
 
-  unregister(connection_id) {
-    delete this.mam_data_map[connection_id];
+  unregister(mam_id) {
+    delete this.mam_map[mam_id];
   }
 
-  get_connection(character_id) {
-    return this._get_mam_key_by_character_id(character_id);
+  get_connection_id_object_id(object_id) {
+    return this._get_mam_id_by_object_id(object_id);
   }
 
-  _get_mam_key_by_character_id(id) {
-    for (const [connection_id, mam_data] of Object.entries(this.mam_data_map)) {
-      if (mam_data.characters_list.includes(id)) return connection_id;
-    }
+  _get_mam_id_by_object_id(id) {
+    for (const [connection_id, mam] of Object.entries(this.mam_map))
+      if (mam.objects_list.includes(id)) return connection_id;
   }
 }
 

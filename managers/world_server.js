@@ -55,9 +55,9 @@ const parse_packet = {
     });
   },
   process_api: function (connection, received_data, managers) {
-    const { character_id, api_name, timeout, args } = received_data;
+    const { object_id, api, timeout, args } = received_data;
 
-    managers.api_loader({ character_id, api_name, timeout, args });
+    managers.api_loader.process({ object_id, api, timeout, args });
   }
 };
 

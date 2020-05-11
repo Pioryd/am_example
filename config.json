@@ -16,7 +16,7 @@
         },
         "backup": {
           "url": "mongodb://127.0.0.1:27017",
-          "name": "am_world_schema_1",
+          "name": "world_backup",
           "interval": 3,
           "archive_limit": 3,
           "list": []
@@ -36,9 +36,103 @@
             }
           ]
         },
+        "editor": {
+          "data_config": {
+            "type": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_creator"
+              },
+              "actions": ["data", "update"],
+              "init": { "id": "", "extends": "", "data": {}, "properties": [] },
+              "validate": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "extends": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object"
+                  },
+                  "properties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["id"],
+                "additionalProperties": false
+              }
+            },
+            "object": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_creator"
+              },
+              "actions": ["data", "update"],
+              "init": {
+                "id": "",
+                "type": "",
+                "data": {},
+                "properties": [],
+                "area": ""
+              },
+              "validate": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object"
+                  },
+                  "properties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "area": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id"],
+                "additionalProperties": false
+              }
+            },
+            "am_form": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_program": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_system": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_script": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            }
+          }
+        },
         "world_creator": {
-          "load_from": "",
-          "force_new": true
+          "force_create": false
         },
         "api_loader": {},
         "mam_register": {},
@@ -54,6 +148,7 @@
       },
       "managers_order": {
         "initialize": [
+          "editor",
           "world_creator",
           "api_loader",
           "mam_register",
@@ -67,6 +162,7 @@
           "admin_server",
           "world_server",
           "world_creator",
+          "editor",
           "api_loader",
           "mam_register",
           "backup"
@@ -76,6 +172,7 @@
           "admin_server",
           "api_loader",
           "mam_register",
+          "editor",
           "world_server",
           "world_creator",
           "backup"

@@ -45,12 +45,12 @@ const parse_packet = {
     return true;
   },
   data_mirror: function (connection, received_data, managers) {
-    const { character_id } = received_data;
+    const { object_id } = received_data;
 
-    const mirror = this.root_module.data.characters[character_id];
+    const mirror = this.root_module.data.world;
 
     managers.world_server.send(connection.get_id(), "data_mirror", {
-      character_id,
+      object_id,
       mirror
     });
   },

@@ -37,10 +37,12 @@ class MAM_Register {
     if ("included" in mam_data && mam_data.included.length > 0) {
       for (const id of mam_data.included) {
         const object = this.root_module.data.objects[id];
-        throw_if.not_found(object);
-        throw_if.cannot_be_am(object);
-        throw_if.is_taken(object);
-        mam.objects_list.push(id);
+        try {
+          throw_if.not_found(object);
+          throw_if.cannot_be_am(object);
+          throw_if.is_taken(object);
+          mam.objects_list.push(id);
+        } catch (e) {}
       }
     } else if ("excluded" in mam_data && mam_data.excluded.length > 0) {
       for (const [id, object] of Object.entries(

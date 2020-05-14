@@ -36,22 +36,122 @@
             }
           ]
         },
-        "am": {},
+        "am_root": {
+          "process_delay": 500,
+          "process_debug": true
+        },
         "am_data": {},
         "world_client": {
           "login": "World",
           "password": "123",
           "options": {
-            "url": "http://localhost:3100",
+            "url": "http://localhost:3103",
             "packet_timeout": 0,
             "send_delay": 1000
           },
-          "socket_io_options": {}
+          "socket_io_options": {},
+          "objects_to_register": {}
+        },
+        "editor": {
+          "data_config": {
+            "type": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_creator"
+              },
+              "actions": ["data", "update"],
+              "init": { "id": "", "extends": "", "data": {}, "properties": [] },
+              "validate": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "extends": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object"
+                  },
+                  "properties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["id"],
+                "additionalProperties": false
+              }
+            },
+            "object": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_creator"
+              },
+              "actions": ["data", "update"],
+              "init": {
+                "id": "",
+                "type": "",
+                "data": {},
+                "properties": [],
+                "area": ""
+              },
+              "validate": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object"
+                  },
+                  "properties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "area": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id"],
+                "additionalProperties": false
+              }
+            },
+            "am_form": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_program": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_system": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_script": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            }
+          }
         }
       },
       "managers_order": {
         "initialize": [
-          "am",
+          "editor",
+          "am_root",
           "am_data",
           "admin_scripts",
           "admin_server",
@@ -59,17 +159,19 @@
           "backup"
         ],
         "terminate": [
+          "editor",
           "admin_scripts",
           "admin_server",
           "world_client",
-          "am",
+          "am_root",
           "am_data",
           "backup"
         ],
         "poll": [
+          "editor",
           "admin_scripts",
           "admin_server",
-          "am",
+          "am_root",
           "world_client",
           "am_data",
           "backup"

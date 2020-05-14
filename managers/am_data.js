@@ -1,69 +1,88 @@
 const path = require("path");
-const { ScriptingSystem } = require(path.join(
-  global.node_modules_path,
-  "am_framework"
-));
+const { AM } = require(path.join(global.node_modules_path, "am_framework"));
 
 class AM_Data {
-  constructor(root_module) {
+  constructor({ root_module }) {
     this.root_module = root_module;
+
+    this.data_to_load = {
+      am_system: { data_name: "systems", loaded: false },
+      am_program: { data_name: "programs", loaded: false },
+      am_form: { data_name: "forms", loaded: false },
+      am_script: { data_name: "scripts", loaded: false }
+    };
+
+    this.am_source = {};
+
+    this.loaded = false;
   }
 
   initialize() {}
 
   terminate() {}
 
-  poll() {}
-
-  get_primary(characters_ids) {
-    const { managers } = this.root_module;
-    const am_data = { systems: {}, programs: {}, forms: {}, scripts: {} };
-
-    for (const id of characters_ids) {
-      const system_id = managers.characters.get_default_system_id(id);
-      if (system_id == null)
-        throw new Error(`Not found system[${system_id}] of character[${id}]`);
-      if (am_data.systems != null && system_id in am_data.systems) continue;
-
-      const full_system_data = this._get_full_system_data(system_id);
-      for (const [id, system] of Object.entries(full_system_data.systems))
-        am_data.systems[id] = system;
-      for (const [id, program] of Object.entries(full_system_data.programs))
-        am_data.programs[id] = program;
-      for (const [id, form] of Object.entries(full_system_data.forms))
-        am_data.forms[id] = form;
-      for (const [id, script] of Object.entries(full_system_data.scripts))
-        am_data.scripts[id] = script;
-    }
-
-    return am_data;
+  poll() {
+    if (!this.loaded) this._load_data();
   }
 
-  _get_full_system_data(id) {
-    const { data } = this.root_module;
+  reload_data() {
+    this.loaded = false;
+    for (const data_info of Object.values(this.data_to_load))
+      data_info.loaded = false;
+
+    this._load_data();
+  }
+
+  _load_data() {
+    const { managers } = this.root_module;
+
+    if (this.is_loaded() || !managers.editor.is_connected()) return;
+
+    for (const [data_name, data_info] of Object.entries(this.data_to_load)) {
+      managers.editor.get_data(data_name, (objects_list, message) => {
+        if (objects_list == null) return;
+        this.am_source[data_info.data_name] = {};
+        for (const object of objects_list)
+          this.am_source[data_info.data_name][object.id] = object;
+        this.data_to_load[data_name].loaded = true;
+      });
+    }
+  }
+
+  get_full_system_data(system_id) {
     const am_data = { systems: {}, programs: {}, forms: {}, scripts: {} };
-    const system = data.am_systems_map[id]._data;
 
-    if (system == null) return am_data;
-
-    am_data.systems[id] = system;
+    const system = this.am_source.system[system_id]._data;
+    if (system == null) throw new Error(`Not found system[${system_id}].`);
+    am_data.systems[system_id] = system;
 
     for (const program_id of system.programs) {
-      const program = data.am_programs_map[program_id]._data;
+      const program = this.am_source.programs[program_id];
+      if (program == null) throw new Error(`Not found program[${program_id}].`);
       am_data.programs[program_id] = program;
 
       for (const form_id of program.forms) {
-        const form = data.am_forms_map[form_id]._data;
+        const form = this.am_source.forms[form_id];
+        if (form == null) throw new Error(`Not found form[${form_id}].`);
         am_data.forms[form_id] = form;
 
         for (const script_id of form.scripts) {
-          const script = data.am_scripts_map[script_id]._data;
-          am_data.scripts[script_id] = ScriptingSystem.AML.parse(script.source);
+          const script = this.am_source.scripts[script_id];
+          if (script == null)
+            throw new Error(`Not found script[${script_id}].`);
+          am_data.scripts[script_id] = AM.AML.parse(script.source);
         }
       }
     }
 
     return am_data;
+  }
+
+  is_loaded() {
+    for (const data_info of Object.values(this.data_to_load))
+      if (!data_info.loaded) return false;
+    this.loaded = true;
+    return true;
   }
 }
 

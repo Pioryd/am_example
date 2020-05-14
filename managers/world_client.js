@@ -11,33 +11,18 @@ const logger = create_logger({
 
 const parse_packets = {
   accept_connection: (data, managers) => {
-    const { characters_info, am_data } = data;
-    managers.world_client.root_module.data.characters_info = characters_info;
+    const { objects_list } = data;
+    managers.world_client.root_module.data.objects_list = objects_list;
 
-    managers.am.am_data = am_data;
-
-    for (const character_id of Object.keys(
-      managers.world_client.root_module.data.characters_info
-    )) {
-      managers.world_client.send("data_mirror", { character_id });
-    }
+    managers.world_client.send("data_mirror", {});
   },
   data_mirror: (data, managers) => {
-    const { character_id, mirror } = data;
-
-    // To not override [character_info] object
-    for (const [key, value] of Object.entries(mirror))
-      managers.world_client.root_module.data.characters_info[character_id][
-        key
-      ] = value;
-
-    managers.world_client.send("data_mirror", { character_id });
+    const { mirror } = data;
+    managers.world_client.root_module.data.mirror = mirror;
   },
   process_api: (data, managers) => {
     const { script_id, query_id, value } = data;
-
-    for (const root of Object.values(managers.am.containers_map))
-      root.return_data.insert({ script_id, query_id, value });
+    managers.am_root.process_return_value({ script_id, query_id, value });
   }
 };
 const ParsePacket = {
@@ -54,9 +39,16 @@ class WorldClient extends Managers.client {
       config,
       parse_packet: ParsePacket,
       on_connected: () => {
-        const { login, password } = config;
-        const { characters } = root_module.config;
-        this.send("accept_connection", { login, password, characters });
+        try {
+          const { login, password, objects_to_register } = config;
+          this.send("accept_connection", {
+            login,
+            password,
+            objects_to_register
+          });
+        } catch (e) {
+          logger.error(e, e.stack);
+        }
       }
     });
   }

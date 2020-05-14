@@ -1,7 +1,20 @@
+const path = require("path");
+const { create_logger } = require(path.join(
+  global.node_modules_path,
+  "am_framework"
+));
+const _ = require(path.join(global.node_modules_path, "lodash"));
+
+const logger = create_logger({
+  module_name: "module_world",
+  file_name: __filename
+});
+
+const DEFAULT_CONFIG = { debug: false };
 class MAM_Register {
   constructor({ root_module, config }) {
     this.root_module = root_module;
-    this.config = config;
+    this.config = _.merge(DEFAULT_CONFIG, config);
 
     this.mam_map = {};
   }
@@ -12,20 +25,23 @@ class MAM_Register {
 
   poll() {}
 
-  register(mam_data, connection_id) {
+  register(objects_to_register, connection_id) {
     const throw_if = {
       not_found: (object) => {
-        if (object == null) throw new Error(`Object[${id}] not found`);
+        if (object == null)
+          throw new Error(`Object[${JSON.stringify(object)}] not found`);
       },
       cannot_be_am: (object) => {
         if (!object.properties.includes("am"))
-          throw new Error(`Object[${object.id}] cannot be AM`);
+          throw new Error(`Object[${JSON.stringify(object)}] cannot be AM`);
       },
       is_taken: (object) => {
         const mam_id = this._get_mam_id_by_object_id(object.id);
         if (mam_id != null)
           throw new Error(
-            `Object[${object.id}] is connected to another MAM[${mam_id}]`
+            `Object[${JSON.stringify(
+              object
+            )}] is connected to another MAM[${mam_id}]`
           );
       }
     };
@@ -34,36 +50,48 @@ class MAM_Register {
       throw new Error(`Mam with id[${connection_id}] is already registered.`);
 
     const mam = { objects_list: [] };
-    if ("included" in mam_data && mam_data.included.length > 0) {
-      for (const id of mam_data.included) {
-        const object = this.root_module.data.objects[id];
+    if (
+      "included" in objects_to_register &&
+      objects_to_register.included.length > 0
+    ) {
+      for (const id of objects_to_register.included) {
+        const object = this.root_module.data.world.objects[id];
         try {
           throw_if.not_found(object);
           throw_if.cannot_be_am(object);
           throw_if.is_taken(object);
           mam.objects_list.push(id);
-        } catch (e) {}
+        } catch (e) {
+          if (this.config.debug) logger.debug(e, e.stack);
+        }
       }
-    } else if ("excluded" in mam_data && mam_data.excluded.length > 0) {
+    } else if (
+      "excluded" in objects_to_register &&
+      objects_to_register.excluded.length > 0
+    ) {
       for (const [id, object] of Object.entries(
-        this.root_module.data.objects
+        this.root_module.data.world.objects
       )) {
-        if (mam_data.excluded.includes(id)) continue;
+        if (objects_to_register.excluded.includes(id)) continue;
         try {
           throw_if.cannot_be_am(object);
           throw_if.is_taken(object);
           mam.objects_list.push(id);
-        } catch (e) {}
+        } catch (e) {
+          if (this.config.debug) logger.debug(e, e.stack);
+        }
       }
     } else {
       for (const [id, object] of Object.entries(
-        this.root_module.data.objects
+        this.root_module.data.world.objects
       )) {
         try {
           throw_if.cannot_be_am(object);
           throw_if.is_taken(object);
           mam.objects_list.push(id);
-        } catch (e) {}
+        } catch (e) {
+          if (this.config.debug) logger.debug(e, e.stack);
+        }
       }
     }
 

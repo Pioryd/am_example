@@ -11,7 +11,7 @@ const logger = create_logger({
 
 const parse_packet = {
   accept_connection: function (connection, received_data, managers) {
-    const { login, password, mam_data } = received_data;
+    const { login, password, objects_to_register } = received_data;
     const { config } = managers.world_server;
 
     if (
@@ -29,35 +29,39 @@ const parse_packet = {
       return false;
     }
 
-    const { objects_list } = managers.mam_register.register(
-      mam_data,
+    const mam = managers.mam_register.register(
+      objects_to_register,
       connection.get_id()
-    ).mam;
+    );
 
     connection.on_close = (connection) => {
       managers.mam_register.unregister(connection.get_id());
     };
 
     managers.world_server.send(connection.get_id(), "accept_connection", {
-      objects_list
+      objects_list: mam.objects_list
     });
 
     return true;
   },
   data_mirror: function (connection, received_data, managers) {
-    const { object_id } = received_data;
-
-    const mirror = this.root_module.data.world;
-
     managers.world_server.send(connection.get_id(), "data_mirror", {
-      object_id,
-      mirror
+      mirror: managers.world_server.root_module.data.world
     });
   },
   process_api: function (connection, received_data, managers) {
     const { object_id, api, timeout, args } = received_data;
 
-    managers.api_loader.process({ object_id, api, timeout, args });
+    managers.api_loader.process(
+      { object_id, api, timeout, args },
+      ({ script_id, query_id, value }) => {
+        managers.world_server.send(connection, "process_api", {
+          script_id,
+          query_id,
+          value
+        });
+      }
+    );
   }
 };
 
@@ -68,6 +72,10 @@ class WorldServer extends Managers.server {
 
   send(connection_id, packet_id, packet_data) {
     super.send(connection_id, "root", { packet_id, packet_data });
+  }
+
+  poll() {
+    if (this.root_module.managers.world_creator.created) super.poll();
   }
 }
 

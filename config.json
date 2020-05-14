@@ -132,10 +132,12 @@
           }
         },
         "world_creator": {
-          "force_create": false
+          "force_create": true
         },
         "api_loader": {},
-        "mam_register": {},
+        "mam_register": {
+          "debug": false
+        },
         "world_server": {
           "login": "World",
           "password": "123",

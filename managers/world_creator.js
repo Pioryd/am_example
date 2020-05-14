@@ -3,6 +3,7 @@ const { create_logger } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
+const _ = require(path.join(global.node_modules_path, "lodash"));
 
 const logger = create_logger({
   module_name: "module_world",
@@ -32,19 +33,26 @@ class WorldCreator {
   }
 
   _create() {
-    this._load_async();
-    if (!this.__is_loaded() || this.created) return;
+    this.__load_async();
+    if (!this._is_loaded() || this.created) return;
 
-    this._check_objects_locations();
+    this.__create_objects_from_types();
+    this.__check_objects_locations();
     this.created = true;
     logger.info("World creator: created.");
   }
 
-  _load_async() {
+  _is_loaded() {
+    for (const data_info of Object.values(this.data_to_load))
+      if (!data_info.loaded) return false;
+    return true;
+  }
+
+  __load_async() {
     const { managers } = this.root_module;
 
     if (
-      this.__is_loaded() ||
+      this._is_loaded() ||
       this.loading === true ||
       !managers.editor.is_connected() ||
       !managers.backup.restored
@@ -72,18 +80,28 @@ class WorldCreator {
     }
   }
 
-  _check_objects_locations() {
+  __create_objects_from_types() {
+    const merge_with_type = (object, type_id) => {
+      if (type_id === "") return object;
+      const type = this.root_module.data.world.types[type_id];
+      object = _.merge(
+        { data: type.data, properties: type.properties },
+        object
+      );
+      return merge_with_type(object, type.extends);
+    };
+
+    const world_objects = this.root_module.data.world.objects;
+    for (const [id, object] of Object.entries(world_objects))
+      world_objects[id] = merge_with_type(object, object.type);
+  }
+
+  __check_objects_locations() {
     for (const object of Object.values(this.root_module.data.world.objects)) {
       if (object.area === "") continue;
       const area = this.root_module.data.world[object.area];
       if (area == null || !area.properties.includes("area")) object.area = "";
     }
-  }
-
-  __is_loaded() {
-    for (const data_info of Object.values(this.data_to_load))
-      if (!data_info.loaded) return false;
-    return true;
   }
 }
 

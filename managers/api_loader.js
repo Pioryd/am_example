@@ -50,16 +50,19 @@ class ApiLoader {
     }
   }
 
-  process({ object_id, api, timeout, args }) {
+  process({ object_id, api, timeout, args }, callback) {
     try {
       let api_to_process = null;
       eval(`api_to_process = this.api_map.${api}`);
-      api_to_process({
-        root_module: this.root_module,
-        object_id,
-        timeout,
-        args
-      });
+      api_to_process(
+        {
+          root_module: this.root_module,
+          object_id,
+          timeout,
+          args
+        },
+        callback
+      );
     } catch (e) {
       logger.error(
         `Unable to process api. Error: ${e.message}. Data ${JSON.stringify(

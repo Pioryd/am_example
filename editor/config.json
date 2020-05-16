@@ -1,0 +1,138 @@
+{
+  "managers_rel_name": "managers",
+  "node_modules_rel_path": "node_modules",
+  "close_app_delay": 5000,
+  "modules": {
+    "module_editor": {
+      "managers_map": {
+        "admin_server": {
+          "login": "editor",
+          "password": "123",
+          "options": {
+            "port": 3104,
+            "packet_timeout": 0
+          },
+          "socket_io_options": {}
+        },
+        "editor": {
+          "data_config": {
+            "type": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_creator"
+              },
+              "actions": ["data", "update"],
+              "init": { "id": "", "extends": "", "data": {}, "properties": [] },
+              "validate": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "extends": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object"
+                  },
+                  "properties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": ["id"],
+                "additionalProperties": false
+              }
+            },
+            "object": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_creator"
+              },
+              "actions": ["data", "update"],
+              "init": {
+                "id": "",
+                "type": "",
+                "data": {},
+                "properties": [],
+                "area": ""
+              },
+              "validate": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "type": "object"
+                  },
+                  "properties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "area": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id"],
+                "additionalProperties": false
+              }
+            },
+            "am_form": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_program": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_system": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            },
+            "am_script": {
+              "db_data": {
+                "url": "mongodb://127.0.0.1:27017",
+                "name": "world_am_data"
+              }
+            }
+          }
+        },
+        "backup": {
+          "url": "mongodb://127.0.0.1:27017",
+          "name": "editor_backup",
+          "interval": 3,
+          "archive_limit": 3,
+          "list": []
+        },
+        "admin_scripts": {
+          "url": "mongodb://127.0.0.1:27017",
+          "name": "admin_scripts",
+          "scripts_rel_name": "scripts",
+          "auto_run_scripts": [
+            {
+              "id": "net_msg",
+              "args": ["module_editor", "admin_server", "false"]
+            }
+          ]
+        }
+      },
+      "managers_order": {
+        "initialize": ["editor", "admin_scripts", "admin_server", "backup"],
+        "terminate": ["admin_scripts", "admin_server", "editor", "backup"],
+        "poll": ["admin_scripts", "admin_server", "editor", "backup"]
+      }
+    }
+  }
+}

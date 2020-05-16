@@ -1,5 +1,5 @@
 {
-  "name": "am_app_mam",
+  "name": "mam",
   "version": "0.0.1",
   "description": "MAM - Manager of Artificial Minds",
   "engines": {
@@ -26,13 +26,5 @@
   "scripts": {
     "test": "mocha ./test/**/*.js",
     "start": "node index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Pioryd/am_app_mam.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Pioryd/am_app_mam/issues"
-  },
-  "homepage": "https://github.com/Pioryd/am_app_mam#readme"
+  }
 }

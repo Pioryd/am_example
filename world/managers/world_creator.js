@@ -10,10 +10,12 @@ const logger = create_logger({
   file_name: __filename
 });
 
+const DEFAULT_CONFIG = { force_create: false };
+
 class WorldCreator {
   constructor({ root_module, config }) {
     this.root_module = root_module;
-    this.config = config;
+    this.config = _.merge(DEFAULT_CONFIG, config);
 
     this.created = false;
     this.loading = false;

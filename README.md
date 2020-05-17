@@ -1,3 +1,17 @@
-# Artificial Mind - Example
+# Artificial Mind - Example project
 
-## More informations at [Artificial Mind](https://www.artificialmind.dev/)
+## Include Apps
+
+- [Editor](editor/README.md)
+- [MAM](mam/README.md)
+- [World](world/README.md)
+
+## Additional use
+
+- [Web Client](https://github.com/Pioryd/am_web_client)
+
+## Based on
+
+- [AM Framework](https://github.com/Pioryd/am_framework)
+
+## More informations at [Artificial Mind](https://pioryd.github.io/)

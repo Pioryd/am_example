@@ -57,7 +57,7 @@ class AM_Root {
       root.ext.object_id = id;
 
       root.install_data_getter(() => {
-        return this.root_module.data.objects[id];
+        return this.root_module.data.mirror.objects[id].data;
       });
       root.install_api(
         ({ root, fn_full_name, script_id, query_id, timeout, args }) => {

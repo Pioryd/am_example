@@ -1,5 +1,5 @@
 const path = require("path");
-const { AM } = require(path.join(global.node_modules_path, "am_framework"));
+const { AML } = require(path.join(global.node_modules_path, "am_framework"));
 
 class AM_Data {
   constructor({ root_module }) {
@@ -70,7 +70,7 @@ class AM_Data {
           const script = this.am_source.scripts[script_id];
           if (script == null)
             throw new Error(`Not found script[${script_id}].`);
-          am_data.scripts[script_id] = AM.AML.parse(script.source);
+          am_data.scripts[script_id] = AML.Script.parse(script.source);
         }
       }
     }

@@ -1,5 +1,5 @@
 const path = require("path");
-const { AM, create_logger, Stopwatch } = require(path.join(
+const { AML, create_logger, Stopwatch } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
@@ -53,7 +53,7 @@ class AM_Root {
     const { am_source } = this.root_module.managers.am_data;
 
     for (const id of this.root_module.data.objects_list) {
-      const root = new AM.Root();
+      const root = new AML.Root();
       root.ext.object_id = id;
 
       root.install_data_getter(() => {
@@ -73,7 +73,7 @@ class AM_Root {
       const parsed_scripts = {};
 
       for (const script of Object.values(am_source.scripts))
-        parsed_scripts[script.id] = AM.AML.parse(script.id, script.source);
+        parsed_scripts[script.id] = AML.Script.parse(script.id, script.source);
       root.install_scripts(parsed_scripts);
 
       root.install_forms(am_source.forms);

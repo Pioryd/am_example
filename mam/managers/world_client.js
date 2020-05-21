@@ -10,23 +10,24 @@ const logger = create_logger({
 });
 
 const parse_packets = {
-  accept_connection: (data, managers) => {
+  accept_connection(data, managers) {
     const { objects_list } = data;
     managers.world_client.root_module.data.objects_list = objects_list;
 
     managers.world_client.send("data_mirror", {});
   },
-  data_mirror: (data, managers) => {
+  data_mirror(data, managers) {
     const { mirror } = data;
     managers.world_client.root_module.data.mirror = mirror;
   },
-  process_api: (data, managers) => {
+  process_api(data, managers) {
     const { script_id, query_id, value } = data;
     managers.am_root.process_return_value({ script_id, query_id, value });
   }
 };
+
 const ParsePacket = {
-  root: (data, managers) => {
+  root(data, managers) {
     const { packet_id, packet_data } = data;
     parse_packets[packet_id](packet_data, managers);
   }

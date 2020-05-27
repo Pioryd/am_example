@@ -131,6 +131,7 @@
             }
           }
         },
+        "world_program": {},
         "world_creator": {
           "force_create": true
         },
@@ -152,6 +153,7 @@
         "initialize": [
           "editor",
           "world_creator",
+          "world_program",
           "api_loader",
           "mam_register",
           "admin_scripts",
@@ -164,6 +166,7 @@
           "admin_server",
           "world_server",
           "world_creator",
+          "world_program",
           "editor",
           "api_loader",
           "mam_register",
@@ -177,6 +180,7 @@
           "editor",
           "world_server",
           "world_creator",
+          "world_program",
           "backup"
         ]
       }

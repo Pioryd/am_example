@@ -40,6 +40,7 @@ class WorldCreator {
 
     this.__create_objects_from_types();
     this.__check_objects_locations();
+    this.root_module.managers.world_program.run();
     this.created = true;
     logger.info("World creator: created.");
   }

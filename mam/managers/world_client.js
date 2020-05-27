@@ -22,7 +22,7 @@ const parse_packets = {
   },
   process_api(data, managers) {
     const { script_id, query_id, value } = data;
-    managers.am_root.process_return_value({ script_id, query_id, value });
+    managers.aml_roots.process_return_value({ script_id, query_id, value });
   }
 };
 

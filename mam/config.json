@@ -36,7 +36,7 @@
             }
           ]
         },
-        "am_root": {
+        "aml_roots": {
           "process_delay": 500,
           "process_debug": true
         },
@@ -151,8 +151,7 @@
       "managers_order": {
         "initialize": [
           "editor",
-          "am_root",
-          "am_data",
+          "aml_roots",
           "admin_scripts",
           "admin_server",
           "world_client",
@@ -163,17 +162,15 @@
           "admin_scripts",
           "admin_server",
           "world_client",
-          "am_root",
-          "am_data",
+          "aml_roots",
           "backup"
         ],
         "poll": [
           "editor",
           "admin_scripts",
           "admin_server",
-          "am_root",
+          "aml_roots",
           "world_client",
-          "am_data",
           "backup"
         ]
       }

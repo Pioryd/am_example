@@ -19,6 +19,7 @@ const parse_packets = {
   data_mirror(data, managers) {
     const { mirror } = data;
     managers.world_client.root_module.data.mirror = mirror;
+    managers.world_client.send("data_mirror", {});
   },
   process_api(data, managers) {
     const { script_id, query_id, value } = data;

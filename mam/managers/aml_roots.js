@@ -168,7 +168,7 @@ class AML_Roots {
               let source =
                 type !== "script"
                   ? object
-                  : AML.script_to_json(id, object.source);
+                  : AML.script_to_json(object.id, object.source);
 
               this.aml_source[type][source.id] = source;
             }

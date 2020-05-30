@@ -26,16 +26,6 @@
 </tr>
 
 <tr>
-<td>am_data</td>
-<td>
-none
-</td>
-<td>
-  - load AM data on initialize.
-</td>
-</tr>
-
-<tr>
 <td>aml_roots</td>
 <td>
 <pre lang="json">

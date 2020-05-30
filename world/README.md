@@ -63,6 +63,18 @@
 </tr>
 
 <tr>
+<td>world_program</td>
+<td>
+<pre lang="json">
+{}
+</pre>
+</td>
+<td>
+- manage all world mechanics.
+</td>
+</tr>
+
+<tr>
 <td>world server</td>
 <td>
 extends am_framework.Managers.server

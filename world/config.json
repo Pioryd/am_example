@@ -41,7 +41,7 @@
             "type": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "world_creator"
+                "name": "tutorial_1"
               },
               "actions": ["data", "update"],
               "init": { "id": "", "extends": "", "data": {}, "properties": [] },
@@ -70,7 +70,7 @@
             "object": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "world_creator"
+                "name": "tutorial_1"
               },
               "actions": ["data", "update"],
               "init": {
@@ -108,25 +108,25 @@
             "am_form": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "world_am_data"
+                "name": "tutorial_1"
               }
             },
             "am_program": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "world_am_data"
+                "name": "tutorial_1"
               }
             },
             "am_system": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "world_am_data"
+                "name": "tutorial_1"
               }
             },
             "am_script": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "world_am_data"
+                "name": "tutorial_1"
               }
             }
           }
@@ -135,7 +135,7 @@
         "world_creator": {
           "force_create": true
         },
-        "api_loader": {},
+        "api_loader": { "api_folder": "../tutorial_data/01/api" },
         "mam_register": {
           "debug": false
         },

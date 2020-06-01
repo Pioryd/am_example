@@ -1,21 +1,12 @@
 const path = require("path");
-const { create_logger, AML } = require(path.join(
-  global.node_modules_path,
-  "am_framework"
-));
-const _ = require(path.join(global.node_modules_path, "lodash"));
+const { AML } = require(path.join(global.node_modules_path, "am_framework"));
 
-const logger = create_logger({
-  module_name: "module_world",
-  file_name: __filename
-});
-
-const events = {
+module.exports = {
   init: {
     interval: 0,
     fn: (root_module) => {
-      root_module.managers.world_program.data.events.init.aml_data = {};
-      const aml_data = root_module.managers.world_program.data.events.init;
+      root_module.data.events.world.init.data.aml_data = {};
+      const aml_data = root_module.data.events.world.init.data;
       const data_names_list = ["system", "program", "form", "script"];
 
       for (const data_name of data_names_list) {
@@ -68,33 +59,3 @@ const events = {
     }
   }
 };
-
-const DEFAULT_CONFIG = {};
-
-class WorldProgram {
-  constructor({ root_module, config }) {
-    this.root_module = root_module;
-    this.config = _.merge(DEFAULT_CONFIG, config);
-
-    this.data = { events: {} };
-  }
-
-  initialize() {}
-
-  terminate() {}
-
-  poll() {}
-
-  run() {
-    for (const [name, event] of Object.entries(events)) {
-      this.data.events[name] = {};
-      if (event.interval === 0) event.fn(this.root_module);
-      else
-        setInterval(() => {
-          event.fn(this.root_module);
-        }, event.interval);
-    }
-  }
-}
-
-module.exports = WorldProgram;

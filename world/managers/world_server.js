@@ -52,16 +52,35 @@ const parse_packet = {
   process_api: function (connection, received_data, managers) {
     const { object_id, api, timeout, args } = received_data;
 
-    managers.api_loader.process(
-      { object_id, api, timeout, args },
-      ({ script_id, query_id, value }) => {
-        managers.world_server.send(connection, "process_api", {
-          script_id,
-          query_id,
-          value
-        });
-      }
-    );
+    try {
+      let api_to_process = null;
+      eval(
+        `api_to_process = managers.world_server.root_module.data.api.${api}`
+      );
+      api_to_process(
+        {
+          root_module: managers.world_server.root_module,
+          object_id,
+          timeout,
+          args
+        },
+        ({ script_id, query_id, value }) => {
+          managers.world_server.send(connection, "process_api", {
+            script_id,
+            query_id,
+            value
+          });
+        }
+      );
+    } catch (e) {
+      logger.error(
+        `Unable to process api. Error: ${e.message}. Data ${JSON.stringify(
+          { object_id, api, timeout, args },
+          null,
+          2
+        )}`
+      );
+    }
   }
 };
 

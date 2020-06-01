@@ -15,7 +15,7 @@
 - backup
 - admin_scripts
 - editor
-  
+
 ## Additional managers
 
 <table>
@@ -23,19 +23,6 @@
   <th>Name</th>
   <th>Config(default)</th>
   <th>Description</th>
-</tr>
-
-<tr>
-<td>api_loader</td>
-<td>
-<pre lang="json">
-"api_folder": "api"
-</pre>
-</td>
-<td>
-  - load API on initialize.<br>
-  - process API.
-</td>
 </tr>
 
 <tr>
@@ -58,19 +45,9 @@
 </pre>
 </td>
 <td>
-- load or create world at initialize.
-</td>
-</tr>
-
-<tr>
-<td>world_program</td>
-<td>
-<pre lang="json">
-{}
-</pre>
-</td>
-<td>
-- manage all world mechanics.
+- load or create world at initialize.<br>
+- load API on initialize.<br>
+- load events on initialize.
 </td>
 </tr>
 
@@ -88,6 +65,6 @@ extends am_framework.Managers.server
 
 ## Configure world
 
-To configure world login to [Editor](../editor/README.md) from [Web Client]([../editor/README.md](https://github.com/Pioryd/am_web_client))
+To configure world login to [Editor](../editor/README.md) from [Web Client](<[../editor/README.md](https://github.com/Pioryd/am_web_client)>)
 
 ## More informations at [Artificial Mind](https://pioryd.github.io/)

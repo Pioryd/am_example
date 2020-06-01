@@ -131,11 +131,11 @@
             }
           }
         },
-        "world_program": {},
         "world_creator": {
-          "force_create": true
+          "force_create": true,
+          "api_folder": "../tutorial_data/01/api",
+          "events_folder": "../tutorial_data/01/events"
         },
-        "api_loader": { "api_folder": "../tutorial_data/01/api" },
         "mam_register": {
           "debug": false
         },
@@ -153,8 +153,6 @@
         "initialize": [
           "editor",
           "world_creator",
-          "world_program",
-          "api_loader",
           "mam_register",
           "admin_scripts",
           "admin_server",
@@ -166,21 +164,17 @@
           "admin_server",
           "world_server",
           "world_creator",
-          "world_program",
           "editor",
-          "api_loader",
           "mam_register",
           "backup"
         ],
         "poll": [
           "admin_scripts",
           "admin_server",
-          "api_loader",
           "mam_register",
           "editor",
           "world_server",
           "world_creator",
-          "world_program",
           "backup"
         ]
       }

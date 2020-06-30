@@ -76,6 +76,12 @@
                     "items": {
                       "type": "string"
                     }
+                  },
+                  "signals": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 },
                 "required": ["id"],
@@ -107,6 +113,12 @@
                     "type": "object"
                   },
                   "properties": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "signals": {
                     "type": "array",
                     "items": {
                       "type": "string"

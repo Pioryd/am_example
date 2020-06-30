@@ -95,7 +95,7 @@
                 "additionalProperties": false
               }
             },
-            "am_form": {
+            "am_module": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
                 "name": "tutorial_1"

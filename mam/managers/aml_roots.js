@@ -20,7 +20,7 @@ class AML_Roots {
     this.last_mirror = {};
     this.root_map = {};
 
-    this.aml_source = { system: {}, program: {}, form: {}, script: {} };
+    this.aml_source = { system: {}, program: {}, module: {}, script: {} };
 
     this.queue_last_id = "";
 
@@ -135,7 +135,7 @@ class AML_Roots {
               this.queue_last_id = signal.id;
 
               if (
-                ["root", "system", "program", "form", "script"].includes(
+                ["root", "system", "program", "module", "script"].includes(
                   signal.key
                 )
               ) {

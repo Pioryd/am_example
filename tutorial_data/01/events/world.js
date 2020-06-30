@@ -7,7 +7,7 @@ module.exports = {
     fn: (root_module) => {
       root_module.data.events.world.init.data.aml_data = {};
       const aml_data = root_module.data.events.world.init.data;
-      const data_names_list = ["system", "program", "form", "script"];
+      const data_names_list = ["system", "program", "module", "script"];
 
       for (const data_name of data_names_list) {
         root_module.managers.editor.get_data(

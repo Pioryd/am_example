@@ -152,7 +152,7 @@ class WorldCreator {
         { data: type.data, properties: type.properties },
         object
       );
-      return merge_with_type(object, type.extends);
+      return JSON.parse(JSON.stringify(merge_with_type(object, type.extends)));
     };
 
     const world_objects = this.root_module.data.world.objects;
@@ -163,8 +163,9 @@ class WorldCreator {
   __check_objects_locations() {
     for (const object of Object.values(this.root_module.data.world.objects)) {
       if (object.area === "") continue;
-      const area = this.root_module.data.world[object.area];
-      if (area == null || !area.properties.includes("area")) object.area = "";
+      const area_object = this.root_module.data.world.objects[object.area];
+      if (area_object == null || !area_object.properties.includes("area"))
+        object.area = "";
     }
   }
 }

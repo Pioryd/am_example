@@ -62,10 +62,11 @@ class AML_Roots {
 
       root.options.debug_enabled = this.config.process_debug;
       root.install_process_api(
-        ({ root, fn_full_name, script_id, query_id, timeout, args }) => {
+        ({ root, fn_full_name, aml, query_id, timeout, args }) => {
           this.root_module.managers.world_client.send("process_api", {
             object_id: root.ext.object_id,
             api: fn_full_name,
+            aml,
             timeout,
             args
           });
@@ -197,9 +198,9 @@ class AML_Roots {
     }
   }
 
-  process_return_value({ script_id, query_id, value }) {
+  process_return_value(data) {
     for (const root of Object.values(this.root_map))
-      root.return_data.insert({ script_id, query_id, value });
+      root.return_data.insert(data);
   }
 
   _check_ready() {

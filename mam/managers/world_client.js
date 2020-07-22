@@ -22,8 +22,7 @@ const parse_packets = {
     managers.world_client.send("data_mirror", {});
   },
   process_api(data, managers) {
-    const { script_id, query_id, value } = data;
-    managers.aml_roots.process_return_value({ script_id, query_id, value });
+    managers.aml_roots.process_return_value(data);
   }
 };
 

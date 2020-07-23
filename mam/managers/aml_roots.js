@@ -46,6 +46,7 @@ class AML_Roots {
     if (this.process_delay_stopwatch.is_elapsed()) {
       this.emit_data();
       for (const root of Object.values(this.root_map)) root.process();
+
       this.process_delay_stopwatch.reset();
     }
   }
@@ -89,26 +90,6 @@ class AML_Roots {
   }
 
   emit_data() {
-    const handle_aml_signal = (root, signal) => {
-      if (signal.key === "root") {
-        const type = "system";
-        root.source_ids = signal.value;
-        this.get_aml_source_async(
-          { type, id: Object.values(root.source_ids.system)[0] },
-          (source) => {
-            root.update(type, source);
-          }
-        );
-      } else {
-        const type = signal.key;
-        const id = signal.value;
-
-        this.get_aml_source_async({ type, id }, (source) => {
-          root.update(type, source);
-        });
-      }
-    };
-
     if (
       this.last_mirror === this.root_module.data.mirror ||
       this.root_module.data.mirror == null
@@ -118,36 +99,14 @@ class AML_Roots {
     this.last_mirror = this.root_module.data.mirror;
 
     for (const [id, object] of Object.entries(this.last_mirror.objects)) {
+      if (!object.properties.includes("am")) continue;
+
       for (const [signal_id, signal_data] of Object.entries(object.data)) {
         try {
           const root = this.root_map[id];
+          if (root == null) throw new Error(`Not found root id[${id}]`);
 
-          if (signal_id === "queue") {
-            let start_queue_index = 0;
-            for (let i = 0; i < signal_data.length; i++) {
-              if (signal_data[i].id === this.queue_last_id) {
-                start_queue_index = Math.min(i + 1, signal_data.length);
-                break;
-              }
-            }
-
-            for (let i = start_queue_index; i < signal_data.length; i++) {
-              const signal = signal_data[i];
-              this.queue_last_id = signal.id;
-
-              if (
-                ["root", "system", "program", "module", "script"].includes(
-                  signal.key
-                )
-              ) {
-                handle_aml_signal(root, signal);
-              } else {
-                logger.error(`Unknown queue_signal id[${signal.id}]`);
-              }
-            }
-          } else {
-            root.emit(signal_id, signal_data);
-          }
+          root.emit(signal_id, signal_data);
         } catch (e) {
           logger.error(
             `Unable to handle signal id[${signal_id}]. \n${e}\n${e.stack}`
@@ -157,45 +116,39 @@ class AML_Roots {
     }
   }
 
-  get_aml_source_async({ type, id }, callback) {
-    const refresh_all_aml_source_async = (type, callback) => {
-      this.root_module.managers.editor.get_data(
-        `am_${type}`,
-        (objects_list, message) => {
-          try {
-            if (objects_list == null || objects_list.length === 0) return;
-
-            for (const object of objects_list) {
-              let source =
-                type !== "script"
-                  ? object
-                  : AML.script_to_json(object.id, object.source);
-
-              this.aml_source[type][source.id] = source;
-            }
-
-            callback();
-          } catch (e) {
-            logger.error(`Unable to get data [am_${type}]. \n${e}\n${e.stack}`);
-          }
-        }
-      );
-    };
-
-    if (this.aml_source[type] == null || this.aml_source[type][id] == null) {
-      refresh_all_aml_source_async(type, () => {
+  /**
+   * Return first found source that matching the pattern .
+   */
+  get_aml_source_async({ type, id, name }, callback) {
+    this.root_module.managers.editor.get_data(
+      `am_${type}`,
+      (objects_list, message) => {
         try {
-          callback(this.aml_source[type][id]);
+          if (objects_list == null || objects_list.length === 0) return;
+
+          for (const object of objects_list) {
+            let source =
+              type !== "script"
+                ? object
+                : AML.script_to_json(object.id, object.source);
+
+            if (Array.isArray(id)) {
+              if (id.includes(object.id) && source.name === name) {
+                callback(source);
+                return;
+              }
+            } else {
+              if (object.id === id && (name == null || source.name === name)) {
+                callback(source);
+                return;
+              }
+            }
+          }
         } catch (e) {
-          logger.error(
-            `Unable to get data [am_${type}] type[${type}] id[${id}].` +
-              `\n${e.stack}`
-          );
+          logger.error(`Unable to get data [am_${type}]. \n${e}\n${e.stack}`);
         }
-      });
-    } else {
-      callback(this.aml_source[type][id]);
-    }
+      }
+    );
   }
 
   process_return_value(data) {
@@ -206,7 +159,6 @@ class AML_Roots {
   _check_ready() {
     if (
       this.root_module.managers.editor.is_connected() &&
-      "objects_list" in this.root_module.data &&
       "objects_list" in this.root_module.data &&
       "mirror" in this.root_module.data &&
       this.last_mirror !== this.root_module.data.mirror

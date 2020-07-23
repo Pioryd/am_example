@@ -145,12 +145,12 @@
         },
         "world_creator": {
           "force_create": true,
-          "api_folder": "../tutorial_data/01/api",
-          "events_folder": "../tutorial_data/01/events"
+          "world_module": "../tutorial_data/butler/world"
         },
         "mam_register": {
           "debug": false
         },
+        "ai": { "ai_modules_folder": "../tutorial_data/butler/ai_modules" },
         "world_server": {
           "login": "World",
           "password": "123",
@@ -167,11 +167,13 @@
           "world_creator",
           "mam_register",
           "admin_scripts",
+          "ai",
           "admin_server",
           "world_server",
           "backup"
         ],
         "terminate": [
+          "ai",
           "admin_scripts",
           "admin_server",
           "world_server",
@@ -182,6 +184,7 @@
         ],
         "poll": [
           "admin_scripts",
+          "ai",
           "admin_server",
           "mam_register",
           "editor",

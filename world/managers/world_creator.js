@@ -1,5 +1,6 @@
 const path = require("path");
 const fs = require("fs");
+const { exit } = require("process");
 const { create_logger, Util } = require(path.join(
   global.node_modules_path,
   "am_framework"
@@ -8,13 +9,12 @@ const _ = require(path.join(global.node_modules_path, "lodash"));
 
 const logger = create_logger({
   module_name: "module_world",
-  file_name: __filename
+  file_name: __filename,
+  world_module: "world"
 });
 
 const DEFAULT_CONFIG = {
-  force_create: false,
-  api_folder: "api",
-  events_folder: "api"
+  force_create: false
 };
 
 class WorldCreator {
@@ -40,8 +40,7 @@ class WorldCreator {
   }
 
   _create() {
-    this.__load_api();
-    this.__load_events();
+    this.__load_world();
     this.__load_async();
     if (!this._is_loaded() || this.created) return;
 
@@ -58,46 +57,23 @@ class WorldCreator {
     return true;
   }
 
-  __load_api() {
+  __load_world() {
     this.root_module.data.api = {};
 
-    const folder_full_name = path.join(
+    const world_module_full_name = path.join(
       this.root_module.application.root_full_name,
-      this.config.api_folder
+      this.config.world_module
     );
 
-    if (folder_full_name != null && fs.existsSync(folder_full_name)) {
-      for (const file of Util.get_files(folder_full_name)) {
-        const file_name_without_extension = file
-          .split(".")
-          .slice(0, -1)
-          .join(".");
-        this.root_module.data.api[
-          file_name_without_extension
-        ] = require(path.join(folder_full_name, file));
-      }
-    }
-  }
+    if (
+      world_module_full_name == null ||
+      !fs.existsSync(world_module_full_name)
+    )
+      throw new Error(`Not found world folder[${world_module_full_name}]`);
 
-  __load_events() {
-    this.root_module.data.events = {};
-
-    const folder_full_name = path.join(
-      this.root_module.application.root_full_name,
-      this.config.events_folder
-    );
-
-    if (folder_full_name != null && fs.existsSync(folder_full_name)) {
-      for (const file of Util.get_files(folder_full_name)) {
-        const file_name_without_extension = file
-          .split(".")
-          .slice(0, -1)
-          .join(".");
-        this.root_module.data.events[
-          file_name_without_extension
-        ] = require(path.join(folder_full_name, file));
-      }
-    }
+    const { api, events } = require(world_module_full_name);
+    this.root_module.data.api = api;
+    this.root_module.data.events = events;
   }
 
   __load_async() {
@@ -133,14 +109,10 @@ class WorldCreator {
   }
 
   __run_events() {
-    for (const [namespace, events_map] of Object.entries(
-      this.root_module.data.events
-    )) {
-      for (const [name, event] of Object.entries(events_map)) {
-        this.root_module.data.events[namespace][name].data = {};
-        if (event.interval === 0) event.fn(this.root_module);
-        else setInterval(() => event.fn(this.root_module), event.interval);
-      }
+    for (const [name, event] of Object.entries(this.root_module.data.events)) {
+      this.root_module.data.events[name].data = {};
+      if (event.interval === 0) event.fn(this.root_module);
+      else setInterval(() => event.fn(this.root_module), event.interval);
     }
   }
 
@@ -156,8 +128,11 @@ class WorldCreator {
     };
 
     const world_objects = this.root_module.data.world.objects;
-    for (const [id, object] of Object.entries(world_objects))
+    for (const [id, object] of Object.entries(world_objects)) {
       world_objects[id] = merge_with_type(object, object.type);
+      if (world_objects[id].properties.includes("am"))
+        this.root_module.managers.ai.add_object(id);
+    }
   }
 
   __check_objects_locations() {

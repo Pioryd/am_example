@@ -46,6 +46,7 @@ class MAM_Register {
       }
     };
 
+    if (objects_to_register == null) return;
     if (connection_id in this.mam_map)
       throw new Error(`Mam with id[${connection_id}] is already registered.`);
 

@@ -75,26 +75,54 @@ class AI {
     delete this.objects_ai[id];
   }
 
-  process_api({ api, aml, object_id, timeout, args }) {
+  process_ai_api({ api, aml, object_id, data }) {
     try {
       this.objects_ai[object_id][aml.system][aml.program][
         aml.module
-      ]._ext_push(null, { api, object_id, timeout, ...args });
+      ].process_api(api, data);
     } catch (e) {
       logger.error(
         "Unable to process api. " +
           JSON.stringify(
             {
+              api,
               aml,
               object_id,
-              timeout,
-              args
+              data
             },
             null,
             2
-          )
+          ) +
+          `${e}`
       );
     }
+  }
+
+  process_world_api(object_id, api, data) {
+    this.root_module.data.api[api](this.root_module, object_id, data);
+
+    const { area } = this.root_module.data.world.objects[object_id];
+    this.root_module.data.world.actions.push({
+      time: new Date().toUTCString(),
+      area,
+      object_id,
+      api,
+      data: JSON.stringify(data, null, 2)
+    });
+  }
+
+  process_world_data({ object_id, data }) {
+    this.__for_each_module(
+      ({ object_ai_id, program_id, module_id, module }) => {
+        if (object_id === object_ai_id) {
+          const module_name = this.source.modules[module_id].name;
+          if ("world" in this.connections[program_id][module_name])
+            module._ext_push("world", null, data);
+
+          return;
+        }
+      }
+    );
   }
 
   _load_ai_classes() {
@@ -252,7 +280,9 @@ class AI {
               this.__get_data_async("module", module_id, (object) => {
                 if (!action.is_active()) return;
 
-                const ai_module = new this._ai_modules_classes[object.ai]();
+                const ai_module = new this._ai_modules_classes[object.ai]({
+                  mirror: this.root_module.data.world.objects[object_id]
+                });
                 this.objects_ai[object_id][system_id][program_id][
                   module_id
                 ] = ai_module;
@@ -299,11 +329,11 @@ class AI {
           for (const [from_socket_name, from_socket_data] of Object.entries(
             from_module_data
           )) {
+            if (from_socket_name === "world") continue;
+
             for (const [to_module_name, to_sockets_list] of Object.entries(
               from_socket_data
             )) {
-              if (to_module_name === "world") continue;
-
               for (const to_socket_name of to_sockets_list) {
                 add_mirrors({
                   program_id,
@@ -386,63 +416,76 @@ class AI {
 
   _queue_ai_modules() {
     const process = (
-      { object_id, program_id, program_data, module_id },
-      data
+      { object_ai_id, program_id, program_data, module_id },
+      packet
     ) => {
-      const get_module_by_name = (name) => {
-        for (const module of Object.values(program_data))
-          if (module.get_name() == name) return module;
-      };
-      const for_each_module_socket = (socket_data, callback) => {
-        for (const [module_name, sockets_list] of Object.entries(socket_data))
-          for (const socket_name of sockets_list)
-            callback(module_name, socket_name);
-      };
+      const process_modules_sockets = () => {
+        const get_module_by_name = (name) => {
+          for (const module of Object.values(program_data))
+            if (module.get_name() == name) return module;
+        };
 
-      const from_module_name = this.source.modules[module_id].name;
-      let socket_data = null;
-      try {
-        socket_data = this.connections[program_id][from_module_name][
-          data.socket
-        ];
-      } catch (e) {
-        logger.error(
-          `Unable to find found socket from data[${JSON.stringify({
-            program_id,
-            from_module_name,
-            socket: data.socket
-          })}] Connections[${JSON.stringify(this.connections, null, 2)}]. ${e}`
-        );
-        return;
-      }
+        const from_module_name = this.source.modules[module_id].name;
 
-      for_each_module_socket(socket_data, (to_module_name, to_socket) => {
-        if (to_module_name === "world") {
-          this.root_module.data.api[data.api](this.root_module, {
-            object_id,
-            args: data
-          });
-        } else {
-          const to_module = get_module_by_name(to_module_name);
-          if (to_module == null)
-            throw new Error(`Not found module[${to_module}]`);
-          to_module.push(to_socket, { ...data });
+        let socket_data = null;
+        try {
+          socket_data = this.connections[program_id][from_module_name][
+            packet.socket
+          ];
+          if (socket_data == null) throw new Error();
+        } catch (e) {
+          logger.error(
+            `Unable to find found socket from data[${JSON.stringify({
+              program_id,
+              from_module_name,
+              socket: packet.socket
+            })}] Connections[${JSON.stringify(
+              this.connections,
+              null,
+              2
+            )}]. ${e}`
+          );
+          return;
         }
-      });
+
+        for (const [module_name, sockets_list] of Object.entries(socket_data))
+          for (const socket_name of sockets_list) {
+            const to_module = get_module_by_name(module_name);
+            if (to_module == null)
+              throw new Error(`Not found module[${to_module}]`);
+            if (!to_module.sockets.includes(socket_name))
+              throw new Error(
+                `Module[${to_module}] do NOT have socket[${socket_name}]`
+              );
+            to_module.push(socket_name, packet.api, packet.data);
+          }
+      };
+
+      if (packet.socket === "world") {
+        this.process_world_api(object_ai_id, packet.api, packet.data);
+      } else {
+        process_modules_sockets();
+      }
     };
 
     this.__for_each_module((args) => {
       const { module } = args;
-      let data = module._ext_pop();
-      while (data != null) {
-        process(args, data);
-        data = module._ext_pop();
+      let packet = module._ext_pop();
+      while (packet != null) {
+        process(args, packet);
+        packet = module._ext_pop();
       }
     });
   }
 
   _poll_ai_modules() {
-    this.__for_each_module(({ module }) => module.poll());
+    this.__for_each_module(({ module_id, module }) => {
+      try {
+        module.poll();
+      } catch (e) {
+        logger.error(`Unable to poll module[${module_id}]. ${e}. ${e.stack}`);
+      }
+    });
   }
 
   __for_each_system(callback) {

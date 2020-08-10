@@ -1,6 +1,5 @@
 const path = require("path");
 const fs = require("fs");
-const { exit } = require("process");
 const { create_logger, Util } = require(path.join(
   global.node_modules_path,
   "am_framework"
@@ -95,6 +94,8 @@ class WorldCreator {
     }
 
     this.root_module.data["world"] = {};
+
+    this.root_module.data.world.actions = [];
 
     for (const [data_name, data_info] of Object.entries(this.data_to_load)) {
       this.root_module.data.world[data_info.data_name] = {};

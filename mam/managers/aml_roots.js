@@ -104,7 +104,10 @@ class AML_Roots {
       for (const [signal_id, signal_data] of Object.entries(object.data)) {
         try {
           const root = this.root_map[id];
-          if (root == null) throw new Error(`Not found root id[${id}]`);
+          if (root == null)
+            throw new Error(
+              `Not found root id[${id}]. Roots[${Object.keys(this.root_map)}]`
+            );
 
           root.emit(signal_id, signal_data);
         } catch (e) {

@@ -57,8 +57,6 @@ class WorldCreator {
   }
 
   __load_world() {
-    this.root_module.data.api = {};
-
     const world_module_full_name = path.join(
       this.root_module.application.root_full_name,
       this.config.world_module
@@ -70,9 +68,11 @@ class WorldCreator {
     )
       throw new Error(`Not found world folder[${world_module_full_name}]`);
 
-    const { api, events } = require(world_module_full_name);
+    const { api, fn, validate, events } = require(world_module_full_name);
     this.root_module.data.api = api;
+    this.root_module.data.fn = fn;
     this.root_module.data.events = events;
+    this.root_module.data.validate = validate;
   }
 
   __load_async() {

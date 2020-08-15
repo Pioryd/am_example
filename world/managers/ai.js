@@ -4,6 +4,7 @@ const { create_logger, Util, Action } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
+const Ajv = require(path.join(global.node_modules_path, "ajv"));
 const _ = require(path.join(global.node_modules_path, "lodash"));
 
 const logger = create_logger({
@@ -77,6 +78,8 @@ class AI {
 
   process_ai_api({ api, aml, object_id, data }) {
     try {
+      this._validate(data);
+
       this.objects_ai[object_id][aml.system][aml.program][
         aml.module
       ].process_api(api, data);
@@ -99,6 +102,12 @@ class AI {
   }
 
   process_world_api(object_id, api, data) {
+    try {
+      this._validate(data);
+    } catch (e) {
+      logger.error(e, `Data[${JSON.stringify(data, null, 2)}]`, e.stack);
+    }
+
     this.root_module.data.api[api](this.root_module, object_id, data);
 
     const { area } = this.root_module.data.world.objects[object_id];
@@ -111,7 +120,22 @@ class AI {
     });
   }
 
+  process_world_fn(fn, data) {
+    try {
+      this._validate(data);
+      this.root_module.data.world.fn[fn](this.root_module, data);
+    } catch (e) {
+      logger.error(e, `Data[${JSON.stringify(data, null, 2)}]`, e.stack);
+    }
+  }
+
   process_world_data({ object_id, data }) {
+    try {
+      this._validate(data);
+    } catch (e) {
+      logger.error(e, `Data[${JSON.stringify(data, null, 2)}]`, e.stack);
+    }
+
     this.__for_each_module(
       ({ object_ai_id, program_id, module_id, module }) => {
         if (object_id === object_ai_id) {
@@ -281,7 +305,8 @@ class AI {
                 if (!action.is_active()) return;
 
                 const ai_module = new this._ai_modules_classes[object.ai]({
-                  mirror: this.root_module.data.world.objects[object_id]
+                  mirror: this.root_module.data.world.objects[object_id],
+                  process_world_fn: this.process_world_fn
                 });
                 this.objects_ai[object_id][system_id][program_id][
                   module_id
@@ -486,6 +511,30 @@ class AI {
         logger.error(`Unable to poll module[${module_id}]. ${e}. ${e.stack}`);
       }
     });
+  }
+
+  _validate(data) {
+    const validate_object = (object) => {
+      const rule = this.root_module.data.validate;
+      const ajv = new Ajv({ allErrors: true });
+      const validate = ajv.compile(rule);
+      const valid = validate(object);
+      if (!valid)
+        throw new Error(
+          `Object[${JSON.stringify(object, null, 2)}]\n` +
+            `Data[${JSON.stringify(data, null, 2)}]\n` +
+            `AJV[${ajv.errorsText(validate.errors)}]`
+        );
+    };
+    const get_object_data = (object) => {
+      const { data } = object;
+      if (data != null) {
+        validate_object(object);
+        get_object_data(data);
+      }
+    };
+
+    get_object_data(data);
   }
 
   __for_each_system(callback) {

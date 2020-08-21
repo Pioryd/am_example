@@ -32,7 +32,7 @@ const DEFAULT_CONFIG = {
  *    {
  *      from_module_1: {
  *        from_socket_1: {
- *          to_module_2: ["to_socket_1", ...],
+ *          to_module_2: "to_socket_1",
  *          ...
  *        },
  *        ...
@@ -356,18 +356,16 @@ class AI {
           )) {
             if (from_socket_name === "world") continue;
 
-            for (const [to_module_name, to_sockets_list] of Object.entries(
+            for (const [to_module_name, to_socket_name] of Object.entries(
               from_socket_data
             )) {
-              for (const to_socket_name of to_sockets_list) {
-                add_mirrors({
-                  program_id,
-                  from_module_name,
-                  to_module_name,
-                  from_socket_name,
-                  to_socket_name
-                });
-              }
+              add_mirrors({
+                program_id,
+                from_module_name,
+                to_module_name,
+                from_socket_name,
+                to_socket_name
+              });
             }
           }
         }

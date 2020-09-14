@@ -116,7 +116,7 @@ class AI {
       area,
       object_id,
       api,
-      data: JSON.stringify(data, null, 2)
+      data
     });
   }
 

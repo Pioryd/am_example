@@ -1,10 +1,10 @@
 const fs = require("fs");
 const path = require("path");
+const EventEmitter = require("events");
 const { create_logger, Util, Action } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
-const Ajv = require(path.join(global.node_modules_path, "ajv"));
 const _ = require(path.join(global.node_modules_path, "lodash"));
 
 const logger = create_logger({
@@ -33,6 +33,7 @@ const DEFAULT_CONFIG = {
  */
 class AI {
   constructor({ root_module, config }) {
+    this.event_emitter = new EventEmitter();
     this.root_module = root_module;
     this.config = _.merge(DEFAULT_CONFIG, config);
 
@@ -48,11 +49,13 @@ class AI {
     this._load_ai_classes();
   }
 
-  terminate() {}
+  terminate() {
+    this.event_emitter.emit("module_terminate");
+  }
 
   poll() {
     this._update_ai_modules();
-    this._poll_ai_modules();
+    this.event_emitter.emit("module_poll");
   }
 
   add_object(id) {
@@ -65,24 +68,13 @@ class AI {
 
   process_ai_api({ api, aml, object_id, data }) {
     try {
-      this._validate(data);
-
       this.objects_ai[object_id][aml.system][aml.program][
         aml.module
       ].process_api(api, data);
     } catch (e) {
       logger.error(
         "Unable to process api. " +
-          JSON.stringify(
-            {
-              api,
-              aml,
-              object_id,
-              data
-            },
-            null,
-            2
-          ) +
+          JSON.stringify({ api, aml, object_id, data }, null, 2) +
           `${e}`
       );
     }
@@ -90,30 +82,14 @@ class AI {
 
   process_world_api(object_id, api, data) {
     try {
-      this._validate(data);
+      this.root_module.data.api[api](this.root_module, object_id, data);
     } catch (e) {
       logger.error(e, `Data[${JSON.stringify(data, null, 2)}]`, e.stack);
     }
-
-    this.root_module.data.api[api](this.root_module, object_id, data);
-
     const { area } = this.root_module.data.world.objects[object_id];
-    this.root_module.data.world.actions.push({
-      time: new Date().toUTCString(),
-      area,
-      object_id,
-      api,
-      data
-    });
-  }
-
-  process_world_fn(fn, data) {
-    try {
-      this._validate(data);
-      this.root_module.data.world.fn[fn](this.root_module, data);
-    } catch (e) {
-      logger.error(e, `Data[${JSON.stringify(data, null, 2)}]`, e.stack);
-    }
+    const time = new Date().toUTCString();
+    const { actions } = this.root_module.data.world;
+    actions.push({ time, area, object_id, api, data });
   }
 
   _load_ai_classes() {
@@ -153,7 +129,7 @@ class AI {
             for (const module of Object.values(
               object_ai[system_id][program_id]
             ))
-              module.terminate();
+              this.event_emitter.emit("module_terminate", module);
           }
         };
 
@@ -272,20 +248,20 @@ class AI {
                 if (!action.is_active()) return;
 
                 const ai_module = new this._ai_modules_classes[object.ai]({
+                  event_emitter: this.event_emitter,
                   mirror: this.root_module.data.world.objects[object_id],
-                  process_world_fn: this.process_world_fn
+                  process_world_api: this.process_world_api
                 });
                 this.objects_ai[object_id][system_id][program_id][
                   module_id
                 ] = ai_module;
-                ai_module.initialize();
-
                 this.source.modules[module_id] = object;
 
                 check_action();
               });
             }
           }
+          this.event_emitter.emit("module_initialize");
           check_action();
         };
 
@@ -348,40 +324,6 @@ class AI {
         stop: (action) => (main_action.data.updated.modules = true)
       }
     });
-  }
-
-  _poll_ai_modules() {
-    this.__for_each_module(({ module_id, module }) => {
-      try {
-        module.poll();
-      } catch (e) {
-        logger.error(`Unable to poll module[${module_id}]. ${e}. ${e.stack}`);
-      }
-    });
-  }
-
-  _validate(data) {
-    const validate_object = (object) => {
-      const rule = this.root_module.data.validate;
-      const ajv = new Ajv({ allErrors: true });
-      const validate = ajv.compile(rule);
-      const valid = validate(object);
-      if (!valid)
-        throw new Error(
-          `Object[${JSON.stringify(object, null, 2)}]\n` +
-            `Data[${JSON.stringify(data, null, 2)}]\n` +
-            `AJV[${ajv.errorsText(validate.errors)}]`
-        );
-    };
-    const get_object_data = (object) => {
-      const { data } = object;
-      if (data != null) {
-        validate_object(object);
-        get_object_data(data);
-      }
-    };
-
-    get_object_data(data);
   }
 
   __for_each_system(callback) {

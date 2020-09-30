@@ -54,10 +54,10 @@ const parse_packet = {
     });
   },
   process_api: function (connection, received_data, managers) {
-    const { object_id, aml, api, args } = received_data;
+    const { object_id, modules, api, args } = received_data;
 
-    if (aml != null) {
-      managers.ai.process_ai_api({ api, aml, object_id, data: args });
+    if (modules != null) {
+      managers.ai.process_ai_api({ api, modules, object_id, data: args });
     } else {
       managers.ai.process_world_api(object_id, api, args);
     }

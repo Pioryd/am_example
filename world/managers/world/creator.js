@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const { create_logger, Util } = require(path.join(
+const { create_logger } = require(path.join(
   global.node_modules_path,
   "am_framework"
 ));
@@ -12,14 +12,10 @@ const logger = create_logger({
   world_module: "world"
 });
 
-const DEFAULT_CONFIG = {
-  force_create: false
-};
-
-class WorldCreator {
+class Creator {
   constructor({ root_module, config }) {
     this.root_module = root_module;
-    this.config = _.merge(DEFAULT_CONFIG, config);
+    this.config = config;
 
     this.created = false;
     this.loading = false;
@@ -30,15 +26,7 @@ class WorldCreator {
     };
   }
 
-  initialize() {}
-
-  terminate() {}
-
-  poll() {
-    if (!this.created) this._create();
-  }
-
-  _create() {
+  create() {
     this.__load_world();
     this.__load_async();
     if (!this._is_loaded() || this.created) return;
@@ -146,4 +134,4 @@ class WorldCreator {
   }
 }
 
-module.exports = WorldCreator;
+module.exports = Creator;

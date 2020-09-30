@@ -54,13 +54,17 @@ const parse_packet = {
     });
   },
   process_api: function (connection, received_data, managers) {
-    const { object_id, modules, api, args } = received_data;
+    const { object_id, module, api, data } = received_data;
 
-    if (modules != null) {
-      managers.ai.process_ai_api({ api, modules, object_id, data: args });
+    if (module_name != null) {
+      managers.ai.process_ai_api({ object_id, module, api, data });
     } else {
-      managers.ai.process_world_api(object_id, api, args);
+      managers.world.process_api(object_id, api, data);
     }
+  },
+  update_modules: function (connection, received_data, managers) {
+    const { object_id, modules } = received_data;
+    managers.ai.update_ai_modules(object_id, modules);
   }
 };
 

@@ -41,14 +41,19 @@ class AI {
   }
 
   add_object(id) {
+    if (this.objects_ai[id] != null) return;
     this.objects_ai[id] = {};
   }
 
   remove_object(id) {
+    if (this.objects_ai[id] == null) return;
+    for (const module of Object.values(this.objects_ai[id]))
+      this.event_emitter.emit("module_terminate", module);
+
     delete this.objects_ai[id];
   }
 
-  process_ai_api({ api, module_name, object_id, data }) {
+  process_ai_api({ object_id, module_name, api, data }) {
     try {
       this.objects_ai[object_id][module_name][api](data);
     } catch (e) {
@@ -60,7 +65,7 @@ class AI {
     }
   }
 
-  update_ai_modules() {
+  update_ai_modules(object_id, modules) {
     const remove_not_actual_modules = (object_id, modules_names) => {
       for (const module_name of Object.keys(this.objects_ai[object_id])) {
         if (!modules_names.includes(module_name)) {
@@ -77,32 +82,15 @@ class AI {
 
         const ai_module = new this._ai_modules_classes[module_name]({
           event_emitter: this.event_emitter,
-          get_property: (name) =>
-            this.root_module.data.world.objects[object_id].properties[name],
-          process_world_api: (object_id, api, data) => {
-            this.root_module.data.api[api](this.root_module, object_id, data);
-            this._add_action(object_id, api, data);
-          }
+          world: this.root_module.managers.world
         });
         this.objects_ai[object_id][module_name] = ai_module;
         this.event_emitter.emit("module_initialize", ai_module);
       }
     };
 
-    for (const object_id of Object.keys(this.objects_ai)) {
-      const { modules } = this.root_module.data.world.objects[object_id].data;
-      if (modules == null) return;
-
-      remove_not_actual_modules(object_id, modules);
-      add_missing_modules(program_id);
-    }
-  }
-
-  _add_action(object_id, api, data) {
-    const { area } = this.root_module.data.world.objects[object_id];
-    const time = new Date().toUTCString();
-    const { actions } = this.root_module.data.world;
-    actions.push({ time, area, object_id, api, data });
+    remove_not_actual_modules(object_id, modules);
+    add_missing_modules(object_id, modules);
   }
 
   _load_ai_classes() {

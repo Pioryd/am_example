@@ -143,7 +143,7 @@
             }
           }
         },
-        "world_creator": {
+        "world": {
           "force_create": true,
           "world_module": "../tutorial_data/butler/world"
         },
@@ -164,7 +164,7 @@
       "managers_order": {
         "initialize": [
           "editor",
-          "world_creator",
+          "world",
           "mam_register",
           "admin_scripts",
           "ai",
@@ -177,7 +177,7 @@
           "admin_scripts",
           "admin_server",
           "world_server",
-          "world_creator",
+          "world",
           "editor",
           "mam_register",
           "backup"
@@ -189,7 +189,7 @@
           "mam_register",
           "editor",
           "world_server",
-          "world_creator",
+          "world",
           "backup"
         ]
       }

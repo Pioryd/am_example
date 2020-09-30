@@ -28,17 +28,6 @@ const DEFAULT_CONFIG = {
  *      }}
  *    }
  *
- *  connections format example:
- *    {
- *      from_module_1: {
- *        from_socket_1: {
- *          to_module_2: "to_socket_1",
- *          ...
- *        },
- *        ...
- *      },
- *      ...
- *    }
  *  NOTE:
  *    'world' as "to_module..." is reserved for world api".
  */
@@ -51,7 +40,6 @@ class AI {
 
     this._ai_modules_classes = {};
     this.objects_ai = {};
-    this.connections = {};
 
     this.source = { system: {}, programs: {}, modules: {} };
   }
@@ -64,7 +52,6 @@ class AI {
 
   poll() {
     this._update_ai_modules();
-    this._queue_ai_modules();
     this._poll_ai_modules();
   }
 
@@ -127,26 +114,6 @@ class AI {
     } catch (e) {
       logger.error(e, `Data[${JSON.stringify(data, null, 2)}]`, e.stack);
     }
-  }
-
-  process_world_data({ object_id, data }) {
-    try {
-      this._validate(data);
-    } catch (e) {
-      logger.error(e, `Data[${JSON.stringify(data, null, 2)}]`, e.stack);
-    }
-
-    this.__for_each_module(
-      ({ object_ai_id, program_id, module_id, module }) => {
-        if (object_id === object_ai_id) {
-          const module_name = this.source.modules[module_id].name;
-          if ("world" in this.connections[program_id][module_name])
-            module._ext_push("world", null, data);
-
-          return;
-        }
-      }
-    );
   }
 
   _load_ai_classes() {
@@ -331,57 +298,6 @@ class AI {
         }
       }
     };
-    const update_connections = () => {
-      const add_mirror_connections = ({ program_id, program_data }) => {
-        const add_mirrors = (
-          program_id,
-          from_module,
-          to_module,
-          from_socket,
-          to_socket
-        ) => {
-          const to_module_data = this.connections[program_id][to_module];
-          if (!(to_socket in to_module_data)) to_module_data[to_socket] = {};
-          if (!(from_module in to_module_data[to_socket]))
-            to_module_data[to_socket][from_module] = [];
-          if (!to_module_data[to_socket][from_module].includes(from_socket))
-            to_module_data[to_socket][from_module].push(from_socket);
-        };
-
-        for (const [from_module_name, from_module_data] of Object.entries(
-          this.connections[program_id]
-        )) {
-          for (const [from_socket_name, from_socket_data] of Object.entries(
-            from_module_data
-          )) {
-            if (from_socket_name === "world") continue;
-
-            for (const [to_module_name, to_socket_name] of Object.entries(
-              from_socket_data
-            )) {
-              add_mirrors({
-                program_id,
-                from_module_name,
-                to_module_name,
-                from_socket_name,
-                to_socket_name
-              });
-            }
-          }
-        }
-      };
-      this.connections = {};
-
-      this.__for_each_program((args) => {
-        const program_source = this.source.programs[args.program_id];
-        if (program_source == null) {
-          logger.error(`Not found source of program[${args.program_id}]`);
-          return;
-        }
-        this.connections[args.program_id] = program_source.connections;
-        add_mirror_connections(args);
-      });
-    };
 
     const main_action = this.root_action.create({
       uid: "update_all",
@@ -401,9 +317,6 @@ class AI {
           action.data.updated.system &&
           action.data.updated.programs &&
           action.data.updated.modules
-      },
-      events: {
-        stop: (action) => update_connections()
       }
     });
     if (main_action == null) return;
@@ -433,70 +346,6 @@ class AI {
       events: {
         start: (action) => update_modules(action),
         stop: (action) => (main_action.data.updated.modules = true)
-      }
-    });
-  }
-
-  _queue_ai_modules() {
-    const process = (
-      { object_ai_id, program_id, program_data, module_id },
-      packet
-    ) => {
-      const process_modules_sockets = () => {
-        const get_module_by_name = (name) => {
-          for (const module of Object.values(program_data))
-            if (module.get_name() == name) return module;
-        };
-
-        const from_module_name = this.source.modules[module_id].name;
-
-        let socket_data = null;
-        try {
-          socket_data = this.connections[program_id][from_module_name][
-            packet.socket
-          ];
-          if (socket_data == null) throw new Error();
-        } catch (e) {
-          logger.error(
-            `Unable to find found socket from data[${JSON.stringify({
-              program_id,
-              from_module_name,
-              socket: packet.socket
-            })}] Connections[${JSON.stringify(
-              this.connections,
-              null,
-              2
-            )}]. ${e}`
-          );
-          return;
-        }
-
-        for (const [module_name, sockets_list] of Object.entries(socket_data))
-          for (const socket_name of sockets_list) {
-            const to_module = get_module_by_name(module_name);
-            if (to_module == null)
-              throw new Error(`Not found module[${to_module}]`);
-            if (!to_module.sockets.includes(socket_name))
-              throw new Error(
-                `Module[${to_module}] do NOT have socket[${socket_name}]`
-              );
-            to_module.push(socket_name, packet.api, packet.data);
-          }
-      };
-
-      if (packet.socket === "world") {
-        this.process_world_api(object_ai_id, packet.api, packet.data);
-      } else {
-        process_modules_sockets();
-      }
-    };
-
-    this.__for_each_module((args) => {
-      const { module } = args;
-      let packet = module._ext_pop();
-      while (packet != null) {
-        process(args, packet);
-        packet = module._ext_pop();
       }
     });
   }

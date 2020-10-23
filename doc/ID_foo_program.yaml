@@ -1,0 +1,9 @@
+id: ID_foo_program
+name: foo_program
+rules:
+  - triggers:
+      - program_initialize: { value: foo_program }
+    actions:
+      - module_initialize: { value: foo_module }
+modules:
+  - foo_module

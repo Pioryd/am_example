@@ -1,0 +1,8 @@
+id: ID_foo_module
+name: foo_module
+rules:
+  - triggers:
+      - val1: { min: 70, max: 100 }
+      - module_initialize: { value: foo_module }
+    actions:
+      - script_initialize: { value: foo_script }

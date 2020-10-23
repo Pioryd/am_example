@@ -1,0 +1,7 @@
+id: ID_foo_object
+data:
+  aml:
+    program: ID_foo_program
+    modules: { foo_module: ID_foo_module }
+    scripts: { foo_script: ID_foo_script }
+  val1: 1

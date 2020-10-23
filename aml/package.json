@@ -1,7 +1,7 @@
 {
-  "name": "mam",
+  "name": "aml",
   "version": "0.0.1",
-  "description": "MAM - Manager of Artificial Minds",
+  "description": "AML - Artificial mind language",
   "engines": {
     "node": ">=6"
   },

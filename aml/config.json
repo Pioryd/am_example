@@ -3,16 +3,38 @@
   "node_modules_rel_path": "node_modules",
   "close_app_delay": 5000,
   "modules": {
-    "module_editor": {
+    "module_aml": {
       "managers_map": {
         "core_admin_server": {
-          "login": "editor",
+          "login": "AML",
           "password": "123",
           "options": {
-            "port": 3104,
+            "port": 3106,
             "packet_timeout": 0
           },
           "socket_io_options": {}
+        },
+        "core_backup": {
+          "url": "mongodb://127.0.0.1:27017",
+          "name": "aml_backup",
+          "interval": 3,
+          "archive_limit": 3,
+          "list": []
+        },
+        "core_admin_scripts": {
+          "url": "mongodb://127.0.0.1:27017",
+          "name": "core_admin_scripts",
+          "scripts_rel_name": "scripts",
+          "auto_run_scripts": [
+            {
+              "id": "net_msg",
+              "args": ["module_aml", "core_admin_server", "false"]
+            },
+            {
+              "id": "net_msg",
+              "args": ["module_aml", "world_client", "false"]
+            }
+          ]
         },
         "core_editor": {
           "data_config": {
@@ -55,45 +77,49 @@
             }
           }
         },
-        "core_backup": {
-          "url": "mongodb://127.0.0.1:27017",
-          "name": "editor_backup",
-          "interval": 3,
-          "archive_limit": 3,
-          "list": []
+        "roots": {
+          "process_delay": 500,
+          "process_debug": true
         },
-        "core_admin_scripts": {
-          "url": "mongodb://127.0.0.1:27017",
-          "name": "core_admin_scripts",
-          "scripts_rel_name": "scripts",
-          "auto_run_scripts": [
-            {
-              "id": "net_msg",
-              "args": ["module_editor", "core_admin_server", "false"]
-            }
-          ]
+        "world_client": {
+          "login": "World",
+          "password": "123",
+          "options": {
+            "url": "http://localhost:3103",
+            "packet_timeout": 0,
+            "send_delay": 1000
+          },
+          "socket_io_options": {},
+          "objects_to_register": {}
         }
       },
       "managers_order": {
         "initialize": [
           "core_editor",
+          "roots",
           "core_admin_scripts",
           "core_admin_server",
+          "world_client",
           "core_backup"
         ],
         "terminate": [
+          "core_editor",
           "core_admin_scripts",
           "core_admin_server",
-          "core_editor",
+          "world_client",
+          "roots",
           "core_backup"
         ],
         "poll": [
+          "core_editor",
           "core_admin_scripts",
           "core_admin_server",
-          "core_editor",
+          "roots",
+          "world_client",
           "core_backup"
         ]
-      }
+      },
+      "managers_blacklist": ["core_backup"]
     }
   }
 }

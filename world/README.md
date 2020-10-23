@@ -3,18 +3,21 @@
 ## Install and run
 
 - install MongoDB
+- install [AM Framework](https://github.com/Pioryd/am_framework)
 - configure config.json
 - ```powershell
+  npm link am_framework
   npm install
   npm start
   ```
 
 ## Used managers of [AM Framework](https://github.com/Pioryd/am_framework)
 
-- admin_server
-- backup
-- admin_scripts
-- editor
+- core_admin_server
+- core_backup
+- core_admin_scripts
+- core_ai
+- core_editor
 
 ## Additional managers
 
@@ -26,19 +29,19 @@
 </tr>
 
 <tr>
-<td>mam_register</td>
+<td>aml</td>
 <td>
 <pre lang="json">
 "debug": false
 </pre>
 </td>
 <td>
-  - register/unregister mam
+  - register/unregister
 </td>
 </tr>
 
 <tr>
-<td>world_creator</td>
+<td>world</td>
 <td>
 <pre lang="json">
 "force_create": false
@@ -46,13 +49,11 @@
 </td>
 <td>
 - load or create world at initialize.<br>
-- load API on initialize.<br>
-- load events on initialize.
 </td>
 </tr>
 
 <tr>
-<td>world server</td>
+<td>server</td>
 <td>
 extends am_framework.Managers.server
 </td>
@@ -62,9 +63,5 @@ extends am_framework.Managers.server
 </tr>
 
 </table>
-
-## Configure world
-
-To configure world login to [Editor](../editor/README.md) from [Web Client](<[../editor/README.md](https://github.com/Pioryd/am_web_client)>)
 
 ## More informations at [Artificial Mind](https://pioryd.github.io/)

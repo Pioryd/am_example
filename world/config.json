@@ -1,11 +1,11 @@
 {
-  "managers_rel_name": "managers",
+  "managers_rel_names": ["managers"],
   "node_modules_rel_path": "node_modules",
   "close_app_delay": 5000,
   "modules": {
     "module_world": {
       "managers_map": {
-        "admin_server": {
+        "core_admin_server": {
           "login": "World",
           "password": "123",
           "options": {
@@ -14,144 +14,79 @@
           },
           "socket_io_options": {}
         },
-        "backup": {
+        "core_backup": {
           "url": "mongodb://127.0.0.1:27017",
-          "name": "world_backup",
+          "name": "world_core_backup",
           "interval": 3,
           "archive_limit": 3,
           "list": []
         },
-        "admin_scripts": {
+        "core_admin_scripts": {
           "url": "mongodb://127.0.0.1:27017",
-          "name": "admin_scripts",
+          "name": "core_admin_scripts",
           "scripts_rel_name": "scripts",
           "auto_run_scripts": [
             {
               "id": "net_msg",
-              "args": ["module_world", "admin_server", "false"]
+              "args": ["module_world", "core_admin_server", "false"]
             },
             {
               "id": "net_msg",
-              "args": ["module_world", "world_server", "false"]
+              "args": ["module_world", "server", "false"]
             }
           ]
         },
-        "editor": {
+        "core_editor": {
           "data_config": {
-            "type": {
-              "db_data": {
-                "url": "mongodb://127.0.0.1:27017",
-                "name": "tutorial_1"
-              },
-              "actions": ["data", "update"],
-              "init": { "id": "", "extends": "", "data": {}, "properties": [] },
-              "validate": {
-                "properties": {
-                  "id": {
-                    "type": "string"
-                  },
-                  "extends": {
-                    "type": "string"
-                  },
-                  "data": {
-                    "type": "object"
-                  },
-                  "properties": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "signals": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "required": ["id"],
-                "additionalProperties": false
-              }
-            },
             "object": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "tutorial_1"
+                "name": "example"
               },
               "actions": ["data", "update"],
               "init": {
                 "id": "",
-                "type": "",
-                "data": {},
-                "properties": [],
-                "area": ""
+                "data": {}
               },
               "validate": {
                 "properties": {
-                  "id": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "data": {
-                    "type": "object"
-                  },
-                  "properties": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "signals": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "area": {
-                    "type": "string"
-                  }
+                  "id": { "type": "string" },
+                  "data": { "type": "object" }
                 },
-                "required": ["id"],
+                "required": ["id", "data"],
                 "additionalProperties": false
               }
             },
             "am_module": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "tutorial_1"
+                "name": "example"
               }
             },
             "am_program": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "tutorial_1"
-              }
-            },
-            "am_system": {
-              "db_data": {
-                "url": "mongodb://127.0.0.1:27017",
-                "name": "tutorial_1"
+                "name": "example"
               }
             },
             "am_script": {
               "db_data": {
                 "url": "mongodb://127.0.0.1:27017",
-                "name": "tutorial_1"
+                "name": "example"
               }
             }
           }
         },
+        "core_ai": {
+          "ai_modules_folder": "ai_modules"
+        },
+        "aml": {
+          "debug": true
+        },
         "world": {
-          "force_create": true,
-          "world_module": "../tutorial_data/butler/world"
+          "force_create": true
         },
-        "mam_register": {
-          "debug": false
-        },
-        "ai": { "ai_modules_folder": "../tutorial_data/butler/ai_modules" },
-        "world_server": {
+        "server": {
           "login": "World",
           "password": "123",
           "options": {
@@ -163,34 +98,34 @@
       },
       "managers_order": {
         "initialize": [
-          "editor",
+          "core_editor",
+          "aml",
           "world",
-          "mam_register",
-          "admin_scripts",
-          "ai",
-          "admin_server",
-          "world_server",
-          "backup"
+          "core_admin_scripts",
+          "core_ai",
+          "core_admin_server",
+          "server",
+          "core_backup"
         ],
         "terminate": [
-          "ai",
-          "admin_scripts",
-          "admin_server",
-          "world_server",
+          "aml",
+          "core_ai",
+          "core_admin_scripts",
+          "core_admin_server",
+          "server",
           "world",
-          "editor",
-          "mam_register",
-          "backup"
+          "core_editor",
+          "core_backup"
         ],
         "poll": [
-          "admin_scripts",
-          "ai",
-          "admin_server",
-          "mam_register",
-          "editor",
-          "world_server",
+          "core_admin_scripts",
+          "core_ai",
+          "core_admin_server",
+          "core_editor",
+          "server",
+          "aml",
           "world",
-          "backup"
+          "core_backup"
         ]
       }
     }

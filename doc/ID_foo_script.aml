@@ -1,0 +1,9 @@
+name foo_script
+data val:0
+
+label start
+while 10 === 10
+  js data.val += mirror.val1 + 10
+  api foo val:data.val
+  sleep 2000
+  goto start

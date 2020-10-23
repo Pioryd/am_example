@@ -10,13 +10,16 @@ const logger = create_logger({
   file_name: __filename
 });
 
-const DEFAULT_CONFIG = { debug: false };
-class MAM_Register {
+const DEFAULT_CONFIG = {
+  debug: false
+};
+
+class AML {
   constructor({ root_module, config }) {
     this.root_module = root_module;
     this.config = _.merge(DEFAULT_CONFIG, config);
 
-    this.mam_map = {};
+    this.aml_map = {};
   }
 
   initialize() {}
@@ -31,26 +34,22 @@ class MAM_Register {
         if (object == null)
           throw new Error(`Object[${JSON.stringify(object)}] not found`);
       },
-      cannot_be_am: (object) => {
-        if (!object.properties.includes("am"))
-          throw new Error(`Object[${JSON.stringify(object)}] cannot be AM`);
-      },
       is_taken: (object) => {
-        const mam_id = this._get_mam_id_by_object_id(object.id);
-        if (mam_id != null)
+        const aml_id = this._get_aml_id_by_object_id(object.id);
+        if (aml_id != null)
           throw new Error(
             `Object[${JSON.stringify(
               object
-            )}] is connected to another MAM[${mam_id}]`
+            )}] is connected to another AML[${aml_id}]`
           );
       }
     };
 
     if (objects_to_register == null) return;
-    if (connection_id in this.mam_map)
-      throw new Error(`Mam with id[${connection_id}] is already registered.`);
+    if (connection_id in this.aml_map)
+      throw new Error(`AML with id[${connection_id}] is already registered.`);
 
-    const mam = { objects_list: [] };
+    const objects_list = [];
     if (
       "included" in objects_to_register &&
       objects_to_register.included.length > 0
@@ -59,9 +58,8 @@ class MAM_Register {
         const object = this.root_module.data.world.objects[id];
         try {
           throw_if.not_found(object);
-          throw_if.cannot_be_am(object);
           throw_if.is_taken(object);
-          mam.objects_list.push(id);
+          objects_list.push(id);
         } catch (e) {
           if (this.config.debug) logger.debug(e, e.stack);
         }
@@ -75,9 +73,8 @@ class MAM_Register {
       )) {
         if (objects_to_register.excluded.includes(id)) continue;
         try {
-          throw_if.cannot_be_am(object);
           throw_if.is_taken(object);
-          mam.objects_list.push(id);
+          objects_list.push(id);
         } catch (e) {
           if (this.config.debug) logger.debug(e, e.stack);
         }
@@ -87,32 +84,30 @@ class MAM_Register {
         this.root_module.data.world.objects
       )) {
         try {
-          throw_if.cannot_be_am(object);
           throw_if.is_taken(object);
-          mam.objects_list.push(id);
+          objects_list.push(id);
         } catch (e) {
           if (this.config.debug) logger.debug(e, e.stack);
         }
       }
     }
 
-    this.mam_map[connection_id] = mam;
-
-    return mam;
+    this.aml_map[connection_id] = objects_list;
+    return objects_list;
   }
 
-  unregister(mam_id) {
-    delete this.mam_map[mam_id];
+  unregister(aml_id) {
+    delete this.aml_map[aml_id];
   }
 
   get_connection_id_object_id(object_id) {
-    return this._get_mam_id_by_object_id(object_id);
+    return this._get_aml_id_by_object_id(object_id);
   }
 
-  _get_mam_id_by_object_id(id) {
-    for (const [connection_id, mam] of Object.entries(this.mam_map))
-      if (mam.objects_list.includes(id)) return connection_id;
+  _get_aml_id_by_object_id(id) {
+    for (const [connection_id, objects_list] of Object.entries(this.aml_map))
+      if (objects_list.includes(id)) return connection_id;
   }
 }
 
-module.exports = MAM_Register;
+module.exports = AML;
